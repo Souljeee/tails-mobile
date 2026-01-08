@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tails_mobile/src/core/constant/localization/localization.dart';
-import 'package:tails_mobile/src/feature/home/widget/home_screen.dart';
+import 'package:tails_mobile/src/core/navigation/router.dart';
 import 'package:tails_mobile/src/feature/settings/model/app_theme.dart';
 import 'package:tails_mobile/src/feature/settings/widget/settings_scope.dart';
 
@@ -28,14 +28,14 @@ class MaterialContext extends StatelessWidget {
     final darkTheme = theme.buildThemeData(Brightness.dark);
     final themeMode = theme.themeMode;
 
-    return MaterialApp(
+    return MaterialApp.router(
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: themeMode,
       locale: settings.locale,
       localizationsDelegates: Localization.localizationDelegates,
       supportedLocales: Localization.supportedLocales,
-      home: const HomeScreen(),
+      routerConfig: AppRouter.config,
       builder: (context, child) => MediaQuery(
         key: _globalKey,
         data: mediaQueryData.copyWith(
