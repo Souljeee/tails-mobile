@@ -2,7 +2,6 @@ import 'dart:developer' as dev;
 
 import 'package:tails_mobile/src/core/utils/logger/logger.dart';
 
-
 /// {@template printing_log_observer}
 /// [LogObserver] that prints logs using `dart:developer`.
 /// {@endtemplate}
