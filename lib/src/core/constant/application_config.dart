@@ -1,4 +1,3 @@
-
 import 'package:tails_mobile/src/feature/initialization/model/environment.dart';
 
 /// Application configuration
