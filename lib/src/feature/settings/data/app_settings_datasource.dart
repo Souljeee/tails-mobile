@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tails_mobile/src/core/utils/color_codec.dart';
 import 'package:tails_mobile/src/core/utils/persisted_entry.dart';
 import 'package:tails_mobile/src/feature/settings/data/theme_mode_codec.dart';
 import 'package:tails_mobile/src/feature/settings/model/app_settings.dart';
@@ -92,10 +91,7 @@ class AppSettingsPersistedEntry extends SharedPreferencesEntry<AppSettings> {
     AppTheme? appTheme;
 
     if (themeMode != null && themeSeedColor != null) {
-      appTheme = AppTheme(
-        themeMode: const ThemeModeCodec().decode(themeMode),
-        seed: colorCodec.decode(themeSeedColor),
-      );
+      appTheme = AppTheme(themeMode: const ThemeModeCodec().decode(themeMode));
     }
 
     Locale? appLocale;
@@ -125,10 +121,7 @@ class AppSettingsPersistedEntry extends SharedPreferencesEntry<AppSettings> {
   @override
   Future<void> set(AppSettings value) async {
     if (value.appTheme != null) {
-      await (
-        _themeMode.set(const ThemeModeCodec().encode(value.appTheme!.themeMode)),
-        _themeSeedColor.set(colorCodec.encode(value.appTheme!.seed)),
-      ).wait;
+      await _themeMode.set(const ThemeModeCodec().encode(value.appTheme!.themeMode));
     }
 
     if (value.locale != null) {
