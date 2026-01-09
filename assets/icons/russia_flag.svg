@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 3 2">
+    <!-- White -->
+    <rect x="0" y="0" width="3" height="0.6666667" fill="#FFFFFF"/>
+    <!-- Blue (RGB 0,50,160) -->
+    <rect x="0" y="0.6666667" width="3" height="0.6666667" fill="#0032A0"/>
+    <!-- Red (RGB 218,41,28) -->
+    <rect x="0" y="1.3333334" width="3" height="0.6666667" fill="#DA291C"/>
+  </svg>
+  

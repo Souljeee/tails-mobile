@@ -67,6 +67,9 @@ dependencies:
   flutter_gen: ^5.12.0
   theme_tailor: ^3.1.2
   flutter_svg: ^2.0.17
+  equatable: ^2.0.8
+  mask_text_input_formatter: ^2.9.0
+  smooth_page_indicator: ^2.0.1
 
 dev_dependencies:
   # Testing
@@ -92,6 +95,7 @@ flutter:
   assets:
     # Add assets from the images directory to the application.
     - assets/images/
+    - assets/icons/
 
 flutter_gen:
   output: lib/src/core/ui_kit/generated
