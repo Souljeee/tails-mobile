@@ -52,11 +52,6 @@ jobs:
             fi
           done
 
-      - name: Install DCM
-        uses: CQLabs/setup-dcm@v1.1.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: ✨ Check Formatting
         run: |
           find lib test -name "*.dart" ! -name "*.*.dart" -print0 \
@@ -64,10 +59,6 @@ jobs:
 
       - name: 🕵️ Analyze
         run: flutter analyze .
-      
-      - name: 🕵️ Analyze with DCM
-        # Remove this step if you don't actually use DCM
-        run: dcm analyze .
 
       # ———————————————————————————————————————————————————————
       #   RUN TESTS + COVERAGE
