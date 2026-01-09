@@ -4,7 +4,7 @@ import 'package:tails_mobile/src/core/navigation/routes.dart';
 
 class AppRouter {
   static final RouterConfig<Object> config = GoRouter(
-    initialLocation: const PetsRoute().location,
+    initialLocation: const AuthRoute().location,
     routes: $appRoutes,
   );
 }
