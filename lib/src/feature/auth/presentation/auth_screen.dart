@@ -19,7 +19,7 @@ class AuthScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _OnboardingSlides(),
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
             Expanded(
               child: _LoginForm(),
             ),
@@ -70,66 +70,7 @@ class _OnboardingSlidesState extends State<_OnboardingSlides> {
             physics: const ClampingScrollPhysics(),
             controller: _pageController,
             itemCount: _slides.length,
-            itemBuilder: (context, index) {
-              final currentSlide = _slides[index];
-
-              return ClipRRect(
-                borderRadius: const BorderRadiusGeometry.only(
-                  bottomLeft: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
-                ),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Positioned.fill(
-                      child: Image.asset(
-                        currentSlide.imagePath,
-                        height: MediaQuery.sizeOf(context).height * 0.6,
-                        width: MediaQuery.sizeOf(context).width,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              context.uiColors.white,
-                              Colors.transparent,
-                            ],
-                            stops: const [0.01, 0.7],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 16,
-                      right: 16,
-                      bottom: 40,
-                      child: Column(
-                        children: [
-                          Text(
-                            currentSlide.title,
-                            style: context.uiFonts.header28Semibold
-                                .copyWith(fontWeight: FontWeight.w700),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            currentSlide.subtitle,
-                            style: context.uiFonts.text16Regular
-                                .copyWith(color: context.uiColors.brown),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+            itemBuilder: (context, index) => _Slide(slide: _slides[index]),
           ),
           Positioned(
             left: 0,
@@ -154,6 +95,70 @@ class _OnboardingSlidesState extends State<_OnboardingSlides> {
   }
 }
 
+class _Slide extends StatelessWidget {
+  final SlideUio slide;
+
+  const _Slide({required this.slide});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: const BorderRadiusGeometry.only(
+        bottomLeft: Radius.circular(24),
+        bottomRight: Radius.circular(24),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              slide.imagePath,
+              height: MediaQuery.sizeOf(context).height * 0.6,
+              width: MediaQuery.sizeOf(context).width,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    context.uiColors.white,
+                    Colors.transparent,
+                  ],
+                  stops: const [0.01, 0.7],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 40,
+            child: Column(
+              children: [
+                Text(
+                  slide.title,
+                  style: context.uiFonts.header28Semibold.copyWith(fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  slide.subtitle,
+                  style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.brown),
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LoginForm extends StatefulWidget {
   const _LoginForm();
 
@@ -170,7 +175,6 @@ class _LoginFormState extends State<_LoginForm> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
