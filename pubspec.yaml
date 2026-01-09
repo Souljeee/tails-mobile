@@ -66,6 +66,7 @@ dependencies:
   package_info_plus: ^8.1.0
   flutter_gen: ^5.12.0
   theme_tailor: ^3.1.2
+  flutter_svg: ^2.0.17
 
 dev_dependencies:
   # Testing
@@ -93,8 +94,14 @@ flutter:
     - assets/images/
 
 flutter_gen:
-  output: lib/src/core/constant/generated
-  line_length: 80
+  output: lib/src/core/ui_kit/generated
+  line_length: 100
+  integrations:
+    flutter_svg: true
+  assets:
+    enabled: true
+    outputs:
+      class_name: UiAssets
 
 flutter_launcher_icons:
   #  image_path: "assets/images/icon-128x128.png"
