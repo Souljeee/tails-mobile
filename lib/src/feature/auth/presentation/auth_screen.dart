@@ -207,7 +207,9 @@ class _LoginFormState extends State<_LoginForm> {
             width: double.infinity,
             child: UiButton.main(
               onPressed: () {
-                const EnterCodeRoute().go(context);
+                final phoneNumber = '+7${_numberController.text}';
+
+                EnterCodeRoute(phoneNumber: phoneNumber).push<void>(context);
               },
               icon: Icons.arrow_right_alt,
               label: 'Войти',

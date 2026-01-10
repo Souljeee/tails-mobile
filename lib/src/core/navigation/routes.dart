@@ -106,10 +106,12 @@ class AuthRoute extends GoRouteData with $AuthRoute {
 }
 
 class EnterCodeRoute extends GoRouteData with $EnterCodeRoute {
-  const EnterCodeRoute();
+  final String phoneNumber;
+
+  const EnterCodeRoute({required this.phoneNumber});
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const EnterCodeScreen();
+  Widget build(BuildContext context, GoRouterState state) => EnterCodeScreen(phoneNumber: phoneNumber);
 }
 
 class PetsRoute extends GoRouteData with $PetsRoute {
