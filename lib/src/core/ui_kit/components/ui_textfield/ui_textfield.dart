@@ -53,7 +53,7 @@ class UiTextField extends StatefulWidget {
     this.alwaysShowBorder = false,
     super.key,
   }) : assert(
-          !(isFocusable == false && focusNode != null),
+          !(!isFocusable && focusNode != null),
           'focusNode must be null if focusable = false',
         );
 
@@ -140,7 +140,7 @@ class _UiTextFieldState extends State<UiTextField> {
       states.add(_InputState.error);
     }
 
-    if ((widget.enabled ?? true)) {
+    if (widget.enabled ?? true) {
       states.add(_pressed ? _InputState.pressed : _InputState.static);
     }
 
@@ -216,7 +216,7 @@ class _UiTextFieldState extends State<UiTextField> {
     final themeTypography = context.uiFonts;
     final enabled = widget.enabled ?? true;
 
-    bool hasValidationErrors = _controller.validators.hasValidationMessage(_controller.text);
+    final bool hasValidationErrors = _controller.validators.hasValidationMessage(_controller.text);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

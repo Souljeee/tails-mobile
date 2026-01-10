@@ -93,7 +93,7 @@ class UiButton extends StatelessWidget {
 
   _ButtonColorScheme _getColorScheme(BuildContext context) {
     final colors = context.uiColors;
-    final transparent = Colors.transparent;
+    const  transparent = Colors.transparent;
 
     switch (_type) {
       case UiButtonType.main:
