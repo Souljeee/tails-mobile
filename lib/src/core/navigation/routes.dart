@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tails_mobile/src/core/navigation/scaffold_with_navbar.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_screen.dart';
+import 'package:tails_mobile/src/feature/enter_code/presentation/enter_code_screen.dart';
 
 part 'routes.g.dart';
 
@@ -12,6 +13,10 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
     TypedGoRoute<AuthRoute>(
       path: '/auth',
       name: 'auth',
+    ),
+    TypedGoRoute<EnterCodeRoute>(
+      path: '/enter-code',
+      name: 'enter-code',
     ),
     TypedStatefulShellRoute<HomeShellRoute>(
       branches: [
@@ -98,6 +103,13 @@ class AuthRoute extends GoRouteData with $AuthRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const AuthScreen();
+}
+
+class EnterCodeRoute extends GoRouteData with $EnterCodeRoute {
+  const EnterCodeRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const EnterCodeScreen();
 }
 
 class PetsRoute extends GoRouteData with $PetsRoute {

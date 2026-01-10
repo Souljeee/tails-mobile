@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
@@ -205,7 +206,9 @@ class _LoginFormState extends State<_LoginForm> {
           SizedBox(
             width: double.infinity,
             child: UiButton.main(
-              onPressed: () {},
+              onPressed: () {
+                const EnterCodeRoute().go(context);
+              },
               icon: Icons.arrow_right_alt,
               label: 'Войти',
             ),
