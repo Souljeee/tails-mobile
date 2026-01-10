@@ -16,35 +16,37 @@ class AuthScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         top: false,
-        child: LayoutBuilder(builder: (context, constraints) {
-          /// Вся эта структура необходима, чтобы до секции условиями использования
-          /// был отступ равный всей оставлшейся высоте (аналог Spacer)
-          return SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    children: const [
-                      _OnboardingSlides(),
-                      SizedBox(height: 28),
-                      _LoginForm(),
-                      SizedBox(height: 8),
-                    ],
-                  ),
-                  const Center(
-                    child: _PrivacyTerms(),
-                  ),
-                ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            /// Вся эта структура необходима, чтобы до секции условиями использования
+            /// был отступ равный всей оставлшейся высоте (аналог Spacer)
+            return SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ListView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      children: const [
+                        _OnboardingSlides(),
+                        SizedBox(height: 28),
+                        _LoginForm(),
+                        SizedBox(height: 8),
+                      ],
+                    ),
+                    const Center(
+                      child: _PrivacyTerms(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }),
+            );
+          },
+        ),
       ),
     );
   }
@@ -195,7 +197,7 @@ class _LoginFormState extends State<_LoginForm> {
   void dispose() {
     _numberController.dispose();
     _focusNode.dispose();
-    
+
     super.dispose();
   }
 
@@ -219,7 +221,7 @@ class _LoginFormState extends State<_LoginForm> {
           ),
           const SizedBox(height: 12),
           TapRegion(
-            onTapOutside: (_){
+            onTapOutside: (_) {
               _focusNode.unfocus();
             },
             child: UiTextField(
