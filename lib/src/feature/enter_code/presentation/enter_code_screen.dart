@@ -13,7 +13,9 @@ class EnterCodeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.uiColors.grayMain,
       appBar: AppBar(
+        backgroundColor: context.uiColors.grayMain,
         leading: IconButton(
           onPressed: () {
             Navigator.maybePop(context);
@@ -27,7 +29,7 @@ class EnterCodeScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          //crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 28),
             const _CallIcon(),
@@ -53,6 +55,10 @@ class EnterCodeScreen extends StatelessWidget {
             _EnterCodeField(
               onCompleted: (code) {},
             ),
+            const Spacer(),
+            _RetryTimer(),
+            const SizedBox(height: 12),
+            _RetryButton(onTap: () {}),
           ],
         ),
       ),
@@ -176,6 +182,8 @@ class _EnterCodeFieldState extends State<_EnterCodeField> {
                 keyboardType: TextInputType.number,
                 textInputAction: fieldIndex == 3 ? TextInputAction.done : TextInputAction.next,
                 maxLength: 1,
+                style: context.uiFonts.header20Medium,
+                cursorColor: context.uiColors.orangePrimary,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: context.uiColors.white,
@@ -202,6 +210,58 @@ class _EnterCodeFieldState extends State<_EnterCodeField> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _RetryButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _RetryButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onTap,
+      child: Text(
+        'Перезвонить еще раз',
+        style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.black40),
+      ),
+    );
+  }
+}
+
+class _RetryTimer extends StatelessWidget {
+  const _RetryTimer();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+          color: context.uiColors.white,
+          borderRadius: BorderRadius.circular(36),
+          border: Border.all(color: context.uiColors.brown)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.timer,
+              color: context.uiColors.orangePrimary,
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Text(
+              '0:34',
+              style: context.uiFonts.text16Semibold,
+            ),
+          ],
         ),
       ),
     );
