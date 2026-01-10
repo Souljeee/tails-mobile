@@ -1,0 +1,7 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Хвостики",
+  "enterCodeTitle": "Ввод кода\nподтверждения",
+  "enterCodeSubtitle": "Вам позвонит робот на номер",
+  "callAgain": "Перезвонить еще раз"
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 
 class EnterCodeScreen extends StatelessWidget {
   final String phoneNumber;
@@ -29,19 +30,18 @@ class EnterCodeScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: Column(
-          //crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 28),
             const _CallIcon(),
             const SizedBox(height: 16),
             Text(
-              'Ввод кода\nподтверждения',
+              context.l10n.enterCodeTitle,
               style: context.uiFonts.header28Semibold.copyWith(fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Text(
-              'Вам позвонит робот на номер',
+              context.l10n.enterCodeSubtitle,
               style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.black60),
               textAlign: TextAlign.center,
             ),
@@ -56,7 +56,7 @@ class EnterCodeScreen extends StatelessWidget {
               onCompleted: (code) {},
             ),
             const Spacer(),
-            _RetryTimer(),
+            const _RetryTimer(),
             const SizedBox(height: 12),
             _RetryButton(onTap: () {}),
           ],
@@ -226,7 +226,7 @@ class _RetryButton extends StatelessWidget {
     return TextButton(
       onPressed: onTap,
       child: Text(
-        'Перезвонить еще раз',
+        context.l10n.callAgain,
         style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.black40),
       ),
     );
@@ -240,9 +240,10 @@ class _RetryTimer extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-          color: context.uiColors.white,
-          borderRadius: BorderRadius.circular(36),
-          border: Border.all(color: context.uiColors.brown)),
+        color: context.uiColors.white,
+        borderRadius: BorderRadius.circular(36),
+        border: Border.all(color: context.uiColors.brown),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
