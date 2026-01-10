@@ -13,19 +13,38 @@ class AuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: SafeArea(
         top: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _OnboardingSlides(),
-            SizedBox(height: 28),
-            Expanded(
-              child: _LoginForm(),
+        child: LayoutBuilder(builder: (context, constraints) {
+          /// Вся эта структура необходима, чтобы до секции условиями использования
+          /// был отступ равный всей оставлшейся высоте (аналог Spacer)
+          return SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ListView(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    children: const [
+                      _OnboardingSlides(),
+                      SizedBox(height: 28),
+                      _LoginForm(),
+                      SizedBox(height: 8),
+                    ],
+                  ),
+                  const Center(
+                    child: _PrivacyTerms(),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          );
+        }),
       ),
     );
   }
@@ -170,6 +189,15 @@ class _LoginForm extends StatefulWidget {
 class _LoginFormState extends State<_LoginForm> {
   final String _numberInputMask = '(###)###-##-##';
   final _numberController = UiTextFieldController();
+  final _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _numberController.dispose();
+    _focusNode.dispose();
+    
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -190,17 +218,25 @@ class _LoginFormState extends State<_LoginForm> {
             ),
           ),
           const SizedBox(height: 12),
-          UiTextField(
-            controller: _numberController,
-            inputMask: _numberInputMask,
-            inputFilter: {'#': RegExp('[0-9]')},
-            inputTextStyle: context.uiFonts.header20Medium,
-            fillColor: context.uiColors.white,
-            placeholderText: '(999)000-00-00',
-            alwaysShowBorder: true,
-            placeholderStyle: context.uiFonts.header20Medium
-                .copyWith(color: context.uiColors.brown.withValues(alpha: 0.5)),
-            trailingIcon: const _CountryCode(),
+          TapRegion(
+            onTapOutside: (_){
+              _focusNode.unfocus();
+            },
+            child: UiTextField(
+              focusNode: _focusNode,
+              controller: _numberController,
+              inputMask: _numberInputMask,
+              inputFilter: {'#': RegExp('[0-9]')},
+              inputTextStyle: context.uiFonts.header20Medium,
+              fillColor: context.uiColors.white,
+              placeholderText: '(999)000-00-00',
+              alwaysShowBorder: true,
+              keyboardType: TextInputType.phone,
+              textInputAction: TextInputAction.done,
+              placeholderStyle: context.uiFonts.header20Medium
+                  .copyWith(color: context.uiColors.brown.withValues(alpha: 0.5)),
+              trailingIcon: const _CountryCode(),
+            ),
           ),
           const SizedBox(height: 24),
           SizedBox(
@@ -215,10 +251,7 @@ class _LoginFormState extends State<_LoginForm> {
               label: 'Войти',
             ),
           ),
-          const Spacer(),
-          const Center(
-            child: _PrivacyTerms(),
-          ),
+          //const Spacer(),
         ],
       ),
     );
