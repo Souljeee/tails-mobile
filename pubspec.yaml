@@ -29,7 +29,9 @@ dependencies:
   rxdart: ^0.28.0
 
   # BLoC
-  flutter_bloc: ^8.1.6
+  flutter_bloc: ^9.1.1
+  bloc: ^9.2.0
+  bloc_concurrency: ^0.3.0
 
   # Networking
   http: ^1.2.2
