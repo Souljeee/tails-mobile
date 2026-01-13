@@ -6,5 +6,5 @@ class UiTextFieldController extends TextEditingController {
 
   UiTextFieldController({super.text, this.validators = const []});
 
-  bool get isValid => validators.hasValidationMessage(text);
+  bool get isValid => !validators.hasValidationMessage(text);
 }

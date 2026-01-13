@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_validators.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/models/slide_uio.dart';
+import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});
@@ -190,13 +194,23 @@ class _LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<_LoginForm> {
   final String _numberInputMask = '(###)###-##-##';
-  final _numberController = UiTextFieldController();
+  final _numberController = UiTextFieldController(
+    validators: [
+      const RequiredFieldValidator(validationMessage: ''),
+    ],
+  );
   final _focusNode = FocusNode();
+
+  late final SendCodeBloc _sendCodeBloc =
+      SendCodeBloc(authRepository: DependenciesScope.of(context).authRepository);
+
+  String get _phoneNumber => '+7${_numberController.text}';
 
   @override
   void dispose() {
     _numberController.dispose();
     _focusNode.dispose();
+    _sendCodeBloc.close();
 
     super.dispose();
   }
@@ -241,20 +255,55 @@ class _LoginFormState extends State<_LoginForm> {
             ),
           ),
           const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: UiButton.main(
-              onPressed: () {
-                final phoneNumber = '+7${_numberController.text}';
-
-                EnterCodeRoute(phoneNumber: phoneNumber).push<void>(context);
-              },
-              icon: Icons.arrow_right_alt,
-              label: 'Войти',
-            ),
+          BlocConsumer<SendCodeBloc, SendCodeState>(
+            bloc: _sendCodeBloc,
+            listener: (context, state) {
+              state.mapOrNull(
+                success: (_) => EnterCodeRoute(phoneNumber: _phoneNumber).push<void>(context),
+                error: (_) => _showErrorSnackBar,
+              );
+            },
+            builder: (context, state) {
+              return ValueListenableBuilder(
+                valueListenable: _numberController,
+                builder: (context, value, child) {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: UiButton.main(
+                      isLoading: state.maybeMap(
+                        loading: (_) => true,
+                        orElse: () => false,
+                      ),
+                      onPressed: _numberController.isValid ? _sendCode : null,
+                      icon: Icons.arrow_right_alt,
+                      label: 'Войти',
+                    ),
+                  );
+                }
+              );
+            },
           ),
-          //const Spacer(),
         ],
+      ),
+    );
+  }
+
+  void _sendCode() {
+    final formattedPhoneNumber =
+        _phoneNumber.replaceAll('(', '').replaceAll(')', '').replaceAll('-', '');
+
+    _sendCodeBloc.add(SendCodeEvent$SendCodeRequested(phoneNumber: formattedPhoneNumber));
+  }
+
+  void _showErrorSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Произошла ошибка. Повторите позднее.',
+          style: context.uiFonts.text14Regular.copyWith(color: context.uiColors.white),
+        ),
+        backgroundColor: context.uiColors.red,
+        duration: const Duration(seconds: 3),
       ),
     );
   }
