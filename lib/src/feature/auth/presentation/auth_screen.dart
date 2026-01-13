@@ -195,11 +195,7 @@ class _LoginForm extends StatefulWidget {
 class _LoginFormState extends State<_LoginForm> {
   final String _numberInputMask = '(###)###-##-##';
   final String _countryCode = '+7';
-  late final _numberController = UiTextFieldController(
-    validators: [
-      const RequiredFieldValidator(validationMessage: ''),
-    ],
-  );
+  late final _numberController = UiTextFieldController();
   final _focusNode = FocusNode();
 
   late final SendCodeBloc _sendCodeBloc =
@@ -275,7 +271,7 @@ class _LoginFormState extends State<_LoginForm> {
                           loading: (_) => true,
                           orElse: () => false,
                         ),
-                        onPressed: _numberController.isValid &&
+                        onPressed: _numberController.value.text.isNotEmpty &&
                                 _phoneNumber.length == _numberInputMask.length + _countryCode.length
                             ? _sendCode
                             : null,
