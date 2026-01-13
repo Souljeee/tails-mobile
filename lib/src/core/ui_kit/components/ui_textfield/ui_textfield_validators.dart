@@ -151,9 +151,9 @@ class DateNoLaterThenValidator extends UiTextFieldValidator {
 }
 
 class MaxLengthValidator extends UiTextFieldValidator {
-  final DateTime minimalDate;
+  final int maxLength;
 
-  const MaxLengthValidator({required super.validationMessage, required this.minimalDate});
+  const MaxLengthValidator({required super.validationMessage, required this.maxLength});
 
   @override
   String? getValidationMessage(String? value) {
@@ -161,13 +161,26 @@ class MaxLengthValidator extends UiTextFieldValidator {
       return null;
     }
 
-    final List<String> date = value.split('.');
+    if (value.length > maxLength) {
+      return validationMessage;
+    }
 
-    final bool isInputDateBeforeMinimalDate = DateTime.parse(
-      date.reversed.join('-'),
-    ).isBefore(minimalDate);
+    return null;
+  }
+}
 
-    if (isInputDateBeforeMinimalDate) {
+class MinLengthValidator extends UiTextFieldValidator {
+  final int minLength;
+
+  const MinLengthValidator({required super.validationMessage, required this.minLength});
+
+  @override
+  String? getValidationMessage(String? value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value.length < minLength) {
       return validationMessage;
     }
 

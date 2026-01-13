@@ -194,7 +194,8 @@ class _LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<_LoginForm> {
   final String _numberInputMask = '(###)###-##-##';
-  final _numberController = UiTextFieldController(
+  final String _countryCode = '+7';
+  late final _numberController = UiTextFieldController(
     validators: [
       const RequiredFieldValidator(validationMessage: ''),
     ],
@@ -204,7 +205,7 @@ class _LoginFormState extends State<_LoginForm> {
   late final SendCodeBloc _sendCodeBloc =
       SendCodeBloc(authRepository: DependenciesScope.of(context).authRepository);
 
-  String get _phoneNumber => '+7${_numberController.text}';
+  String get _phoneNumber => '$_countryCode${_numberController.text}';
 
   @override
   void dispose() {
@@ -265,22 +266,24 @@ class _LoginFormState extends State<_LoginForm> {
             },
             builder: (context, state) {
               return ValueListenableBuilder(
-                valueListenable: _numberController,
-                builder: (context, value, child) {
-                  return SizedBox(
-                    width: double.infinity,
-                    child: UiButton.main(
-                      isLoading: state.maybeMap(
-                        loading: (_) => true,
-                        orElse: () => false,
+                  valueListenable: _numberController,
+                  builder: (context, value, child) {
+                    return SizedBox(
+                      width: double.infinity,
+                      child: UiButton.main(
+                        isLoading: state.maybeMap(
+                          loading: (_) => true,
+                          orElse: () => false,
+                        ),
+                        onPressed: _numberController.isValid &&
+                                _phoneNumber.length == _numberInputMask.length + _countryCode.length
+                            ? _sendCode
+                            : null,
+                        icon: Icons.arrow_right_alt,
+                        label: 'Войти',
                       ),
-                      onPressed: _numberController.isValid ? _sendCode : null,
-                      icon: Icons.arrow_right_alt,
-                      label: 'Войти',
-                    ),
-                  );
-                }
-              );
+                    );
+                  });
             },
           ),
         ],
