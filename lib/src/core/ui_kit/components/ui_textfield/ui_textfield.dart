@@ -136,7 +136,8 @@ class _UiTextFieldState extends State<UiTextField> {
       states.add(_InputState.disabled);
     }
 
-    if (widget.controller.validators.hasValidationMessage(_controller.text)) {
+    // Показываем ошибку только если поле было "тронуто"
+    if (_controller.touched && widget.controller.validators.hasValidationMessage(_controller.text)) {
       states.add(_InputState.error);
     }
 
@@ -177,6 +178,10 @@ class _UiTextFieldState extends State<UiTextField> {
     _controller.addListener(_controllerListener!);
 
     _focusNode?.addListener(() {
+      // Помечаем поле как "тронутое" при потере фокуса
+      if (!_hasFocus && _controller.text.isNotEmpty) {
+        _controller.markAsTouched();
+      }
       setState(() {}); // Rebuild when focus changes, to reset position of label
     });
   }
@@ -216,7 +221,9 @@ class _UiTextFieldState extends State<UiTextField> {
     final themeTypography = context.uiFonts;
     final enabled = widget.enabled ?? true;
 
-    final bool hasValidationErrors = _controller.validators.hasValidationMessage(_controller.text);
+    // Показываем ошибки только если поле было "тронуто"
+    final bool hasValidationErrors = 
+        _controller.touched && _controller.validators.hasValidationMessage(_controller.text);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,7 +237,13 @@ class _UiTextFieldState extends State<UiTextField> {
               child: TextField(
                 textCapitalization: widget.capitalization,
                 onTap: widget.onTap,
-                onChanged: widget.onChanged,
+                onChanged: (value) {
+                  // Помечаем поле как "тронутое" при начале ввода
+                  if (!_controller.touched) {
+                    _controller.markAsTouched();
+                  }
+                  widget.onChanged?.call(value);
+                },
                 onSubmitted: widget.onSubmitted,
                 onEditingComplete: widget.onEditingComplete,
                 textInputAction: widget.textInputAction,
