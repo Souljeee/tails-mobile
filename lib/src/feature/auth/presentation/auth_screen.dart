@@ -261,7 +261,7 @@ class _LoginFormState extends State<_LoginForm> {
             listener: (context, state) {
               state.mapOrNull(
                 success: (_) => EnterCodeRoute(phoneNumber: _phoneNumber).push<void>(context),
-                error: (_) => _showErrorSnackBar,
+                error: (_) => _showErrorSnackBar(),
               );
             },
             builder: (context, state) {
