@@ -1,35 +1,48 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:http/http.dart';
 import 'package:intercepted_client/intercepted_client.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:rest_client/src/utils/retry_request_mixin.dart';
 
-/// [Token] is a simple class that holds the pair of tokens
-class Token {
-  /// Create a [Token]
-  const Token(this.accessToken, this.refreshToken);
-
-  /// Access token (used to authenticate the user)
+/// [OAuth2Token] is a simple class that holds the pair of tokens
+class OAuth2Token extends Equatable {
   final String accessToken;
-
-  /// Refresh token (used to refresh the access token)
   final String refreshToken;
+  final int accessExpires;
+  final int refreshExpires;
+
+  /// Create a [OAuth2Token]
+  const OAuth2Token({
+    required this.accessToken,
+    required this.refreshToken,
+    required this.accessExpires,
+    required this.refreshExpires,
+  });
+
+  @override
+  List<Object?> get props => [
+        accessToken,
+        refreshToken,
+        accessExpires,
+        refreshExpires,
+      ];
 }
 
 /// Status of the authentication
-enum AuthenticationStatus {
-  /// Authenticated
-  authenticated,
+enum AuthorizationStatus {
+  /// Authorized
+  authorized,
 
-  /// Unauthenticated
-  unauthenticated,
+  /// Not authorized
+  notAuthorized,
 }
 
 /// AuthStatusSource is used to get the status of the authentication
 abstract interface class AuthStatusSource {
-  /// Stream of [AuthenticationStatus]
-  Stream<AuthenticationStatus> get authStatus;
+  /// Stream of [AuthorizationStatus]
+  Stream<AuthorizationStatus> get authStatus;
 }
 
 /// AuthInterceptor is used to add the Auth token to the request header
@@ -42,27 +55,27 @@ class AuthInterceptor extends SequentialHttpInterceptor {
     required this.tokenStorage,
     required this.authorizationClient,
     Client? retryClient,
-    Token? token,
+    OAuth2Token? token,
   })  : retryClient = retryClient ?? Client(),
         _token = token {
     _tokenStorageSubscription = tokenStorage.getStream().listen((newToken) => _token = newToken);
   }
 
-  StreamSubscription<Token?>? _tokenStorageSubscription;
+  StreamSubscription<OAuth2Token?>? _tokenStorageSubscription;
 
   /// [Client] to retry the request
   final Client retryClient;
 
   /// [TokenStorage] to store and retrieve the token
-  final TokenStorage<Token> tokenStorage;
+  final TokenStorage<OAuth2Token> tokenStorage;
 
   /// [AuthorizationClient] to refresh the token
-  final AuthorizationClient<Token> authorizationClient;
-  Token? _token;
+  final AuthorizationClient<OAuth2Token> authorizationClient;
+  OAuth2Token? _token;
 
-  Token? _loadToken() => _token;
+  OAuth2Token? _loadToken() => _token;
 
-  Map<String, String> _buildHeaders(Token token) => {
+  Map<String, String> _buildHeaders(OAuth2Token token) => {
         'Authorization': 'Bearer ${token.accessToken}',
       };
 

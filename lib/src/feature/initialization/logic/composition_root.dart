@@ -1,5 +1,7 @@
 import 'package:clock/clock.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:intercepted_client/intercepted_client.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +9,9 @@ import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/sentry_error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/logger/logger.dart';
-import 'package:tails_mobile/src/feature/auth/data/data_sorces/auth_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_client_impl.dart';
+import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/auth/data/data_sources/secure_token_storage.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
@@ -136,14 +140,25 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
     final sharedPreferences = SharedPreferencesAsync();
 
     final packageInfo = await PackageInfo.fromPlatform();
-    
+
     final settingsBloc = await AppSettingsBlocFactory(sharedPreferences).create();
 
-    final restClient = await _initRestClient(config);
+    const secureStorage = FlutterSecureStorage();
+
+    final secureTokenStorage = SecureTokenStorage(secureStorage: secureStorage);
+
+    final resreshTokenClient = await _initRefreshTokenClient(config);
+
+    final authClient = AuthClientImpl(restClient: resreshTokenClient);
+
+    final restClient = await _initRestClient(config, secureTokenStorage, authClient);
 
     final authRemoteDataSource = AuthRemoteDataSource(restClient: restClient);
 
-    final authRepository = AuthRepository(authRemoteDataSource: authRemoteDataSource);
+    final authRepository = AuthRepository(
+      authRemoteDataSource: authRemoteDataSource,
+      tokenStorage: secureTokenStorage,
+    );
 
     return DependenciesContainer(
       logger: logger,
@@ -157,8 +172,19 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
   }
 }
 
-Future<RestClient> _initRestClient(ApplicationConfig config) async {
-  final client = http.Client();
+Future<RestClient> _initRestClient(
+  ApplicationConfig config,
+  SecureTokenStorage secureTokenStorage,
+  AuthorizationClient<OAuth2Token> authorizationClient,
+) async {
+  final client = InterceptedClient(
+    interceptors: [
+      AuthInterceptor(
+        tokenStorage: secureTokenStorage,
+        authorizationClient: authorizationClient,
+      ),
+    ],
+  );
 
   final restClient = RestClientHttp(
     baseUrl: config.baseUrl,
@@ -166,6 +192,13 @@ Future<RestClient> _initRestClient(ApplicationConfig config) async {
   );
 
   return restClient;
+}
+
+Future<RestClient> _initRefreshTokenClient(ApplicationConfig config) async {
+  return RestClientHttp(
+    baseUrl: config.baseUrl,
+    client: http.Client(),
+  );
 }
 
 /// {@template app_logger_factory}

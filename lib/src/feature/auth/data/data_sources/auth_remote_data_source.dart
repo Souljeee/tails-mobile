@@ -1,5 +1,5 @@
 import 'package:rest_client/rest_client.dart';
-import 'package:tails_mobile/src/feature/auth/data/data_sorces/dtos/tokens_dto.dart';
+import 'package:tails_mobile/src/feature/auth/data/data_sources/dtos/tokens_dto.dart';
 import 'package:tails_mobile/src/feature/auth/exceptions/account_blocked_exception.dart';
 import 'package:tails_mobile/src/feature/auth/exceptions/code_sending_timer_exceptions.dart';
 import 'package:tails_mobile/src/feature/auth/exceptions/invalid_code_exception.dart';
@@ -57,7 +57,7 @@ class AuthRemoteDataSource {
   /// code - The code to verify.
   ///
   /// Returns TokensDto if the code is verified successfully.
-  Future<TokensDto> verifyCode({
+  Future<OAuth2Token> verifyCode({
     required String phoneNumber,
     required String code,
   }) async {
@@ -74,7 +74,14 @@ class AuthRemoteDataSource {
         throw const ClientException(message: 'Response is null');
       }
 
-      return TokensDto.fromJson(response);
+      final token = TokensDto.fromJson(response);
+
+      return OAuth2Token(
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+        accessExpires: token.accessExpires,
+        refreshExpires: token.refreshExpires,
+      );
     } on RestClientException catch (e) {
       if (e.statusCode == 400) {
         throw InvalidCodeException(

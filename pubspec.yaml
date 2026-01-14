@@ -37,11 +37,13 @@ dependencies:
   http: ^1.2.2
   cronet_http: ^1.3.2
   cupertino_http: ^2.0.1
+  intercepted_client: ^0.0.1
 
   # Storing data
   shared_preferences: ^2.3.2
   drift: ^2.21.0
   drift_flutter: ^0.2.1
+  flutter_secure_storage: ^10.0.0
 
   # Routing
   go_router: ^17.0.1
