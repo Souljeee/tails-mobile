@@ -4,6 +4,7 @@ import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/logger/logger.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
+import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 
 /// {@template dependencies_container}
@@ -21,6 +22,7 @@ class DependenciesContainer {
     required this.packageInfo,
     required this.restClient, 
     required this.authRepository,
+    required this.authorizationBloc,
   });
 
   /// [Logger] instance, used to log messages.
@@ -43,6 +45,9 @@ class DependenciesContainer {
 
   /// [AuthRepository] instance, used to fetch auth data from the remote source.
   final AuthRepository authRepository;
+
+  /// [AuthBloc] instance, used to manage authentication state.
+  final AuthBloc authorizationBloc;
 }
 
 /// {@template testing_dependencies_container}
