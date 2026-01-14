@@ -3,15 +3,25 @@ part of 'send_code_bloc.dart';
 typedef SendCodeStateMatch<T, S extends SendCodeState> = T Function(S state);
 
 sealed class SendCodeState extends Equatable {
-  const SendCodeState();
+  final int secondsRemaining;
 
-  const factory SendCodeState.initial() = SendCodeState$Initial;
+  const SendCodeState({required this.secondsRemaining});
 
-  const factory SendCodeState.loading() = SendCodeState$Loading;
+  const factory SendCodeState.initial({
+    int secondsRemaining,
+  }) = SendCodeState$Initial;
 
-  const factory SendCodeState.success() = SendCodeState$Success;
+  const factory SendCodeState.loading({
+    int secondsRemaining,
+  }) = SendCodeState$Loading;
 
-  const factory SendCodeState.error() = SendCodeState$Error;
+  const factory SendCodeState.success({
+    int secondsRemaining,
+  }) = SendCodeState$Success;
+
+  const factory SendCodeState.error({
+    int secondsRemaining,
+  }) = SendCodeState$Error;
 
   T map<T>({
     required SendCodeStateMatch<T, SendCodeState$Initial> initial,
@@ -57,29 +67,29 @@ sealed class SendCodeState extends Equatable {
 /// States
 
 final class SendCodeState$Initial extends SendCodeState {
-  const SendCodeState$Initial();
+  const SendCodeState$Initial({super.secondsRemaining = 0});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [secondsRemaining];
 }
 
 final class SendCodeState$Loading extends SendCodeState {
-  const SendCodeState$Loading();
+  const SendCodeState$Loading({super.secondsRemaining = 0});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [secondsRemaining];
 }
 
 final class SendCodeState$Success extends SendCodeState {
-  const SendCodeState$Success();
+  const SendCodeState$Success({super.secondsRemaining = 0});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [secondsRemaining];
 }
 
 final class SendCodeState$Error extends SendCodeState {
-  const SendCodeState$Error();
+  const SendCodeState$Error({super.secondsRemaining = 0});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [secondsRemaining];
 }

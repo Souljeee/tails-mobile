@@ -14,6 +14,7 @@ import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_remote_data
 import 'package:tails_mobile/src/feature/auth/data/data_sources/secure_token_storage.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
+import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 import 'package:tails_mobile/src/feature/settings/data/app_settings_datasource.dart';
@@ -172,6 +173,8 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       authRepository: authRepository,
     );
 
+    final sendCodeBloc = SendCodeBloc(authRepository: authRepository);
+
     return DependenciesContainer(
       logger: logger,
       config: config,
@@ -181,6 +184,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       restClient: restClient,
       authRepository: authRepository,
       authorizationBloc: authorizationBloc,
+      sendCodeBloc: sendCodeBloc,
     );
   }
 }

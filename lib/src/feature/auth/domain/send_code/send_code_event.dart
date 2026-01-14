@@ -7,12 +7,35 @@ sealed class SendCodeEvent extends Equatable {
 
   const factory SendCodeEvent.sendCodeRequested({required String phoneNumber}) = SendCodeEvent$SendCodeRequested;
 
+  const factory SendCodeEvent.timerTick() = SendCodeEvent$TimerTick;
+
   T map<T>({
     required SendCodeEventMatch<T, SendCodeEvent$SendCodeRequested> sendCodeRequested,
+    required SendCodeEventMatch<T, SendCodeEvent$TimerTick> timerTick,
   }) =>
       switch (this) {
         final SendCodeEvent$SendCodeRequested event => sendCodeRequested(event),
+        final SendCodeEvent$TimerTick event => timerTick(event),
       };
+
+  T? mapOrNull<T>({
+    SendCodeEventMatch<T, SendCodeEvent$SendCodeRequested>? sendCodeRequested,
+    SendCodeEventMatch<T, SendCodeEvent$TimerTick>? timerTick,
+  }) =>
+      map<T?>(
+        sendCodeRequested: sendCodeRequested ?? (_) => null,
+        timerTick: timerTick ?? (_) => null,
+      );
+
+  T maybeMap<T>({
+    required T Function() orElse,
+    SendCodeEventMatch<T, SendCodeEvent$SendCodeRequested>? sendCodeRequested,
+    SendCodeEventMatch<T, SendCodeEvent$TimerTick>? timerTick,
+  }) =>
+      map<T>(
+        sendCodeRequested: sendCodeRequested ?? (_) => orElse(),
+        timerTick: timerTick ?? (_) => orElse(),
+      );
 }
 
 final class SendCodeEvent$SendCodeRequested extends SendCodeEvent {
@@ -22,4 +45,11 @@ final class SendCodeEvent$SendCodeRequested extends SendCodeEvent {
 
   @override
   List<Object?> get props => [phoneNumber];
+}
+
+final class SendCodeEvent$TimerTick extends SendCodeEvent {
+  const SendCodeEvent$TimerTick();
+
+  @override
+  List<Object?> get props => [];
 }

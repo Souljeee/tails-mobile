@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
+import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_scope.dart';
+import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 
 class EnterCodeScreen extends StatelessWidget {
   final String phoneNumber;
@@ -61,7 +64,7 @@ class EnterCodeScreen extends StatelessWidget {
             const Spacer(),
             const _RetryTimer(),
             const SizedBox(height: 12),
-            _RetryButton(onTap: () {}),
+            _RetryButton(phoneNumber: phoneNumber),
           ],
         ),
       ),
@@ -220,18 +223,35 @@ class _EnterCodeFieldState extends State<_EnterCodeField> {
 }
 
 class _RetryButton extends StatelessWidget {
-  final VoidCallback onTap;
+  final String phoneNumber;
 
-  const _RetryButton({required this.onTap});
+  const _RetryButton({required this.phoneNumber});
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onTap,
-      child: Text(
-        context.l10n.callAgain,
-        style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.black40),
-      ),
+    final sendCodeBloc = DependenciesScope.of(context).sendCodeBloc;
+
+    return BlocBuilder<SendCodeBloc, SendCodeState>(
+      bloc: sendCodeBloc,
+      builder: (context, state) {
+        final isEnabled = state.secondsRemaining == 0;
+
+        return TextButton(
+          onPressed: isEnabled
+              ? () {
+                  sendCodeBloc.add(
+                    SendCodeEvent.sendCodeRequested(phoneNumber: phoneNumber),
+                  );
+                }
+              : null,
+          child: Text(
+            context.l10n.callAgain,
+            style: context.uiFonts.text16Medium.copyWith(
+              color: isEnabled ? context.uiColors.orangePrimary : context.uiColors.black40,
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -239,35 +259,52 @@ class _RetryButton extends StatelessWidget {
 class _RetryTimer extends StatelessWidget {
   const _RetryTimer();
 
+  String _formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: context.uiColors.white,
-        borderRadius: BorderRadius.circular(36),
-        border: Border.all(color: context.uiColors.brown),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.timer,
-              color: context.uiColors.orangePrimary,
-              size: 24,
+    final sendCodeBloc = DependenciesScope.of(context).sendCodeBloc;
+
+    return BlocBuilder<SendCodeBloc, SendCodeState>(
+      bloc: sendCodeBloc,
+      builder: (context, state) {
+        if (state.secondsRemaining > 0) {
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: context.uiColors.white,
+              borderRadius: BorderRadius.circular(36),
+              border: Border.all(color: context.uiColors.brown),
             ),
-            const SizedBox(width: 16),
-            Text(
-              '0:34',
-              style: context.uiFonts.text16Semibold,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.timer,
+                    color: context.uiColors.orangePrimary,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    _formatTime(state.secondsRemaining),
+                    style: context.uiFonts.text16Semibold,
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 }
