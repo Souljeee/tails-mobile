@@ -6,7 +6,7 @@ import 'package:intercepted_client/intercepted_client.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:rest_client/src/utils/retry_request_mixin.dart';
 
-/// [OAuth2Token] is a simple class that holds the pair of tokens
+/// [OAuth2Token] is a simple class that holds the pair of tokens and their expiration dates
 class OAuth2Token extends Equatable {
   final String accessToken;
   final String refreshToken;
