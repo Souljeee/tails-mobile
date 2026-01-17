@@ -77,8 +77,8 @@ class AuthRemoteDataSource {
       final token = TokensDto.fromJson(response);
 
       return OAuth2Token(
-        accessToken: token.accessToken,
-        refreshToken: token.refreshToken,
+        accessToken: token.access,
+        refreshToken: token.refresh,
         accessExpires: token.accessExpires,
         refreshExpires: token.refreshExpires,
       );

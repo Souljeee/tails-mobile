@@ -5,14 +5,14 @@ part 'tokens_dto.g.dart';
 
 @JsonSerializable()
 class TokensDto extends Equatable {
-  final String accessToken;
-  final String refreshToken;
+  final String access;
+  final String refresh;
   final int accessExpires;
   final int refreshExpires;
 
   const TokensDto({
-    required this.accessToken,
-    required this.refreshToken,
+    required this.access,
+    required this.refresh,
     required this.accessExpires,
     required this.refreshExpires,
   });
@@ -23,8 +23,8 @@ class TokensDto extends Equatable {
 
   @override
   List<Object?> get props => [
-        accessToken,
-        refreshToken,
+        access,
+        refresh,
         accessExpires,
         refreshExpires,
       ];

@@ -53,7 +53,7 @@ class AuthInterceptor extends SequentialHttpInterceptor {
   /// [token] may be preloaded and passed via constructor
   AuthInterceptor({
     required this.tokenStorage,
-    required this.authorizationClient,
+    required this.refreshService,
     Client? retryClient,
     OAuth2Token? token,
   })  : retryClient = retryClient ?? Client(),
@@ -69,8 +69,8 @@ class AuthInterceptor extends SequentialHttpInterceptor {
   /// [TokenStorage] to store and retrieve the token
   final TokenStorage<OAuth2Token> tokenStorage;
 
-  /// [AuthorizationClient] to refresh the token
-  final AuthorizationClient<OAuth2Token> authorizationClient;
+  /// [RefreshService] to refresh the token
+  final RefreshService<OAuth2Token> refreshService;
   OAuth2Token? _token;
 
   OAuth2Token? _loadToken() => _token;
@@ -105,7 +105,7 @@ class AuthInterceptor extends SequentialHttpInterceptor {
     }
 
     // If token is valid, then the request is made with the token
-    if (await authorizationClient.isAccessTokenValid(token)) {
+    if (await refreshService.isAccessTokenValid(token)) {
       final headers = _buildHeaders(token);
       request.headers.addAll(headers);
 
@@ -113,12 +113,12 @@ class AuthInterceptor extends SequentialHttpInterceptor {
     }
 
     // If token is not valid and can be refreshed, then the token is refreshed
-    if (await authorizationClient.isRefreshTokenValid(token)) {
+    if (await refreshService.isRefreshTokenValid(token)) {
       try {
         // Even if refresh token seems to be valid from the client side,
         // it may be revoked / banned / deleted on the server side, so
         // the following method can throw the error.
-        token = await authorizationClient.refresh(token);
+        token = await refreshService.refresh(token);
         await tokenStorage.save(token);
 
         final headers = _buildHeaders(token);
@@ -179,12 +179,12 @@ class AuthInterceptor extends SequentialHttpInterceptor {
 
     // If token is the same, refresh the token
     if (tokenFromHeaders == token.accessToken) {
-      if (await authorizationClient.isRefreshTokenValid(token)) {
+      if (await refreshService.isRefreshTokenValid(token)) {
         try {
           // Even if refresh token seems to be valid from the client side,
           // it may be revoked / banned / deleted on the server side, so
           // the following method can throw the error.
-          token = await authorizationClient.refresh(token);
+          token = await refreshService.refresh(token);
           await tokenStorage.save(token);
           // If authorization client decides that the token is no longer
           // valid, it throws [RevokeTokenException] and user should be logged

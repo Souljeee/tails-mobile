@@ -9,7 +9,7 @@ import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/sentry_error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/logger/logger.dart';
-import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_client_impl.dart';
+import 'package:tails_mobile/src/feature/auth/data/data_sources/refresh_service_impl.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/secure_token_storage.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
@@ -153,7 +153,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final resreshTokenClient = await _initRefreshTokenClient(config);
 
-    final authClient = AuthClientImpl(restClient: resreshTokenClient);
+    final authClient = RefreshServiceImpl(restClient: resreshTokenClient);
 
     final restClient = await _initRestClient(config, secureTokenStorage, authClient);
 
