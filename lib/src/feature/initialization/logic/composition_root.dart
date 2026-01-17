@@ -14,6 +14,7 @@ import 'package:tails_mobile/src/feature/auth/data/data_sources/refresh_service_
 import 'package:tails_mobile/src/feature/auth/data/data_sources/secure_token_storage.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
+import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
@@ -155,9 +156,11 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final refreshService = RefreshServiceImpl(restClient: resreshTokenClient);
 
+    final notAuthClient = await _initNotAuthClient(config);
+
     final restClient = await _initRestClient(config, secureTokenStorage, refreshService);
 
-    final authRemoteDataSource = AuthRemoteDataSource(restClient: restClient);
+    final authRemoteDataSource = AuthRemoteDataSource(restClient: notAuthClient);
 
     final authRepository = AuthRepository(
       authRemoteDataSource: authRemoteDataSource,
@@ -175,6 +178,8 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final sendCodeBloc = SendCodeBloc(authRepository: authRepository);
 
+    final codeTimerBloc = CodeTimerBloc();
+
     return DependenciesContainer(
       logger: logger,
       config: config,
@@ -185,8 +190,20 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       authRepository: authRepository,
       authorizationBloc: authorizationBloc,
       sendCodeBloc: sendCodeBloc,
+      codeTimerBloc: codeTimerBloc,
     );
   }
+}
+
+Future<RestClient> _initNotAuthClient(ApplicationConfig config) async {
+  final client = http.Client();
+
+  final restClient = RestClientHttp(
+    baseUrl: config.baseUrl,
+    client: client,
+  );
+
+  return restClient;
 }
 
 Future<RestClient> _initRestClient(

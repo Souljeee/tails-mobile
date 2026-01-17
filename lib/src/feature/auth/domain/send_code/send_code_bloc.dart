@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
@@ -9,8 +7,6 @@ part 'send_code_state.dart';
 
 class SendCodeBloc extends Bloc<SendCodeEvent, SendCodeState> {
   final AuthRepository _authRepository;
-  Timer? _timer;
-  static const _timerDuration = 60;
 
   SendCodeBloc({
     required AuthRepository authRepository,
@@ -19,7 +15,6 @@ class SendCodeBloc extends Bloc<SendCodeEvent, SendCodeState> {
     on<SendCodeEvent>(
       (event, emit) => event.map(
         sendCodeRequested: (event) => _onSendCodeRequested(event, emit),
-        timerTick: (event) => _onTimerTick(event, emit),
       ),
     );
   }
@@ -29,64 +24,23 @@ class SendCodeBloc extends Bloc<SendCodeEvent, SendCodeState> {
     Emitter<SendCodeState> emit,
   ) async {
     try {
-      emit(SendCodeState.loading(secondsRemaining: state.secondsRemaining));
+      emit(const SendCodeState.loading());
 
       await _authRepository.sendCode(phoneNumber: event.phoneNumber);
 
-      emit(const SendCodeState.success(secondsRemaining: _timerDuration));
+      emit(const SendCodeState.success());
 
-      // Запускаем таймер после успешной отправки кода
-      _startTimer();
+      // Возвращаемся в начальное состояние после небольшой задержки
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      emit(const SendCodeState.initial());
     } catch (e, s) {
       addError(e, s);
 
-      emit(SendCodeState.error(secondsRemaining: state.secondsRemaining));
+      emit(const SendCodeState.error());
 
-      // Возвращаемся в начальное состояние с текущим таймером
+      // Возвращаемся в начальное состояние
       await Future<void>.delayed(const Duration(seconds: 2));
-      emit(SendCodeState.initial(secondsRemaining: state.secondsRemaining));
+      emit(const SendCodeState.initial());
     }
-  }
-
-  Future<void> _onTimerTick(
-    SendCodeEvent$TimerTick event,
-    Emitter<SendCodeState> emit,
-  ) async {
-    final newSeconds = state.secondsRemaining - 1;
-
-    if (newSeconds <= 0) {
-      _timer?.cancel();
-      emit(
-        state.map(
-          initial: (_) => const SendCodeState.initial(),
-          loading: (_) => const SendCodeState.loading(),
-          success: (_) => const SendCodeState.success(),
-          error: (_) => const SendCodeState.error(),
-        ),
-      );
-    } else {
-      emit(
-        state.map(
-          initial: (_) => SendCodeState.initial(secondsRemaining: newSeconds),
-          loading: (_) => SendCodeState.loading(secondsRemaining: newSeconds),
-          success: (_) => SendCodeState.success(secondsRemaining: newSeconds),
-          error: (_) => SendCodeState.error(secondsRemaining: newSeconds),
-        ),
-      );
-    }
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      add(const SendCodeEvent.timerTick());
-    });
-  }
-
-  @override
-  Future<void> close() {
-    _timer?.cancel();
-    return super.close();
   }
 }

@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_imag
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/models/slide_uio.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
@@ -197,10 +198,23 @@ class _LoginFormState extends State<_LoginForm> {
   late final _numberController = UiTextFieldController();
   final _focusNode = FocusNode();
 
-  late final SendCodeBloc _sendCodeBloc =
-      SendCodeBloc(authRepository: DependenciesScope.of(context).authRepository);
+  late final SendCodeBloc _sendCodeBloc;
+  late final CodeTimerBloc _codeTimerBloc;
 
   String get _phoneNumber => '$_countryCode${_numberController.text}';
+
+  bool get _isNumberValid =>
+      _numberController.value.text.isNotEmpty &&
+      _phoneNumber.length == _numberInputMask.length + _countryCode.length;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    final dependencies = DependenciesScope.of(context);
+    _sendCodeBloc = SendCodeBloc(authRepository: dependencies.authRepository);
+    _codeTimerBloc = dependencies.codeTimerBloc;
+  }
 
   @override
   void dispose() {
@@ -255,35 +269,55 @@ class _LoginFormState extends State<_LoginForm> {
             bloc: _sendCodeBloc,
             listener: (context, state) {
               state.mapOrNull(
-                success: (_) => EnterCodeRoute(phoneNumber: _phoneNumber).push<void>(context),
+                success: (_) {
+                  // Запускаем таймер и переходим на экран ввода кода
+                  _codeTimerBloc.add(const CodeTimerEvent.started());
+                  EnterCodeRoute(phoneNumber: _phoneNumber).push<void>(context);
+                },
                 error: (_) => _showErrorSnackBar(),
               );
             },
-            builder: (context, state) {
-              return ValueListenableBuilder(
-                  valueListenable: _numberController,
-                  builder: (context, value, child) {
-                    return SizedBox(
-                      width: double.infinity,
-                      child: UiButton.main(
-                        isLoading: state.maybeMap(
-                          loading: (_) => true,
-                          orElse: () => false,
+            builder: (context, sendCodeState) {
+              return BlocBuilder<CodeTimerBloc, CodeTimerState>(
+                bloc: _codeTimerBloc,
+                builder: (context, timerState) {
+                  return ValueListenableBuilder(
+                    valueListenable: _numberController,
+                    builder: (context, value, child) {
+                      final isTimerActive = timerState.maybeMap(
+                        ticking: (_) => true,
+                        orElse: () => false,
+                      );
+
+                      return SizedBox(
+                        width: double.infinity,
+                        child: UiButton.main(
+                          isLoading: sendCodeState.maybeMap(
+                            loading: (_) => true,
+                            orElse: () => false,
+                          ),
+                          onPressed: _isNumberValid
+                              ? isTimerActive
+                                  ? _navigateToEnterCode
+                                  : _sendCode
+                              : null,
+                          icon: Icons.arrow_right_alt,
+                          label: 'Войти',
                         ),
-                        onPressed: _numberController.value.text.isNotEmpty &&
-                                _phoneNumber.length == _numberInputMask.length + _countryCode.length
-                            ? _sendCode
-                            : null,
-                        icon: Icons.arrow_right_alt,
-                        label: 'Войти',
-                      ),
-                    );
-                  });
+                      );
+                    },
+                  );
+                },
+              );
             },
           ),
         ],
       ),
     );
+  }
+
+  void _navigateToEnterCode() {
+    EnterCodeRoute(phoneNumber: _phoneNumber).push<void>(context);
   }
 
   void _sendCode() {

@@ -5,6 +5,7 @@ import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/logger/logger.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
+import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 
@@ -25,6 +26,7 @@ class DependenciesContainer {
     required this.authRepository,
     required this.authorizationBloc,
     required this.sendCodeBloc,
+    required this.codeTimerBloc,
   });
 
   /// [Logger] instance, used to log messages.
@@ -51,8 +53,11 @@ class DependenciesContainer {
   /// [AuthBloc] instance, used to manage authentication state.
   final AuthBloc authorizationBloc;
 
-  /// [SendCodeBloc] instance, used to send verification code and manage timer.
+  /// [SendCodeBloc] instance, used to send verification code.
   final SendCodeBloc sendCodeBloc;
+
+  /// [CodeTimerBloc] instance, used to manage code resend timer.
+  final CodeTimerBloc codeTimerBloc;
 }
 
 /// {@template testing_dependencies_container}

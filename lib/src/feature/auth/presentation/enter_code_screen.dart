@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
+import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_scope.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
@@ -62,12 +63,31 @@ class EnterCodeScreen extends StatelessWidget {
               },
             ),
             const Spacer(),
-            const _RetryTimer(),
-            const SizedBox(height: 12),
-            _RetryButton(phoneNumber: phoneNumber),
+            _RetrySection(phoneNumber: phoneNumber),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _RetrySection extends StatelessWidget {
+  final String phoneNumber;
+
+  const _RetrySection({required this.phoneNumber});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CodeTimerBloc, CodeTimerState>(
+      bloc: DependenciesScope.of(context).codeTimerBloc,
+      builder: (context, timerState) {
+        final isTimerActive = timerState.maybeMap(
+          ticking: (_) => true,
+          orElse: () => false,
+        );
+
+        return isTimerActive ? const _RetryTimer() : _RetryButton(phoneNumber: phoneNumber);
+      },
     );
   }
 }
@@ -222,26 +242,51 @@ class _EnterCodeFieldState extends State<_EnterCodeField> {
   }
 }
 
-class _RetryButton extends StatelessWidget {
+class _RetryButton extends StatefulWidget {
   final String phoneNumber;
 
   const _RetryButton({required this.phoneNumber});
 
   @override
-  Widget build(BuildContext context) {
-    final sendCodeBloc = DependenciesScope.of(context).sendCodeBloc;
+  State<_RetryButton> createState() => _RetryButtonState();
+}
 
-    return BlocBuilder<SendCodeBloc, SendCodeState>(
-      bloc: sendCodeBloc,
-      builder: (context, state) {
-        final isEnabled = state.secondsRemaining == 0;
+class _RetryButtonState extends State<_RetryButton> {
+  late final SendCodeBloc _sendCodeBloc;
+  late final CodeTimerBloc _codeTimerBloc;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final dependencies = DependenciesScope.of(context);
+    _sendCodeBloc = SendCodeBloc(authRepository: dependencies.authRepository);
+    _codeTimerBloc = dependencies.codeTimerBloc;
+  }
+
+  @override
+  void dispose() {
+    _sendCodeBloc.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CodeTimerBloc, CodeTimerState>(
+      bloc: _codeTimerBloc,
+      builder: (context, timerState) {
+        final isEnabled = timerState.maybeMap(
+          idle: (_) => true,
+          orElse: () => false,
+        );
 
         return TextButton(
           onPressed: isEnabled
               ? () {
-                  sendCodeBloc.add(
-                    SendCodeEvent.sendCodeRequested(phoneNumber: phoneNumber),
+                  _sendCodeBloc.add(
+                    SendCodeEvent.sendCodeRequested(phoneNumber: widget.phoneNumber),
                   );
+                  _codeTimerBloc.add(const CodeTimerEvent.started());
                 }
               : null,
           child: Text(
@@ -256,21 +301,26 @@ class _RetryButton extends StatelessWidget {
   }
 }
 
-class _RetryTimer extends StatelessWidget {
+class _RetryTimer extends StatefulWidget {
   const _RetryTimer();
 
+  @override
+  State<_RetryTimer> createState() => _RetryTimerState();
+}
+
+class _RetryTimerState extends State<_RetryTimer> {
   String _formatTime(int seconds) {
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
+  late final _codeTimerBloc = DependenciesScope.of(context).codeTimerBloc;
+
   @override
   Widget build(BuildContext context) {
-    final sendCodeBloc = DependenciesScope.of(context).sendCodeBloc;
-
-    return BlocBuilder<SendCodeBloc, SendCodeState>(
-      bloc: sendCodeBloc,
+    return BlocBuilder<CodeTimerBloc, CodeTimerState>(
+      bloc: _codeTimerBloc,
       builder: (context, state) {
         if (state.secondsRemaining > 0) {
           return DecoratedBox(
