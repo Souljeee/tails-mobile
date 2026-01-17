@@ -9,8 +9,8 @@ import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/sentry_error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/logger/logger.dart';
-import 'package:tails_mobile/src/feature/auth/data/data_sources/refresh_service_impl.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/auth/data/data_sources/refresh_service_impl.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/secure_token_storage.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
@@ -153,9 +153,9 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final resreshTokenClient = await _initRefreshTokenClient(config);
 
-    final authClient = RefreshServiceImpl(restClient: resreshTokenClient);
+    final refreshService = RefreshServiceImpl(restClient: resreshTokenClient);
 
-    final restClient = await _initRestClient(config, secureTokenStorage, authClient);
+    final restClient = await _initRestClient(config, secureTokenStorage, refreshService);
 
     final authRemoteDataSource = AuthRemoteDataSource(restClient: restClient);
 
@@ -192,13 +192,13 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 Future<RestClient> _initRestClient(
   ApplicationConfig config,
   SecureTokenStorage secureTokenStorage,
-  AuthorizationClient<OAuth2Token> authorizationClient,
+  RefreshService<OAuth2Token> refreshService,
 ) async {
   final client = InterceptedClient(
     interceptors: [
       AuthInterceptor(
         tokenStorage: secureTokenStorage,
-        authorizationClient: authorizationClient,
+        refreshService: refreshService,
       ),
     ],
   );
