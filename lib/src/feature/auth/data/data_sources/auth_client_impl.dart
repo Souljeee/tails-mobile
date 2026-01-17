@@ -1,4 +1,5 @@
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/feature/auth/exceptions/invalid_or_expired_toke_exception.dart';
 
 class AuthClientImpl implements AuthorizationClient<OAuth2Token> {
   final RestClient restClient;
@@ -21,9 +22,9 @@ class AuthClientImpl implements AuthorizationClient<OAuth2Token> {
   Future<OAuth2Token> refresh(OAuth2Token token) async {
     try {
       final response = await restClient.post(
-        '/api/v1/auth/refresh',
+        '/api/token/refresh',
         body: {
-          'refresh_token': token.refreshToken,
+          'refresh': token.refreshToken,
         },
       );
 
@@ -38,6 +39,10 @@ class AuthClientImpl implements AuthorizationClient<OAuth2Token> {
         refreshExpires: (response['refresh_expires']! as num).toInt(),
       );
     } catch (e) {
+      if (e is RestClientException && e.statusCode == 401) {
+        throw InvalidOrExpiredTokenException(token: token.refreshToken);
+      }
+      
       rethrow;
     }
   }
