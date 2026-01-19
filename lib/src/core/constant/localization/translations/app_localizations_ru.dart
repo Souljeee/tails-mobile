@@ -19,4 +19,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get callAgain => 'Перезвонить еще раз';
+
+  @override
+  String get tryLater => 'Произошла ошибка. Попробуйте позже.';
 }

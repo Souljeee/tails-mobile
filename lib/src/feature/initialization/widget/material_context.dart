@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tails_mobile/src/core/constant/localization/localization.dart';
 import 'package:tails_mobile/src/core/navigation/router.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_loader_overlay/loader_overlay.dart';
 import 'package:tails_mobile/src/feature/settings/model/app_theme.dart';
 import 'package:tails_mobile/src/feature/settings/widget/settings_scope.dart';
 
@@ -43,7 +44,7 @@ class MaterialContext extends StatelessWidget {
             mediaQueryData.textScaler.scale(settings.textScale ?? 1).clamp(0.5, 2),
           ),
         ),
-        child: child!,
+        child: LoaderOverlay(child: child!),
       ),
     );
   }

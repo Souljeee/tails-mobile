@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_loader_overlay/loader_overlay.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
+import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_scope.dart';
@@ -34,37 +36,66 @@ class EnterCodeScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 28),
-            const _CallIcon(),
-            const SizedBox(height: 16),
-            Text(
-              context.l10n.enterCodeTitle,
-              style: context.uiFonts.header28Semibold.copyWith(fontWeight: FontWeight.w700),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              context.l10n.enterCodeSubtitle,
-              style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.black60),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              phoneNumber,
-              style: context.uiFonts.text16Medium.copyWith(fontWeight: FontWeight.w700),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            _EnterCodeField(
-              onCompleted: (code) {
-                AuthScope.of(context).login(phoneNumber, code);
+        child: BlocConsumer<AuthBloc, AuthState>(
+          bloc: DependenciesScope.of(context).authorizationBloc,
+          listener: (context, state) {
+            state.maybeMap(
+              processing: (_) {
+                LoaderOverlay.of(context).showLoader();
               },
-            ),
-            const Spacer(),
-            _RetrySection(phoneNumber: phoneNumber),
-          ],
+              orElse: () {
+                LoaderOverlay.of(context).hideLoader();
+              },
+            );
+
+            state.mapOrNull(
+              error: (_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      context.l10n.tryLater,
+                      style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.white),
+                    ),
+                    backgroundColor: context.uiColors.red,
+                  ),
+                );
+              },
+            );
+          },
+          builder: (context, state) {
+            return Column(
+              children: [
+                const SizedBox(height: 28),
+                const _CallIcon(),
+                const SizedBox(height: 16),
+                Text(
+                  context.l10n.enterCodeTitle,
+                  style: context.uiFonts.header28Semibold.copyWith(fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  context.l10n.enterCodeSubtitle,
+                  style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.black60),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  phoneNumber,
+                  style: context.uiFonts.text16Medium.copyWith(fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                _EnterCodeField(
+                  onCompleted: (code) {
+                    AuthScope.of(context).login(phoneNumber, code);
+                  },
+                ),
+                const Spacer(),
+                _RetrySection(phoneNumber: phoneNumber),
+              ],
+            );
+          },
         ),
       ),
     );
