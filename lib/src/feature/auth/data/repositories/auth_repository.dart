@@ -52,4 +52,11 @@ class AuthRepository {
 
     await _tokenStorage.save(token);
   }
+
+  /// Method to logout the user.
+  ///
+  /// Throws RestClientException if the request fails.
+  ///
+  /// Returns void if the logout is successful.
+  Future<void> logout() => _authRemoteDataSource.logout();
 }

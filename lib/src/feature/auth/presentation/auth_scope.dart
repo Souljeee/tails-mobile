@@ -42,7 +42,7 @@ class _AuthScopeState extends State<AuthScope> implements AuthController {
 
   @override
   void logout() {
-    // логаут
+    widget.authBloc.add(const AuthEvent.logout());
   }
 
   @override

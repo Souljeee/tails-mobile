@@ -19,6 +19,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (event, emit) => event.map(
         login: (event) => _onLogin(event, emit),
         authorizationStatusUpdated: (event) => _onAuthorizationStatusUpdated(event, emit),
+        logout: (event) => _onLogout(event, emit),
       ),
     );
 
@@ -55,5 +56,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthState.idle(status: event.newStatus));
+  }
+
+  Future<void> _onLogout(
+    AuthEvent$Logout event,
+    Emitter<AuthState> emit,
+  ) async { 
+    try {
+      emit(AuthState.processing(status: state.status));
+
+      await _authRepository.logout();
+
+      emit(const AuthState.idle(status: AuthorizationStatus.notAuthorized));
+    } catch (e, s) {
+      addError(e, s);
+
+      emit(AuthState.error(status: state.status));
+      emit(AuthState.idle(status: state.status));
+    }
   }
 }

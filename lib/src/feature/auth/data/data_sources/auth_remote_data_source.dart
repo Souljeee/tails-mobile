@@ -97,4 +97,16 @@ class AuthRemoteDataSource {
       rethrow;
     }
   }
+
+  /// Method to logout the user.
+  ///
+  /// Throws RestClientException if the request fails.
+  ///
+  /// Returns void if the logout is successful.
+  Future<void> logout() async {
+    await restClient.post(
+      '/auth/logout/',
+      body: {},
+    );
+  }
 }
