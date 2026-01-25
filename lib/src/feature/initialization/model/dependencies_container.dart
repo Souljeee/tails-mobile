@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 
 /// {@template dependencies_container}
@@ -27,6 +28,7 @@ class DependenciesContainer {
     required this.authorizationBloc,
     required this.sendCodeBloc,
     required this.codeTimerBloc,
+    required this.petRepository,
   });
 
   /// [Logger] instance, used to log messages.
@@ -58,6 +60,9 @@ class DependenciesContainer {
 
   /// [CodeTimerBloc] instance, used to manage code resend timer.
   final CodeTimerBloc codeTimerBloc;
+
+  /// [PetRepository] instance, used to fetch pet data from the remote source.
+  final PetRepository petRepository;
 }
 
 /// {@template testing_dependencies_container}

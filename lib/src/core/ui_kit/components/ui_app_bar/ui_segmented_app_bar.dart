@@ -21,7 +21,6 @@ class UiSegmentedToolbar extends StatelessWidget {
   final TextStyle? unselectedLabelStyle;
 
   UiSegmentedToolbar({
-    super.key,
     required this.tabs,
     this.showBackButton = true,
     this.onBackPressed,
@@ -32,6 +31,7 @@ class UiSegmentedToolbar extends StatelessWidget {
     this.badgeColor,
     this.labelStyle,
     this.unselectedLabelStyle,
+    super.key,
   }) : assert(tabs.isNotEmpty, 'Tabs cannot be empty');
 
   @override
@@ -42,52 +42,50 @@ class UiSegmentedToolbar extends StatelessWidget {
     return AppBar(
       elevation: 0,
       centerTitle: false,
-      leading:
-          showBackButton
-              ? IconButton(
-                padding: const EdgeInsets.only(left: 12),
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onPressed: onBackPressed,
-                icon: Icon(
-                  Icons.arrow_back_ios_new,
-                  color: context.uiColors.black50,
-                  size: 28,
-                ),
-              )
-              : null,
+      leading: showBackButton
+          ? IconButton(
+              padding: const EdgeInsets.only(left: 12),
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onPressed: onBackPressed,
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                color: context.uiColors.black50,
+                size: 28,
+              ),
+            )
+          : null,
       surfaceTintColor: Colors.transparent,
       backgroundColor: backgroundColor ?? Colors.transparent,
       bottom: TabBar(
         padding: const EdgeInsets.only(left: 6),
         isScrollable: true,
         tabAlignment: TabAlignment.start,
-        tabs:
-            tabs
-                .map(
-                  (tab) => Tab(
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Text(tab.label),
-                        if (tab.hasBadge)
-                          Positioned(
-                            right: -10,
-                            top: -2,
-                            child: Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: actualBadgeColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
+        tabs: tabs
+            .map(
+              (tab) => Tab(
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Text(tab.label),
+                    if (tab.hasBadge)
+                      Positioned(
+                        right: -10,
+                        top: -2,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: actualBadgeColor,
+                            shape: BoxShape.circle,
                           ),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            )
+            .toList(),
         labelColor: labelColor ?? context.uiColors.black100,
         labelStyle: labelStyle ?? context.uiFonts.header32Semibold,
         unselectedLabelColor: unselectedLabelColor ?? context.uiColors.black40,
