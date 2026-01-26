@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_app_bar/ui_app_bar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
@@ -53,7 +54,7 @@ class _PetsScreenState extends State<PetsScreen> {
           bloc: _petsListBloc,
           builder: (context, state) {
             return state.map(
-              loading: (_) => const SizedBox.shrink(),
+              loading: (_) => const _PetsShimmer(),
               success: (state) => _PetsList(pets: state.pets),
               error: (_) => const SizedBox.shrink(),
             );
@@ -156,6 +157,33 @@ class _PetsEmptyList extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Text('Список ваших питомцев пуст'),
+    );
+  }
+}
+
+class _PetsShimmer extends StatelessWidget {
+  const _PetsShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: List.generate(
+        3,
+        (index) => Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: UiKitShimmer(
+            child: SizedBox(
+              height: 100,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(32),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
