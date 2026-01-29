@@ -121,6 +121,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Произошла ошибка. Попробуйте позже.'**
   String get tryLater;
+
+  /// Возраст питомца в годах с правильным склонением
+  ///
+  /// In ru, this message translates to:
+  /// **'{years, plural, one{{years} год} few{{years} года} many{{years} лет} other{{years} лет}}'**
+  String petAgeYears(int years);
+
+  /// Возраст питомца в месяцах с правильным склонением
+  ///
+  /// In ru, this message translates to:
+  /// **'{months, plural, one{{months} месяц} few{{months} месяца} many{{months} месяцев} other{{months} месяцев}}'**
+  String petAgeMonths(int months);
+
+  /// Возраст питомца в годах и месяцах с правильным склонением
+  ///
+  /// In ru, this message translates to:
+  /// **'{years, plural, one{{years} год} few{{years} года} many{{years} лет} other{{years} лет}} {months, plural, one{{months} месяц} few{{months} месяца} many{{months} месяцев} other{{months} месяцев}}'**
+  String petAgeYearsAndMonths(int years, int months);
+
+  /// No description provided for @dog.
+  ///
+  /// In ru, this message translates to:
+  /// **'Собака'**
+  String get dog;
+
+  /// No description provided for @cat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кошка'**
+  String get cat;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -32,9 +32,9 @@ class PetsListBloc extends Bloc<PetsListEvent, PetsListState> {
 
       //final pets = await _petRepository.getPets();
 
-      Future.delayed(const Duration(seconds: 2), () {
-        emit(PetsListState.success(pets: _mockedPets));
-      });
+      await Future.delayed(const Duration(seconds: 2));
+
+      emit(PetsListState.success(pets: _mockedPets));
 
       //emit(PetsListState.success(pets: pets));
     } catch (e, s) {
@@ -49,7 +49,7 @@ final _mockedPets = [
   PetModel(
     id: '1',
     name: 'Rex',
-    image: 'https://petstory.ru/knowledge/dogs/dog-adoption/samye-krasivye-porody-sobak-v-mire/',
+    image: 'https://storage-api.petstory.ru/resize/1000x1000x80/cb/48/7f/cb487f4677a640329e92ac0076004607.jpeg',
     petType: PetTypeEnum.dog,
     birthday: DateTime.now().subtract(Duration(days: 365)),
     breed: 'Labrador',
@@ -61,7 +61,7 @@ final _mockedPets = [
   PetModel(
     id: '2',
     name: 'Bella',
-    image: 'https://vethelp72.ru/stati/mkb-u-kotov',
+    image: 'https://domkohouse.com.ua/content/uploads/images/dizayn-bez-nazvanija-19.png',
     petType: PetTypeEnum.cat,
     birthday: DateTime.now().subtract(Duration(days: 1000)),
     breed: 'Siamese',
@@ -73,7 +73,7 @@ final _mockedPets = [
   PetModel(
     id: '3',
     name: 'Charlie',
-    image: 'https://domkohouse.com.ua/ru/yak-viduchyty-kota-mityty-terytoriiu/',
+    image: 'https://habrastorage.org/getpro/habr//post_images/c35/2fe/a96/c352fea96714a16c6f5656841d50e1e5.jpg',
     petType: PetTypeEnum.cat,
     birthday: DateTime.now().subtract(Duration(days: 1500)),
     breed: 'Siamese',

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_app_bar/ui_app_bar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/pets_list/domain/pets_list_bloc.dart';
 
 class PetsScreen extends StatefulWidget {
@@ -47,7 +51,10 @@ class _PetsScreenState extends State<PetsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: context.uiColors.orangePrimary,
-        child: const Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: context.uiColors.white,
+        ),
       ),
       body: SafeArea(
         child: BlocBuilder<PetsListBloc, PetsListState>(
@@ -56,7 +63,11 @@ class _PetsScreenState extends State<PetsScreen> {
             return state.map(
               loading: (_) => const _PetsShimmer(),
               success: (state) => _PetsList(pets: state.pets),
-              error: (_) => const SizedBox.shrink(),
+              error: (_) => _FetchingError(
+                onRetry: () {
+                  _petsListBloc.add(const PetsListEvent.fetchRequested());
+                },
+              ),
             );
           },
         ),
@@ -74,12 +85,10 @@ class _PetsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return pets.isEmpty
         ? const _PetsEmptyList()
-        : ListView.builder(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 24,
-            ),
+        : ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: pets.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
               return _PetItem(pet: pets[index]);
             },
@@ -92,13 +101,17 @@ class _PetItem extends StatelessWidget {
 
   const _PetItem({required this.pet});
 
-  String get petAge {
+  String _getPetAge(BuildContext context) {
     final age = DateTime.now().difference(pet.birthday).inDays;
 
     final years = age ~/ 365;
     final months = (age % 365) ~/ 30;
 
-    return years > 0 ? '$years лет $months месяцев' : '$months месяцев';
+    if (years > 0) {
+      return context.l10n.petAgeYearsAndMonths(years, months);
+    } else {
+      return context.l10n.petAgeMonths(months);
+    }
   }
 
   @override
@@ -112,7 +125,16 @@ class _PetItem extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            Image.network(pet.image),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: Image.network(
+                pet.image,
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,8 +159,9 @@ class _PetItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${pet.petType.name} · $petAge',
+                    '${pet.petType.getLocalizedName(context.l10n)} · ${_getPetAge(context)}',
                     style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.brown),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -155,8 +178,28 @@ class _PetsEmptyList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Список ваших питомцев пуст'),
+    return Center(
+      child: Column(
+        children: [
+          SvgPicture.asset(
+            context.uiIcons.emptyDogHouse.keyName,
+            width: 120,
+            height: 120,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Список ваших питомцев пуст',
+            style: context.uiFonts.header24Semibold,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Расскажите нам о ваших любимцах',
+            style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.brown),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -166,24 +209,60 @@ class _PetsShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: List.generate(
-        3,
-        (index) => Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: UiKitShimmer(
-            child: SizedBox(
-              height: 100,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(32),
-                ),
+    return UiKitShimmer(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: List.generate(
+            3,
+            (index) => Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: UiKitShimmerLoading(
+                height: 100,
+                borderRadius: BorderRadius.circular(32),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FetchingError extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _FetchingError({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SvgPicture.asset(
+          context.uiIcons.sadDoc.keyName,
+          width: 120,
+          height: 120,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Ошибка загрузки',
+          style: context.uiFonts.header24Semibold,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Повторите позднее',
+          style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.brown),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        UiButton.main(
+          label: 'Повторить',
+          onPressed: onRetry,
+        ),
+      ],
     );
   }
 }
