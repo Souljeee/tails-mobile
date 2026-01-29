@@ -19,6 +19,7 @@ dependencies:
   intercepted_client: ^0.0.1
   path: ^1.9.0
   meta: ^1.15.0
+  equatable: ^2.0.8
 
 dev_dependencies:
   flutter_test:

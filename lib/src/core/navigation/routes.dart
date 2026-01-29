@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tails_mobile/src/core/navigation/scaffold_with_navbar.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_screen.dart';
-import 'package:tails_mobile/src/feature/enter_code/presentation/enter_code_screen.dart';
+import 'package:tails_mobile/src/feature/auth/presentation/enter_code_screen.dart';
 
 part 'routes.g.dart';
 

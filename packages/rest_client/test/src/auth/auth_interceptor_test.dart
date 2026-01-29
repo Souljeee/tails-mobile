@@ -6,8 +6,8 @@ import 'package:mockito/mockito.dart';
 import 'package:rest_client/rest_client.dart';
 
 @GenerateNiceMocks([
-  MockSpec<AuthorizationClient<Token>>(),
-  MockSpec<TokenStorage<Token>>(),
+  MockSpec<RefreshService<OAuth2Token>>(),
+  MockSpec<TokenStorage<OAuth2Token>>(),
   MockSpec<RequestHandler>(),
   MockSpec<ResponseHandler>(),
 ])
@@ -15,20 +15,20 @@ import 'auth_interceptor_test.mocks.dart';
 
 void main() {
   group('Auth Interceptor', () {
-    late MockAuthorizationClient mockAuthorizationClient;
+    late MockRefreshService mockRefreshService;
     late MockTokenStorage mockTokenStorage;
     late MockRequestHandler mockRequestHandler;
     late MockResponseHandler mockResponseHandler;
 
     setUp(() {
-      mockAuthorizationClient = MockAuthorizationClient();
+      mockRefreshService = MockRefreshService();
       mockTokenStorage = MockTokenStorage();
       mockRequestHandler = MockRequestHandler();
       mockResponseHandler = MockResponseHandler();
     });
 
     tearDown(() {
-      reset(mockAuthorizationClient);
+      reset(mockRefreshService);
       reset(mockTokenStorage);
       reset(mockRequestHandler);
       reset(mockResponseHandler);
@@ -37,7 +37,7 @@ void main() {
     test('should reject request if token is null', () async {
       final authInterceptor = AuthInterceptor(
         tokenStorage: mockTokenStorage,
-        authorizationClient: mockAuthorizationClient,
+        refreshService: mockRefreshService,
       );
 
       final request = http.Request('GET', Uri.parse('https://example.com'));
@@ -50,11 +50,16 @@ void main() {
     test('should add authorization header if access token is valid', () async {
       final authInterceptor = AuthInterceptor(
         tokenStorage: mockTokenStorage,
-        authorizationClient: mockAuthorizationClient,
-        token: const Token('access_token', 'refresh_token'),
+        refreshService: mockRefreshService,
+        token: const OAuth2Token(
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          accessExpires: 1000,
+          refreshExpires: 1000,
+        ),
       );
 
-      when(mockAuthorizationClient.isAccessTokenValid(any)).thenAnswer((_) => Future.value(true));
+      when(mockRefreshService.isAccessTokenValid(any)).thenAnswer((_) => Future.value(true));
 
       final request = http.Request('GET', Uri.parse('https://example.com'));
 
@@ -71,8 +76,13 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
-          token: const Token('access token', 'refresh token'),
+          refreshService: mockRefreshService,
+          token: const OAuth2Token(
+            accessToken: 'access token',
+            refreshToken: 'refresh token',
+            accessExpires: 1000,
+            refreshExpires: 1000,
+          ),
         );
 
         final response = http.StreamedResponse(
@@ -82,11 +92,11 @@ void main() {
             ..headers['Authorization'] = 'Bearer access token',
         );
 
-        when(mockAuthorizationClient.isAccessTokenValid(any))
+        when(mockRefreshService.isAccessTokenValid(any))
             .thenAnswer((_) => Future.value(false));
-        when(mockAuthorizationClient.isRefreshTokenValid(any))
+        when(mockRefreshService.isRefreshTokenValid(any))
             .thenAnswer((_) => Future.value(true));
-        when(mockAuthorizationClient.refresh(any)).thenThrow(
+        when(mockRefreshService.refresh(any)).thenThrow(
           const RevokeTokenException(
             'Token is not valid and cannot be refreshed',
           ),
@@ -106,17 +116,22 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
-          token: const Token('access token', 'refresh token'),
+          refreshService: mockRefreshService,
+          token: const OAuth2Token(
+            accessToken: 'access token',
+            refreshToken: 'refresh token',
+            accessExpires: 1000,
+            refreshExpires: 1000,
+          ),
         );
 
         final request = http.Request('GET', Uri.parse('https://example.com'));
 
-        when(mockAuthorizationClient.isAccessTokenValid(any))
+        when(mockRefreshService.isAccessTokenValid(any))
             .thenAnswer((_) => Future.value(false));
-        when(mockAuthorizationClient.isRefreshTokenValid(any))
+        when(mockRefreshService.isRefreshTokenValid(any))
             .thenAnswer((_) => Future.value(true));
-        when(mockAuthorizationClient.refresh(any)).thenThrow(Exception());
+        when(mockRefreshService.refresh(any)).thenThrow(Exception());
 
         await authInterceptor.interceptRequest(request, mockRequestHandler);
 
@@ -131,17 +146,27 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
-          token: const Token('access_token', 'refresh_token'),
+          refreshService: mockRefreshService,
+          token: const OAuth2Token(
+            accessToken: 'access_token',
+            refreshToken: 'refresh_token',
+            accessExpires: 1000,
+            refreshExpires: 1000,
+          ),
         );
 
-        when(mockAuthorizationClient.isAccessTokenValid(any))
+        when(mockRefreshService.isAccessTokenValid(any))
             .thenAnswer((_) => Future.value(false));
-        when(mockAuthorizationClient.isRefreshTokenValid(any))
+        when(mockRefreshService.isRefreshTokenValid(any))
             .thenAnswer((_) => Future.value(true));
-        when(mockAuthorizationClient.refresh(any)).thenAnswer(
+        when(mockRefreshService.refresh(any)).thenAnswer(
           (_) => Future.value(
-            const Token('new_access_token', 'new_refresh_token'),
+            const OAuth2Token(
+              accessToken: 'new_access_token',
+              refreshToken: 'new_refresh_token',
+              accessExpires: 1000,
+              refreshExpires: 1000,
+            ),
           ),
         );
 
@@ -150,8 +175,13 @@ void main() {
         await authInterceptor.interceptRequest(request, mockRequestHandler);
 
         verify(
-          mockAuthorizationClient.refresh(
-            const Token('access_token', 'refresh_token'),
+          mockRefreshService.refresh(
+            const OAuth2Token(
+              accessToken: 'access_token',
+              refreshToken: 'refresh_token',
+              accessExpires: 1000,
+              refreshExpires: 1000,
+            ),
           ),
         );
 
@@ -167,13 +197,18 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
-          token: const Token('access token', 'refresh token'),
+          refreshService: mockRefreshService,
+          token: const OAuth2Token(
+            accessToken: 'access token',
+            refreshToken: 'refresh token',
+            accessExpires: 1000,
+            refreshExpires: 1000,
+          ),
         );
 
-        when(mockAuthorizationClient.isAccessTokenValid(any))
+        when(mockRefreshService.isAccessTokenValid(any))
             .thenAnswer((_) => Future.value(false));
-        when(mockAuthorizationClient.isRefreshTokenValid(any))
+        when(mockRefreshService.isRefreshTokenValid(any))
             .thenAnswer((_) => Future.value(false));
 
         final request = http.Request('GET', Uri.parse('https://example.com'));
@@ -188,8 +223,13 @@ void main() {
     test('should resolve response if status code is not 401', () async {
       final authInterceptor = AuthInterceptor(
         tokenStorage: mockTokenStorage,
-        authorizationClient: mockAuthorizationClient,
-        token: const Token('access token', 'refresh token'),
+        refreshService: mockRefreshService,
+        token: const OAuth2Token(
+          accessToken: 'access token',
+          refreshToken: 'refresh token',
+          accessExpires: 1000,
+          refreshExpires: 1000,
+        ),
       );
 
       final response = http.StreamedResponse(
@@ -208,8 +248,13 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
-          token: const Token('access token', 'refresh token'),
+          refreshService: mockRefreshService,
+          token: const OAuth2Token(
+            accessToken: 'access token',
+            refreshToken: 'refresh token',
+            accessExpires: 1000,
+            refreshExpires: 1000,
+          ),
         );
 
         final response = http.StreamedResponse(
@@ -231,8 +276,13 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
-          token: const Token('access token', 'refresh token'),
+          refreshService: mockRefreshService,
+          token: const OAuth2Token(
+            accessToken: 'access token',
+            refreshToken: 'refresh token',
+            accessExpires: 1000,
+            refreshExpires: 1000,
+          ),
         );
 
         final response = http.StreamedResponse(
@@ -242,11 +292,11 @@ void main() {
             ..headers['Authorization'] = 'Bearer access token',
         );
 
-        when(mockAuthorizationClient.isAccessTokenValid(any))
+        when(mockRefreshService.isAccessTokenValid(any))
             .thenAnswer((_) => Future.value(false));
-        when(mockAuthorizationClient.isRefreshTokenValid(any))
+        when(mockRefreshService.isRefreshTokenValid(any))
             .thenAnswer((_) => Future.value(true));
-        when(mockAuthorizationClient.refresh(any)).thenThrow(
+        when(mockRefreshService.refresh(any)).thenThrow(
           const RevokeTokenException(
             'Token is not valid and cannot be refreshed',
           ),
@@ -266,8 +316,13 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
-          token: const Token('access token', 'refresh token'),
+          refreshService: mockRefreshService,
+          token: const OAuth2Token(
+            accessToken: 'access token',
+            refreshToken: 'refresh token',
+            accessExpires: 1000,
+            refreshExpires: 1000,
+          ),
         );
 
         final response = http.StreamedResponse(
@@ -277,11 +332,11 @@ void main() {
             ..headers['Authorization'] = 'Bearer access token',
         );
 
-        when(mockAuthorizationClient.isAccessTokenValid(any))
+        when(mockRefreshService.isAccessTokenValid(any))
             .thenAnswer((_) => Future.value(false));
-        when(mockAuthorizationClient.isRefreshTokenValid(any))
+        when(mockRefreshService.isRefreshTokenValid(any))
             .thenAnswer((_) => Future.value(true));
-        when(mockAuthorizationClient.refresh(any)).thenThrow(Exception());
+        when(mockRefreshService.refresh(any)).thenThrow(Exception());
 
         await authInterceptor.interceptResponse(response, mockResponseHandler);
 
@@ -295,7 +350,7 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
+          refreshService: mockRefreshService,
         );
 
         final response = http.StreamedResponse(
@@ -317,17 +372,27 @@ void main() {
       () async {
         final authInterceptor = AuthInterceptor(
           tokenStorage: mockTokenStorage,
-          authorizationClient: mockAuthorizationClient,
-          token: const Token('access token', 'refresh token'),
+          refreshService: mockRefreshService,
+          token: const OAuth2Token(
+            accessToken: 'access token',
+            refreshToken: 'refresh token',
+            accessExpires: 1000,
+            refreshExpires: 1000,
+          ),
         );
 
-        when(mockAuthorizationClient.isAccessTokenValid(any))
+        when(mockRefreshService.isAccessTokenValid(any))
             .thenAnswer((_) => Future.value(false));
-        when(mockAuthorizationClient.isRefreshTokenValid(any))
+        when(mockRefreshService.isRefreshTokenValid(any))
             .thenAnswer((_) => Future.value(true));
-        when(mockAuthorizationClient.refresh(any)).thenAnswer(
+        when(mockRefreshService.refresh(any)).thenAnswer(
           (_) => Future.value(
-            const Token('new_access_token', 'new_refresh_token'),
+            const OAuth2Token(
+              accessToken: 'new_access_token',
+              refreshToken: 'new_refresh_token',
+              accessExpires: 1000,
+              refreshExpires: 1000,
+            ),
           ),
         );
 
@@ -341,8 +406,13 @@ void main() {
         await authInterceptor.interceptResponse(response, mockResponseHandler);
 
         verify(
-          mockAuthorizationClient.refresh(
-            const Token('access token', 'refresh token'),
+          mockRefreshService.refresh(
+            const OAuth2Token(
+              accessToken: 'access token',
+              refreshToken: 'refresh token',
+              accessExpires: 1000,
+              refreshExpires: 1000,
+            ),
           ),
         );
       },

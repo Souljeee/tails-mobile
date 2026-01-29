@@ -115,6 +115,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Перезвонить еще раз'**
   String get callAgain;
+
+  /// No description provided for @tryLater.
+  ///
+  /// In ru, this message translates to:
+  /// **'Произошла ошибка. Попробуйте позже.'**
+  String get tryLater;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

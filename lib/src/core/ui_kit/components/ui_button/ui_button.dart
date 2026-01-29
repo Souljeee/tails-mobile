@@ -17,6 +17,8 @@ class UiButton extends StatelessWidget {
 
   final IconData? icon;
 
+  final bool isLoading;
+
   final Color? staticFillColor,
       staticItemColor,
       pressedFillColor,
@@ -41,6 +43,7 @@ class UiButton extends StatelessWidget {
     this.pressedBorderColor,
     this.disabledBorderColor,
     this.icon,
+    this.isLoading = false,
     super.key,
   }) : _type = UiButtonType.main;
 
@@ -58,6 +61,7 @@ class UiButton extends StatelessWidget {
     this.disabledBorderColor,
     this.defaultBorderColor,
     this.icon,
+    this.isLoading = false,
     super.key,
   }) : _type = UiButtonType.secondary;
 
@@ -67,24 +71,35 @@ class UiButton extends StatelessWidget {
 
     return ElevatedButton(
       style: _createButtonStyle(context),
-      onPressed: onPressed,
+      onPressed: isLoading ? null : onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            label,
-            style: sizeProps.textStyle,
-            maxLines: 2,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (icon != null) ...[
-            const SizedBox(width: 8),
-            Icon(
-              icon,
-              size: 24,
-              color: context.uiColors.white,
-            )
+          if (isLoading) ...[
+            Center(
+              child: SizedBox.square(
+                dimension: 24,
+                child: CircularProgressIndicator(
+                  color: context.uiColors.white,
+                ),
+              ),
+            ),
+          ] else ...[
+            Text(
+              label,
+              style: sizeProps.textStyle,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (icon != null) ...[
+              const SizedBox(width: 8),
+              Icon(
+                icon,
+                size: 24,
+                color: context.uiColors.white,
+              )
+            ],
           ],
         ],
       ),
@@ -93,7 +108,7 @@ class UiButton extends StatelessWidget {
 
   _ButtonColorScheme _getColorScheme(BuildContext context) {
     final colors = context.uiColors;
-    const  transparent = Colors.transparent;
+    const transparent = Colors.transparent;
 
     switch (_type) {
       case UiButtonType.main:

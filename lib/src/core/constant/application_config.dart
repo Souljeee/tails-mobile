@@ -21,6 +21,9 @@ class ApplicationConfig {
   /// The Sentry DSN.
   String get sentryDsn => const String.fromEnvironment('SENTRY_DSN').trim();
 
+  /// The base URL.
+  String get baseUrl => const String.fromEnvironment('BASE_URL').trim();
+
   /// Whether Sentry is enabled.
   bool get enableSentry => sentryDsn.isNotEmpty;
 }

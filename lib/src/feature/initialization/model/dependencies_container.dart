@@ -1,7 +1,12 @@
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/logger/logger.dart';
+import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
+import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
+import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
+import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 
 /// {@template dependencies_container}
@@ -17,6 +22,11 @@ class DependenciesContainer {
     required this.appSettingsBloc,
     required this.errorReporter,
     required this.packageInfo,
+    required this.restClient, 
+    required this.authRepository,
+    required this.authorizationBloc,
+    required this.sendCodeBloc,
+    required this.codeTimerBloc,
   });
 
   /// [Logger] instance, used to log messages.
@@ -33,6 +43,21 @@ class DependenciesContainer {
 
   /// [PackageInfo] instance, contains information about the application.
   final PackageInfo packageInfo;
+
+  /// [RestClient] instance, used to make HTTP requests.
+  final RestClient restClient;
+
+  /// [AuthRepository] instance, used to fetch auth data from the remote source.
+  final AuthRepository authRepository;
+
+  /// [AuthBloc] instance, used to manage authentication state.
+  final AuthBloc authorizationBloc;
+
+  /// [SendCodeBloc] instance, used to send verification code.
+  final SendCodeBloc sendCodeBloc;
+
+  /// [CodeTimerBloc] instance, used to manage code resend timer.
+  final CodeTimerBloc codeTimerBloc;
 }
 
 /// {@template testing_dependencies_container}

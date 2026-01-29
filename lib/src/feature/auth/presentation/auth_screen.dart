@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
@@ -6,7 +7,10 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_imag
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
+import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/models/slide_uio.dart';
+import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});
@@ -190,13 +194,33 @@ class _LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<_LoginForm> {
   final String _numberInputMask = '(###)###-##-##';
-  final _numberController = UiTextFieldController();
+  final String _countryCode = '+7';
+  late final _numberController = UiTextFieldController();
   final _focusNode = FocusNode();
+
+  late final SendCodeBloc _sendCodeBloc;
+  late final CodeTimerBloc _codeTimerBloc;
+
+  String get _phoneNumber => '$_countryCode${_numberController.text}';
+
+  bool get _isNumberValid =>
+      _numberController.value.text.isNotEmpty &&
+      _phoneNumber.length == _numberInputMask.length + _countryCode.length;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    final dependencies = DependenciesScope.of(context);
+    _sendCodeBloc = SendCodeBloc(authRepository: dependencies.authRepository);
+    _codeTimerBloc = dependencies.codeTimerBloc;
+  }
 
   @override
   void dispose() {
     _numberController.dispose();
     _focusNode.dispose();
+    _sendCodeBloc.close();
 
     super.dispose();
   }
@@ -241,20 +265,77 @@ class _LoginFormState extends State<_LoginForm> {
             ),
           ),
           const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: UiButton.main(
-              onPressed: () {
-                final phoneNumber = '+7${_numberController.text}';
+          BlocConsumer<SendCodeBloc, SendCodeState>(
+            bloc: _sendCodeBloc,
+            listener: (context, state) {
+              state.mapOrNull(
+                success: (_) {
+                  // Запускаем таймер и переходим на экран ввода кода
+                  _codeTimerBloc.add(const CodeTimerEvent.started());
+                  EnterCodeRoute(phoneNumber: _phoneNumber).push<void>(context);
+                },
+                error: (_) => _showErrorSnackBar(),
+              );
+            },
+            builder: (context, sendCodeState) {
+              return BlocBuilder<CodeTimerBloc, CodeTimerState>(
+                bloc: _codeTimerBloc,
+                builder: (context, timerState) {
+                  return ValueListenableBuilder(
+                    valueListenable: _numberController,
+                    builder: (context, value, child) {
+                      final isTimerActive = timerState.maybeMap(
+                        ticking: (_) => true,
+                        orElse: () => false,
+                      );
 
-                EnterCodeRoute(phoneNumber: phoneNumber).push<void>(context);
-              },
-              icon: Icons.arrow_right_alt,
-              label: 'Войти',
-            ),
+                      return SizedBox(
+                        width: double.infinity,
+                        child: UiButton.main(
+                          isLoading: sendCodeState.maybeMap(
+                            loading: (_) => true,
+                            orElse: () => false,
+                          ),
+                          onPressed: _isNumberValid
+                              ? isTimerActive
+                                  ? _navigateToEnterCode
+                                  : _sendCode
+                              : null,
+                          icon: Icons.arrow_right_alt,
+                          label: 'Войти',
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
           ),
-          //const Spacer(),
         ],
+      ),
+    );
+  }
+
+  void _navigateToEnterCode() {
+    EnterCodeRoute(phoneNumber: _phoneNumber).push<void>(context);
+  }
+
+  void _sendCode() {
+    final formattedPhoneNumber =
+        _phoneNumber.replaceAll('(', '').replaceAll(')', '').replaceAll('-', '');
+
+    _sendCodeBloc.add(SendCodeEvent$SendCodeRequested(phoneNumber: formattedPhoneNumber));
+  }
+
+  void _showErrorSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Произошла ошибка. Повторите позднее.',
+          style: context.uiFonts.text14Regular.copyWith(color: context.uiColors.white),
+        ),
+        backgroundColor: context.uiColors.red,
+        duration: const Duration(seconds: 3),
       ),
     );
   }

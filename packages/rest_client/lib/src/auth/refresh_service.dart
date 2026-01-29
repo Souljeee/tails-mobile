@@ -1,7 +1,7 @@
 import 'dart:async';
 
 /// The client that refreshes the Auth token using the refresh token.
-abstract interface class AuthorizationClient<T> {
+abstract interface class RefreshService<T> {
   /// Check if refresh token is valid
   Future<bool> isRefreshTokenValid(T token);
 

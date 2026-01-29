@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:tails_mobile/src/core/utils/layout/window_size.dart';
+import 'package:tails_mobile/src/feature/auth/presentation/auth_scope.dart';
 import 'package:tails_mobile/src/feature/initialization/logic/composition_root.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/material_context.dart';
@@ -26,9 +27,25 @@ class RootContext extends StatelessWidget {
         bundle: SentryAssetBundle(),
         child: DependenciesScope(
           dependencies: compositionResult.dependencies,
-          child: const SettingsScope(
-            child: WindowSizeScope(child: MaterialContext()),
+          child: SettingsScope(
+            child: WindowSizeScope(
+              child: AuthScope(
+                authBloc: compositionResult.dependencies.authorizationBloc,
+                child: GestureDetector(
+                  onTap: () => _unFocus(context: context),
+                  child: const MaterialContext(),
+                ),
+              ),
+            ),
           ),
         ),
       );
+
+  void _unFocus({required BuildContext context}) {
+    final currentScope = FocusScope.of(context);
+
+    if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+  }
 }
