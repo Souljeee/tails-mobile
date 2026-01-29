@@ -1,0 +1,17 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Фон круг -->
+    <circle cx="60" cy="60" r="50" fill="#F5F5F5"/>
+    
+    <!-- Крыша будки -->
+    <path d="M 35 55 L 60 35 L 85 55" stroke="#9E9E9E" stroke-width="2.5" fill="#FFE0B2" stroke-linejoin="round"/>
+    
+    <!-- Домик -->
+    <rect x="35" y="55" width="50" height="30" fill="#FFCC80" stroke="#9E9E9E" stroke-width="2.5"/>
+    
+    <!-- Вход (арка) -->
+    <path d="M 50 85 L 50 70 Q 50 62 60 62 Q 70 62 70 70 L 70 85" fill="#E0E0E0" stroke="#9E9E9E" stroke-width="2"/>
+    
+    <!-- Вопросительный знак внутри -->
+    <text x="60" y="77" text-anchor="middle" fill="#B0B0B0" font-size="16" font-family="sans-serif" font-weight="bold">?</text>
+  </svg>
+  

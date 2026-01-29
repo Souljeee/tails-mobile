@@ -8,9 +8,9 @@ class AppRouter {
   static final RouterConfig<Object> config = GoRouter(
     initialLocation: const PetsRoute().location,
     routes: $appRoutes,
-    redirect: RedirectBuilder({
-      RedirectIfNotAuthorizedGuard(),
-      RedirectIfAuthorizedGuard(),
-    }),
+    // redirect: RedirectBuilder({
+    //   RedirectIfNotAuthorizedGuard(),
+    //   RedirectIfAuthorizedGuard(),
+    // }),
   );
 }

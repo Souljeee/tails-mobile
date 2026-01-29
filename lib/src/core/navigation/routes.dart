@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tails_mobile/src/core/navigation/scaffold_with_navbar.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_screen.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/enter_code_screen.dart';
+import 'package:tails_mobile/src/feature/pets/pets_list/presentation/pets_screen.dart';
 
 part 'routes.g.dart';
 
@@ -118,7 +119,7 @@ class PetsRoute extends GoRouteData with $PetsRoute {
   const PetsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const SizedBox();
+  Widget build(BuildContext context, GoRouterState state) => const PetsScreen();
 }
 
 class CalendarRoute extends GoRouteData with $CalendarRoute {

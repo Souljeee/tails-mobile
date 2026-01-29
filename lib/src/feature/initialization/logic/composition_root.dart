@@ -17,6 +17,8 @@ import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 import 'package:tails_mobile/src/feature/settings/data/app_settings_datasource.dart';
 import 'package:tails_mobile/src/feature/settings/data/app_settings_repository.dart';
@@ -180,6 +182,10 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final codeTimerBloc = CodeTimerBloc();
 
+    final petsRemoteDataSource = PetsRemoteDataSource(restClient: restClient);
+
+    final petRepository = PetRepository(petsRemoteDataSource: petsRemoteDataSource);
+
     return DependenciesContainer(
       logger: logger,
       config: config,
@@ -191,6 +197,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       authorizationBloc: authorizationBloc,
       sendCodeBloc: sendCodeBloc,
       codeTimerBloc: codeTimerBloc,
+      petRepository: petRepository,
     );
   }
 }

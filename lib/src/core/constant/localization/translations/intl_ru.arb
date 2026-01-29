@@ -4,5 +4,41 @@
   "enterCodeTitle": "Ввод кода\nподтверждения",
   "enterCodeSubtitle": "Вам позвонит робот на номер",
   "callAgain": "Перезвонить еще раз",
-  "tryLater": "Произошла ошибка. Попробуйте позже."
+  "tryLater": "Произошла ошибка. Попробуйте позже.",
+  "petAgeYears": "{years, plural, one{{years} год} few{{years} года} many{{years} лет} other{{years} лет}}",
+  "@petAgeYears": {
+    "description": "Возраст питомца в годах с правильным склонением",
+    "placeholders": {
+      "years": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "petAgeMonths": "{months, plural, one{{months} месяц} few{{months} месяца} many{{months} месяцев} other{{months} месяцев}}",
+  "@petAgeMonths": {
+    "description": "Возраст питомца в месяцах с правильным склонением",
+    "placeholders": {
+      "months": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "petAgeYearsAndMonths": "{years, plural, one{{years} год} few{{years} года} many{{years} лет} other{{years} лет}} {months, plural, one{{months} месяц} few{{months} месяца} many{{months} месяцев} other{{months} месяцев}}",
+  "@petAgeYearsAndMonths": {
+    "description": "Возраст питомца в годах и месяцах с правильным склонением",
+    "placeholders": {
+      "years": {
+        "type": "int",
+        "example": "2"
+      },
+      "months": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "dog": "Собака",
+  "cat": "Кошка"
 }
