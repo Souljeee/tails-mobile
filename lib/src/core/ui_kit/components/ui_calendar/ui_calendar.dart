@@ -129,8 +129,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
 
   CalendarStyle get _defaultStyle => CalendarStyle(
         resolveDateTextColor: (_) => context.uiColors.black50,
-        resolveDateBackgroundColor: null,
-        resolveDateBorderColor: null,
       );
 
   DateConstraints get _defaultConstraints => const DateConstraints();
@@ -452,7 +450,7 @@ class _CalendarMonthData {
     required this.month,
   });
 
-  final _daysInWeekCount = 7;
+  static const _daysInWeekCount = 7;
 
   int get _daysInMonth => DateUtils.getDaysInMonth(year, month);
 
@@ -462,7 +460,7 @@ class _CalendarMonthData {
 
   List<List<_CalendarDayData>> get weeks {
     final res = <List<_CalendarDayData>>[];
-    final firstDayMonth = DateTime(year, month, 1);
+    final firstDayMonth = DateTime(year, month);
     DateTime firstDayOfWeek = firstDayMonth.subtract(Duration(days: _firstDayOffset));
 
     for (var weekIndex = 0; weekIndex < _weeksCount; weekIndex++) {
@@ -483,7 +481,7 @@ class _CalendarMonthData {
 
       res.add(week);
 
-      firstDayOfWeek = firstDayOfWeek.add(Duration(days: _daysInWeekCount));
+      firstDayOfWeek = firstDayOfWeek.add(const Duration(days: _daysInWeekCount));
     }
 
     return res;
