@@ -35,7 +35,7 @@ class UiTextField extends StatefulWidget {
     this.textInputAction,
     this.trailingIcon,
     this.onTrailingTap,
-    this.suffixIconPath,
+    this.suffixIcon,
     this.suffixIconColor,
     this.onSuffixTap,
     this.secondaryText,
@@ -85,7 +85,7 @@ class UiTextField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final Widget? trailingIcon;
   final VoidCallback? onTrailingTap;
-  final String? suffixIconPath;
+  final IconData? suffixIcon;
   final Color? suffixIconColor;
   final VoidCallback? onSuffixTap;
   final String? secondaryText;
@@ -229,12 +229,14 @@ class _UiTextFieldState extends State<UiTextField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Stack(
-          children: [
-            Listener(
-              onPointerUp: (_) => setState(() => _pressed = false),
-              onPointerDown: (_) => setState(() => _pressed = true),
-              child: TextField(
+        GestureDetector(
+          onTapDown: (_) => setState(() => _pressed = true),
+          onTapUp: (_) => setState(() => _pressed = false),
+          onTapCancel: () => setState(() => _pressed = false),
+          behavior: HitTestBehavior.translucent,
+          child: Stack(
+            children: [
+              TextField(
                 textCapitalization: widget.capitalization,
                 onTap: widget.onTap,
                 onChanged: (value) {
@@ -267,17 +269,21 @@ class _UiTextFieldState extends State<UiTextField> {
                 textAlignVertical: TextAlignVertical.bottom,
                 decoration: InputDecoration(
                   isDense: true,
-                  hintText: widget.labelText == null || _hasFocus ? widget.placeholderText : null,
+                  hintText: widget.labelText == null ? widget.placeholderText : null,
                   hintMaxLines: widget.labelMaxLines,
                   hintStyle: widget.placeholderStyle ??
                       themeTypography.text16Regular.copyWith(
                         color: colors.black50,
                         overflow: TextOverflow.ellipsis,
                       ),
-                  prefixIcon: GestureDetector(
-                    onTap: widget.onTrailingTap,
-                    child: widget.trailingIcon,
-                  ),
+                  prefixIcon: widget.trailingIcon == null
+                      ? null
+                      : GestureDetector(
+                          onTap: widget.onTrailingTap,
+                          child: widget.trailingIcon,
+                        ),
+                  prefixIconConstraints:
+                      widget.trailingIcon == null ? null : widget.trailingConstraints,
                   // prefix: GestureDetector(
                   //   onTap: widget.onTrailingTap,
                   //   child: widget.trailingIcon,
@@ -286,7 +292,7 @@ class _UiTextFieldState extends State<UiTextField> {
                   //prefixIconConstraints: const BoxConstraints(minWidth: 44, maxWidth: 44, minHeight: 44, maxHeight: 44),
                   suffixIcon: _SuffixWidget(
                     secondaryText: widget.secondaryText,
-                    suffixIconPath: widget.suffixIconPath,
+                    suffixIcon: widget.suffixIcon,
                     hasFocus: _hasFocus,
                     suffixIconColor: widget.suffixIconColor,
                     onSuffixTap: widget.onSuffixTap,
@@ -324,7 +330,6 @@ class _UiTextFieldState extends State<UiTextField> {
                   ...widget.trailingFormatters,
                 ],
               ),
-            ),
             if (widget.labelText != null)
               IgnorePointer(
                 child: AnimatedContainer(
@@ -342,6 +347,7 @@ class _UiTextFieldState extends State<UiTextField> {
                 ),
               ),
           ],
+        ),
         ),
         if (hasValidationErrors && widget.maxLength == null)
           Padding(
@@ -365,7 +371,7 @@ class _UiTextFieldState extends State<UiTextField> {
 class _SuffixWidget extends StatelessWidget {
   const _SuffixWidget({
     required this.secondaryText,
-    required this.suffixIconPath,
+    required this.suffixIcon,
     required this.hasFocus,
     required this.suffixIconColor,
     required this.onSuffixTap,
@@ -373,7 +379,7 @@ class _SuffixWidget extends StatelessWidget {
   });
 
   final String? secondaryText;
-  final String? suffixIconPath;
+  final IconData? suffixIcon;
   final bool hasFocus;
   final Color? suffixIconColor;
   final VoidCallback? onSuffixTap;
@@ -381,7 +387,7 @@ class _SuffixWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (secondaryText == null && suffixIconPath == null) {
+    if (secondaryText == null && suffixIcon == null) {
       return const SizedBox.shrink();
     }
 
@@ -397,13 +403,14 @@ class _SuffixWidget extends StatelessWidget {
                 style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black40),
               ),
             ),
-          if (suffixIconPath == null) const SizedBox(width: 12),
-          if (suffixIconPath != null)
+          if (suffixIcon == null) const SizedBox(width: 12),
+          if (suffixIcon != null)
             IconButton(
               padding: EdgeInsets.zero,
               onPressed: onSuffixTap,
-              icon: UiSvgImage(
-                svgPath: suffixIconPath!,
+              icon: Icon(
+                suffixIcon,
+                size: 28,
                 color: suffixIconColor ?? context.uiColors.black100,
               ),
             ),

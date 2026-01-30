@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.da
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/pets/add_pet/persentation/add_pet_modal.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/pets_list/domain/pets_list_bloc.dart';
@@ -49,7 +50,12 @@ class _PetsScreenState extends State<PetsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddPetModal()),
+          );
+        },
         backgroundColor: context.uiColors.orangePrimary,
         child: Icon(
           Icons.add,

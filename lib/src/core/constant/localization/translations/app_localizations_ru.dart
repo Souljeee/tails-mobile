@@ -75,4 +75,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get cat => 'Кошка';
+
+  @override
+  String get monday => 'Пн';
+
+  @override
+  String get tuesday => 'Вт';
+
+  @override
+  String get wednesday => 'Ср';
+
+  @override
+  String get thursday => 'Чт';
+
+  @override
+  String get friday => 'Пт';
+
+  @override
+  String get saturday => 'Сб';
+
+  @override
+  String get sunday => 'Вс';
 }

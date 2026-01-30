@@ -151,6 +151,48 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Кошка'**
   String get cat;
+
+  /// No description provided for @monday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пн'**
+  String get monday;
+
+  /// No description provided for @tuesday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вт'**
+  String get tuesday;
+
+  /// No description provided for @wednesday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ср'**
+  String get wednesday;
+
+  /// No description provided for @thursday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чт'**
+  String get thursday;
+
+  /// No description provided for @friday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пт'**
+  String get friday;
+
+  /// No description provided for @saturday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сб'**
+  String get saturday;
+
+  /// No description provided for @sunday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вс'**
+  String get sunday;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
