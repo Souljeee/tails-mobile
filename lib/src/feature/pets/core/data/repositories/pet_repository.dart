@@ -21,7 +21,7 @@ class PetRepository {
 
   Future<void> addPet({
     required AddPetModel model,
-    required Uint8List image,
+    required Uint8List? image,
   }) async {
     await _petsRemoteDataSource.addPet(dto: model.toDto(), image: image);
   }

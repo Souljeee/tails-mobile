@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/pets/add_pet/domain/add_pet_bloc.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/calendar_popup.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/castration_section.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/pet_type_selection.dart';
@@ -28,6 +31,9 @@ class _AddPetModalState extends State<AddPetModal> {
   PetSexEnum _selectedPetSex = PetSexEnum.male;
   bool _isCastrated = false;
   double? _weight;
+
+  late final AddPetBloc _addPetBloc =
+      AddPetBloc(petRepository: DependenciesScope.of(context).petRepository);
 
   final UiTextFieldController _nameController = UiTextFieldController();
   final UiTextFieldController _birthDateController = UiTextFieldController();
@@ -195,9 +201,34 @@ class _AddPetModalState extends State<AddPetModal> {
                 onSelected: _onCastrationSelected,
               ),
               const SizedBox(height: 32),
-              UiButton.main(
-                label: 'Сохранить',
-                onPressed: () {},
+              BlocBuilder<AddPetBloc, AddPetState>(
+                bloc: _addPetBloc,
+                builder: (context, state) {
+                  return UiButton.main(
+                    isLoading: state.maybeMap(
+                      loading: (_) => true,
+                      orElse: () => false,
+                    ),
+                    label: 'Сохранить',
+                    onPressed: state.mapOrNull(
+                      initial: (_) => () {
+                        _addPetBloc.add(
+                          AddPetEvent.addingRequested(
+                            name: _nameController.text,
+                            petType: _selectedPetType,
+                            breed: _breedController.text,
+                            color: _colorController.text,
+                            weight: _weight?.toString() ?? '',
+                            sex: _selectedPetSex,
+                            birthDate: DateTime.parse(_birthDateController.text),
+                            castration: _isCastrated,
+                            image: _selectedPetImage?.readAsBytesSync(),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
             ],
           ),

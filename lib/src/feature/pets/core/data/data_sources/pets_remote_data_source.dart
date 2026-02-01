@@ -23,17 +23,18 @@ class PetsRemoteDataSource {
 
   Future<void> addPet({
     required AddPetDto dto,
-    required Uint8List image,
+    required Uint8List? image,
   }) async {
     final response = await _restClient.multipart(
       '/pets',
       fields: dto.toJson().map((key, value) => MapEntry(key, value.toString())),
       files: [
-        RestClientMultipartFile.bytes(
-          field: 'image',
-          bytes: image,
-          filename: '',
-        ),
+        if (image != null)
+          RestClientMultipartFile.bytes(
+            field: 'image',
+            bytes: image,
+            filename: '',
+          ),
       ],
     );
 
