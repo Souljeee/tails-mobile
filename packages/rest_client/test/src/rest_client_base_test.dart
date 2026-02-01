@@ -199,6 +199,33 @@ void main() {
       );
     });
 
+    test('multipartReturns', () {
+      final client = _ReturningRestClientBase(baseUrl: 'http://localhost:8080');
+      final file = RestClientMultipartFile.bytes(
+        field: 'file',
+        bytes: const [1, 2, 3],
+        filename: 'file.bin',
+      );
+
+      expectLater(
+        client.multipart(
+          '/path',
+          fields: const {'hello': 'world'},
+          files: [file],
+        ),
+        completion(
+          equals({
+            'path': '/path',
+            'method': 'POST',
+            'headers': null,
+            'queryParams': null,
+            'fields': const {'hello': 'world'},
+            'files': [file.toString()],
+          }),
+        ),
+      );
+    });
+
     test('postReturns', () {
       final client = _ReturningRestClientBase(baseUrl: 'http://localhost:8080');
       expectLater(
@@ -293,8 +320,8 @@ final class _ReturningRestClientBase extends RestClientBase {
     required String path,
     required String method,
     Map<String, Object?>? body,
-    Map<String, Object?>? headers,
-    Map<String, Object?>? queryParams,
+    Map<String, String>? headers,
+    Map<String, String?>? queryParams,
   }) async =>
       {
         'path': path,
@@ -302,6 +329,24 @@ final class _ReturningRestClientBase extends RestClientBase {
         'body': body,
         'headers': headers,
         'queryParams': queryParams,
+      };
+
+  @override
+  Future<Map<String, Object?>?> sendMultipart({
+    required String path,
+    required String method,
+    Map<String, String>? headers,
+    Map<String, String?>? queryParams,
+    Map<String, String>? fields,
+    List<RestClientMultipartFile>? files,
+  }) async =>
+      {
+        'path': path,
+        'method': method,
+        'headers': headers,
+        'queryParams': queryParams,
+        'fields': fields,
+        'files': files?.map((f) => f.toString()).toList(),
       };
 }
 
@@ -317,8 +362,19 @@ final class NoOpRestClientBase extends RestClientBase {
     required String path,
     required String method,
     Map<String, Object?>? body,
-    Map<String, Object?>? headers,
-    Map<String, Object?>? queryParams,
+    Map<String, String>? headers,
+    Map<String, String?>? queryParams,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<Map<String, Object?>?> sendMultipart({
+    required String path,
+    required String method,
+    Map<String, String>? headers,
+    Map<String, String?>? queryParams,
+    Map<String, String>? fields,
+    List<RestClientMultipartFile>? files,
   }) =>
       throw UnimplementedError();
 }

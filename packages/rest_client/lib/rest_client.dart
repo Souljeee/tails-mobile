@@ -6,5 +6,6 @@ export 'src/auth/refresh_service.dart';
 export 'src/auth/token_storage.dart';
 export 'src/exception/rest_client_exception.dart';
 export 'src/http/rest_client_http.dart';
+export 'src/multipart/rest_client_multipart_file.dart';
 export 'src/rest_client.dart';
 export 'src/rest_client_base.dart';

@@ -25,6 +25,16 @@ abstract base class RestClientBase implements RestClient {
     Map<String, String?>? queryParams,
   });
 
+  /// Sends a multipart/form-data request to the server.
+  Future<Map<String, Object?>?> sendMultipart({
+    required String path,
+    required String method,
+    Map<String, String>? headers,
+    Map<String, String?>? queryParams,
+    Map<String, String>? fields,
+    List<RestClientMultipartFile>? files,
+  });
+
   @override
   Future<Map<String, Object?>?> delete(
     String path, {
@@ -49,6 +59,24 @@ abstract base class RestClientBase implements RestClient {
         method: 'GET',
         headers: headers,
         queryParams: queryParams,
+      );
+
+  @override
+  Future<Map<String, Object?>?> multipart(
+    String path, {
+    String method = 'POST',
+    Map<String, String>? headers,
+    Map<String, String?>? queryParams,
+    Map<String, String>? fields,
+    List<RestClientMultipartFile>? files,
+  }) =>
+      sendMultipart(
+        path: path,
+        method: method,
+        headers: headers,
+        queryParams: queryParams,
+        fields: fields,
+        files: files,
       );
 
   @override
