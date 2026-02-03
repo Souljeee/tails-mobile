@@ -299,9 +299,14 @@ class _AddPetModalState extends State<AddPetModal> {
                 ),
               ),
               const SizedBox(height: 16),
-              CastrationSection(
-                sex: _formData.value.sex ?? PetSexEnum.male,
-                onSelected: _onCastrationSelected,
+              ValueListenableBuilder(
+                valueListenable: _formData,
+                builder: (context, formData, _) {
+                  return CastrationSection(
+                    sex: formData.sex ?? PetSexEnum.male,
+                    onSelected: _onCastrationSelected,
+                  );
+                }
               ),
               const SizedBox(height: 32),
               BlocBuilder<AddPetBloc, AddPetState>(
