@@ -78,7 +78,14 @@ class AuthRemoteDataSource {
         throw const ClientException(message: 'Response is null');
       }
 
-      final token = TokensDto.fromJson(response);
+      if (response is! Map) {
+        throw ClientException(
+          message: 'Unexpected response type for verify-code',
+          cause: response.runtimeType,
+        );
+      }
+
+      final token = TokensDto.fromJson(Map<String, dynamic>.from(response));
 
       return OAuth2Token(
         accessToken: token.access,

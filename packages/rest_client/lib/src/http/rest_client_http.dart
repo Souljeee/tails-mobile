@@ -58,7 +58,7 @@ final class RestClientHttp extends RestClientBase {
   final http.Client _client;
 
   @override
-  Future<Map<String, Object?>?> send({
+  Future<Object?> send({
     required String path,
     required String method,
     Map<String, String?>? queryParams,
@@ -103,7 +103,7 @@ final class RestClientHttp extends RestClientBase {
   }
 
   @override
-  Future<Map<String, Object?>?> sendMultipart({
+  Future<Object?> sendMultipart({
     required String path,
     required String method,
     Map<String, String?>? queryParams,

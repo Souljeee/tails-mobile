@@ -316,7 +316,7 @@ final class _ReturningRestClientBase extends RestClientBase {
   _ReturningRestClientBase({required super.baseUrl});
 
   @override
-  Future<Map<String, Object?>?> send({
+  Future<Object?> send({
     required String path,
     required String method,
     Map<String, Object?>? body,
@@ -332,7 +332,7 @@ final class _ReturningRestClientBase extends RestClientBase {
       };
 
   @override
-  Future<Map<String, Object?>?> sendMultipart({
+  Future<Object?> sendMultipart({
     required String path,
     required String method,
     Map<String, String>? headers,
@@ -358,7 +358,7 @@ final class NoOpRestClientBase extends RestClientBase {
   NoOpRestClientBase({required super.baseUrl});
 
   @override
-  Future<Map<String, Object?>?> send({
+  Future<Object?> send({
     required String path,
     required String method,
     Map<String, Object?>? body,
@@ -368,7 +368,7 @@ final class NoOpRestClientBase extends RestClientBase {
       throw UnimplementedError();
 
   @override
-  Future<Map<String, Object?>?> sendMultipart({
+  Future<Object?> sendMultipart({
     required String path,
     required String method,
     Map<String, String>? headers,

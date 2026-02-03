@@ -40,11 +40,17 @@ class RefreshServiceImpl implements RefreshService<OAuth2Token> {
         throw const RevokeTokenException('Response is null');
       }
 
+      if (response is! Map) {
+        throw RevokeTokenException('Unexpected response type: ${response.runtimeType}');
+      }
+
+      final json = response.cast<String, Object?>();
+
       return OAuth2Token(
-        accessToken: response['access_token']! as String,
-        refreshToken: response['refresh_token']! as String,
-        accessExpires: _toEpochMillis((response['access_expires']! as num).toInt()),
-        refreshExpires: _toEpochMillis((response['refresh_expires']! as num).toInt()),
+        accessToken: json['access_token']! as String,
+        refreshToken: json['refresh_token']! as String,
+        accessExpires: _toEpochMillis((json['access_expires']! as num).toInt()),
+        refreshExpires: _toEpochMillis((json['refresh_expires']! as num).toInt()),
       );
     } catch (e) {
       if (e is RestClientException && e.statusCode == 401) {

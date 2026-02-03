@@ -17,7 +17,7 @@ abstract base class RestClientBase implements RestClient {
   static final _jsonUTF8 = json.fuse(utf8);
 
   /// Sends a request to the server
-  Future<Map<String, Object?>?> send({
+  Future<Object?> send({
     required String path,
     required String method,
     Map<String, Object?>? body,
@@ -26,7 +26,7 @@ abstract base class RestClientBase implements RestClient {
   });
 
   /// Sends a multipart/form-data request to the server.
-  Future<Map<String, Object?>?> sendMultipart({
+  Future<Object?> sendMultipart({
     required String path,
     required String method,
     Map<String, String>? headers,
@@ -36,7 +36,7 @@ abstract base class RestClientBase implements RestClient {
   });
 
   @override
-  Future<Map<String, Object?>?> delete(
+  Future<Object?> delete(
     String path, {
     Map<String, String>? headers,
     Map<String, String?>? queryParams,
@@ -49,7 +49,7 @@ abstract base class RestClientBase implements RestClient {
       );
 
   @override
-  Future<Map<String, Object?>?> get(
+  Future<Object?> get(
     String path, {
     Map<String, String>? headers,
     Map<String, String?>? queryParams,
@@ -62,7 +62,7 @@ abstract base class RestClientBase implements RestClient {
       );
 
   @override
-  Future<Map<String, Object?>?> multipart(
+  Future<Object?> multipart(
     String path, {
     String method = 'POST',
     Map<String, String>? headers,
@@ -80,7 +80,7 @@ abstract base class RestClientBase implements RestClient {
       );
 
   @override
-  Future<Map<String, Object?>?> patch(
+  Future<Object?> patch(
     String path, {
     required Map<String, Object?> body,
     Map<String, String>? headers,
@@ -95,7 +95,7 @@ abstract base class RestClientBase implements RestClient {
       );
 
   @override
-  Future<Map<String, Object?>?> post(
+  Future<Object?> post(
     String path, {
     required Map<String, Object?> body,
     Map<String, String>? headers,
@@ -110,7 +110,7 @@ abstract base class RestClientBase implements RestClient {
       );
 
   @override
-  Future<Map<String, Object?>?> put(
+  Future<Object?> put(
     String path, {
     required Map<String, Object?> body,
     Map<String, String>? headers,
@@ -161,7 +161,7 @@ abstract base class RestClientBase implements RestClient {
   /// body as is.
   @protected
   @visibleForTesting
-  Future<Map<String, Object?>?> decodeResponse(
+  Future<Object?> decodeResponse(
     ResponseBody<Object>? body, {
     int? statusCode,
   }) async {
@@ -174,18 +174,26 @@ abstract base class RestClientBase implements RestClient {
         BytesResponseBody(:final List<int> data) => await _decodeBytes(data),
       };
 
-      if (decodedBody case {'error': final Map<String, Object?> error}) {
-        throw StructuredBackendException(
-          error: error,
-          statusCode: statusCode,
-        );
+      if (decodedBody is Map) {
+        final map = decodedBody.cast<String, Object?>();
+
+        if (map['error'] case final Map<dynamic, dynamic> error) {
+          throw StructuredBackendException(
+            error: error.cast<String, Object?>(),
+            statusCode: statusCode,
+          );
+        }
+
+        // Если бекенд оборачивает ответ в { "data": ... }, возвращаем ровно data
+        // (оно может быть Map, List или примитивом).
+        if (map.containsKey('data')) {
+          return map['data'];
+        }
+
+        return map;
       }
 
-      if (decodedBody case {'data': final Map<String, Object?> data}) {
-        return data;
-      }
-
-      // Simply return decoded body if it is not an error or data
+      // List / primitive / null
       return decodedBody;
     } on RestClientException {
       rethrow;
@@ -201,8 +209,8 @@ abstract base class RestClientBase implements RestClient {
     }
   }
 
-  /// Decodes a [String] to a [Map<String, Object?>]
-  Future<Map<String, Object?>?> _decodeString(String stringBody) async {
+  /// Decodes a [String] to a JSON value (Map / List / primitive / null).
+  Future<Object?> _decodeString(String stringBody) async {
     if (stringBody.isEmpty) return null;
 
     if (stringBody.length > 1000) {
@@ -210,14 +218,14 @@ abstract base class RestClientBase implements RestClient {
         json.decode,
         stringBody,
         debugLabel: kDebugMode ? 'Decode String Compute' : null,
-      )) as Map<String, Object?>;
+      ));
     }
 
-    return json.decode(stringBody) as Map<String, Object?>;
+    return json.decode(stringBody);
   }
 
-  /// Decodes a [List<int>] to a [Map<String, Object?>]
-  Future<Map<String, Object?>?> _decodeBytes(List<int> bytesBody) async {
+  /// Decodes a [List<int>] to a JSON value (Map / List / primitive / null).
+  Future<Object?> _decodeBytes(List<int> bytesBody) async {
     if (bytesBody.isEmpty) return null;
 
     if (bytesBody.length > 1000) {
@@ -225,10 +233,10 @@ abstract base class RestClientBase implements RestClient {
         _jsonUTF8.decode,
         bytesBody,
         debugLabel: kDebugMode ? 'Decode Bytes Compute' : null,
-      ))! as Map<String, Object?>;
+      ));
     }
 
-    return _jsonUTF8.decode(bytesBody)! as Map<String, Object?>;
+    return _jsonUTF8.decode(bytesBody);
   }
 }
 
