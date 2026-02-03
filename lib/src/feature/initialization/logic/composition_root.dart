@@ -218,11 +218,14 @@ Future<RestClient> _initRestClient(
   SecureTokenStorage secureTokenStorage,
   RefreshService<OAuth2Token> refreshService,
 ) async {
+  final authorizationToken = await secureTokenStorage.load();
+
   final client = InterceptedClient(
     interceptors: [
       AuthInterceptor(
         tokenStorage: secureTokenStorage,
         refreshService: refreshService,
+        token: authorizationToken,
       ),
     ],
   );

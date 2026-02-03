@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_loader_overlay/loader_overlay.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
@@ -39,6 +41,13 @@ class EnterCodeScreen extends StatelessWidget {
         child: BlocConsumer<AuthBloc, AuthState>(
           bloc: DependenciesScope.of(context).authorizationBloc,
           listener: (context, state) {
+            // После успешной авторизации уходим на главный экран.
+            // Это страхует от ситуаций, когда redirect не пересчитался вовремя.
+            // if (state.status == AuthorizationStatus.authorized) {
+            //   const PetsRoute().go(context);
+            //   return;
+            // }
+
             state.maybeMap(
               processing: (_) {
                 LoaderOverlay.of(context).showLoader();

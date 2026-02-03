@@ -187,19 +187,15 @@ class _UiTextFieldState extends State<UiTextField> {
 
   @override
   void didUpdateWidget(UiTextField oldWidget) {
-    if (oldWidget.placeholderText != widget.placeholderText ||
-        oldWidget.focusNode != widget.focusNode ||
-        oldWidget.controller != widget.controller) {
+    super.didUpdateWidget(oldWidget);
+
+    // Контроллером владеет вызывающая сторона, поэтому мы его НЕ диспоузим.
+    // Здесь нужно только перекинуть listener при замене контроллера.
+    if (oldWidget.controller != widget.controller) {
       _controller.removeListener(_controllerListener!);
-
-      _controller.dispose();
-
       _controller = widget.controller;
-
       _controller.addListener(_controllerListener!);
     }
-
-    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -209,7 +205,6 @@ class _UiTextFieldState extends State<UiTextField> {
     }
 
     _controller.removeListener(_controllerListener!);
-    _controller.dispose();
 
     super.dispose();
   }
