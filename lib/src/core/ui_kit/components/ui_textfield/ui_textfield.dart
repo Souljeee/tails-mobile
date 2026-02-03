@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:tails_mobile/src/core/ui_kit/colors/ui_color_scheme.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_validators.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';

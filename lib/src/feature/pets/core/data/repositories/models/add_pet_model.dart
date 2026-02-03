@@ -7,7 +7,7 @@ class AddPetModel extends Equatable {
   final PetTypeEnum petType;
   final String breed;
   final String color;
-  final String weight;
+  final double weight;
   final PetSexEnum sex;
   final DateTime birthDate;
   final bool castration;

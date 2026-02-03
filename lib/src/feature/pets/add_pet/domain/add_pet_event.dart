@@ -10,7 +10,7 @@ sealed class AddPetEvent extends Equatable {
     required PetTypeEnum petType,
     required String breed,
     required String color,
-    required String weight,
+    required double weight,
     required PetSexEnum sex,
     required DateTime birthDate,
     required bool castration,
@@ -30,7 +30,7 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
   final PetTypeEnum petType;
   final String breed;
   final String color;
-  final String weight;
+  final double weight;
   final PetSexEnum sex;
   final DateTime birthDate;
   final bool castration;
