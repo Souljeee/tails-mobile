@@ -53,7 +53,7 @@ class _PetsScreenState extends State<PetsScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const AddPetModal()),
+            MaterialPageRoute<void>(builder: (_) => const AddPetModal()),
           );
         },
         backgroundColor: context.uiColors.orangePrimary,
