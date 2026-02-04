@@ -246,7 +246,6 @@ class _FetchingError extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 120),
           SvgPicture.asset(

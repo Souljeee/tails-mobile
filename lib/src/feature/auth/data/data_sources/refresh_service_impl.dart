@@ -30,7 +30,7 @@ class RefreshServiceImpl implements RefreshService<OAuth2Token> {
   Future<OAuth2Token> refresh(OAuth2Token token) async {
     try {
       final response = await restClient.post(
-        '/api/token/refresh',
+        '/auth/token/refresh/',
         body: {
           'refresh': token.refreshToken,
         },
@@ -54,7 +54,7 @@ class RefreshServiceImpl implements RefreshService<OAuth2Token> {
       );
     } catch (e) {
       if (e is RestClientException && e.statusCode == 401) {
-        throw InvalidOrExpiredTokenException(token: token.refreshToken);
+        throw RevokeTokenException('Token with access token ${token.accessToken} and refresh token ${token.refreshToken} can not be refreshed');
       }
       
       rethrow;

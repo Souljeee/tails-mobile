@@ -4,7 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
-import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
 part 'pets_list_event.dart';
 part 'pets_list_state.dart';

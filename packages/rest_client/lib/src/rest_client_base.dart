@@ -214,11 +214,11 @@ abstract base class RestClientBase implements RestClient {
     if (stringBody.isEmpty) return null;
 
     if (stringBody.length > 1000) {
-      return (await compute(
+      return await compute(
         json.decode,
         stringBody,
         debugLabel: kDebugMode ? 'Decode String Compute' : null,
-      ));
+      );
     }
 
     return json.decode(stringBody);
@@ -229,11 +229,11 @@ abstract base class RestClientBase implements RestClient {
     if (bytesBody.isEmpty) return null;
 
     if (bytesBody.length > 1000) {
-      return (await compute(
+      return await compute(
         _jsonUTF8.decode,
         bytesBody,
         debugLabel: kDebugMode ? 'Decode Bytes Compute' : null,
-      ));
+      );
     }
 
     return _jsonUTF8.decode(bytesBody);

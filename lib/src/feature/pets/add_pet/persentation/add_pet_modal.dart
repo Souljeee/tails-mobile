@@ -300,17 +300,32 @@ class _AddPetModalState extends State<AddPetModal> {
               ),
               const SizedBox(height: 16),
               ValueListenableBuilder(
-                valueListenable: _formData,
-                builder: (context, formData, _) {
-                  return CastrationSection(
-                    sex: formData.sex ?? PetSexEnum.male,
-                    onSelected: _onCastrationSelected,
-                  );
-                }
-              ),
+                  valueListenable: _formData,
+                  builder: (context, formData, _) {
+                    return CastrationSection(
+                      sex: formData.sex ?? PetSexEnum.male,
+                      onSelected: _onCastrationSelected,
+                    );
+                  }),
               const SizedBox(height: 32),
-              BlocBuilder<AddPetBloc, AddPetState>(
+              BlocConsumer<AddPetBloc, AddPetState>(
                 bloc: _addPetBloc,
+                listener: (context, state) {
+                  state.mapOrNull(
+                    success: (_) => Navigator.of(context).pop(),
+                    error: (e) => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Произошла ошибка. Повторите позднее.',
+                          style: context.uiFonts.text16Regular.copyWith(
+                            color: context.uiColors.white,
+                          ),
+                        ),
+                        backgroundColor: context.uiColors.red,
+                      ),
+                    ),
+                  );
+                },
                 builder: (context, state) {
                   return ValueListenableBuilder<AddPetFormData>(
                     valueListenable: _formData,
