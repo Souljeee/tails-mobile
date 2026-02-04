@@ -87,6 +87,37 @@ final class StructuredBackendException extends RestClientException {
       ')';
 }
 
+/// {@template backend_exception}
+/// Exception for non-2xx HTTP responses without structured `error`.
+///
+/// Some backends return error payloads like:
+/// ```json
+/// { "detail": "Not authenticated" }
+/// ```
+/// or even an empty body. This exception keeps [statusCode] and the decoded
+/// [response] to allow callers to handle cases like 401.
+/// {@endtemplate}
+final class BackendException extends RestClientException {
+  /// {@macro backend_exception}
+  const BackendException({
+    required super.message,
+    required this.response,
+    super.statusCode,
+    super.cause,
+  });
+
+  /// Decoded response body (Map / List / String / null).
+  final Object? response;
+
+  @override
+  String toString() => 'BackendException('
+      'message: $message, '
+      'statusCode: $statusCode, '
+      'response: $response, '
+      'cause: $cause'
+      ')';
+}
+
 /// {@template wrong_response_type_exception}
 /// [WrongResponseTypeException] is thrown if the response type
 /// is not the expected one

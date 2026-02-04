@@ -165,7 +165,17 @@ abstract base class RestClientBase implements RestClient {
     ResponseBody<Object>? body, {
     int? statusCode,
   }) async {
-    if (body == null) return null;
+    if (body == null) {
+      // If status code indicates an error but body is absent, still fail.
+      if (statusCode != null && statusCode >= 400) {
+        throw BackendException(
+          message: 'Request failed with status code $statusCode',
+          statusCode: statusCode,
+          response: null,
+        );
+      }
+      return null;
+    }
 
     try {
       final decodedBody = switch (body) {
@@ -174,6 +184,8 @@ abstract base class RestClientBase implements RestClient {
         BytesResponseBody(:final List<int> data) => await _decodeBytes(data),
       };
 
+      final isErrorStatus = statusCode != null && statusCode >= 400;
+
       if (decodedBody is Map) {
         final map = decodedBody.cast<String, Object?>();
 
@@ -181,6 +193,14 @@ abstract base class RestClientBase implements RestClient {
           throw StructuredBackendException(
             error: error.cast<String, Object?>(),
             statusCode: statusCode,
+          );
+        }
+
+        if (isErrorStatus) {
+          throw BackendException(
+            message: _messageFromMap(map) ?? 'Request failed with status code $statusCode',
+            statusCode: statusCode,
+            response: map,
           );
         }
 
@@ -193,7 +213,15 @@ abstract base class RestClientBase implements RestClient {
         return map;
       }
 
-      // List / primitive / null
+      if (isErrorStatus) {
+        throw BackendException(
+          message: _messageFromNonMap(decodedBody) ?? 'Request failed with status code $statusCode',
+          statusCode: statusCode,
+          response: decodedBody,
+        );
+      }
+
+      // List / primitive / null (successful)
       return decodedBody;
     } on RestClientException {
       rethrow;
@@ -207,6 +235,28 @@ abstract base class RestClientBase implements RestClient {
         stackTrace,
       );
     }
+  }
+
+  String? _messageFromMap(Map<String, Object?> map) {
+    // Common backend conventions
+    final candidates = <Object?>[
+      map['detail'],
+      map['details'],
+      map['message'],
+      map['error_description'],
+      map['description'],
+    ];
+
+    for (final c in candidates) {
+      if (c is String && c.trim().isNotEmpty) return c;
+    }
+
+    return null;
+  }
+
+  String? _messageFromNonMap(Object? decodedBody) {
+    if (decodedBody is String && decodedBody.trim().isNotEmpty) return decodedBody;
+    return null;
   }
 
   /// Decodes a [String] to a JSON value (Map / List / primitive / null).
