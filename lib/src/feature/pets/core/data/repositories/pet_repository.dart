@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/add_pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_dto.dart';
@@ -21,9 +21,9 @@ class PetRepository {
 
   Future<void> addPet({
     required AddPetModel model,
-    required Uint8List? image,
+    required File? image,
   }) async {
-    await _petsRemoteDataSource.addPet(dto: model.toDto(), image: image);
+    await _petsRemoteDataSource.addPet(dto: model.toDto(), imagePath: image?.path);
   }
 }
 
@@ -52,6 +52,6 @@ extension on AddPetModel {
         weight: weight,
         gender: gender,
         birthday: birthday,
-        castration: castration,
+        hasCastration: hasCastration,
       );
 }

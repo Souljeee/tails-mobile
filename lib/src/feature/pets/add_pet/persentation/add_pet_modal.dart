@@ -349,7 +349,7 @@ class _AddPetModalState extends State<AddPetModal> {
                                       gender: formData.gender!,
                                       birthday: formData.birthday!,
                                       castration: formData.castration!,
-                                      image: formData.image?.readAsBytesSync(),
+                                      image: formData.image,
                                     ),
                                   );
                                 },

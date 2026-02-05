@@ -3,9 +3,9 @@ import 'package:tails_mobile/src/core/constant/localization/localization.dart';
 import 'package:tails_mobile/src/core/navigation/go_router_refresh_stream.dart';
 import 'package:tails_mobile/src/core/navigation/router.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_loader_overlay/loader_overlay.dart';
+import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/settings/model/app_theme.dart';
 import 'package:tails_mobile/src/feature/settings/widget/settings_scope.dart';
-import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 
 /// {@template material_context}
 /// [MaterialContext] is an entry point to the material context.

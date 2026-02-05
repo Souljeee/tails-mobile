@@ -19,7 +19,7 @@ class AddPetDto extends Equatable {
     toJson: _birthdayToJson,
   )
   final DateTime birthday;
-  final bool castration;
+  final bool hasCastration;
 
   const AddPetDto({
     required this.name,
@@ -29,7 +29,7 @@ class AddPetDto extends Equatable {
     required this.weight,
     required this.gender,
     required this.birthday,
-    required this.castration,
+    required this.hasCastration,
   });
 
   @override
@@ -41,7 +41,7 @@ class AddPetDto extends Equatable {
         weight,
         gender,
         birthday,
-        castration,
+        hasCastration,
       ];
 
   factory AddPetDto.fromJson(Map<String, dynamic> json) => _$AddPetDtoFromJson(json);

@@ -1,7 +1,8 @@
 /// {@template rest_client}
 /// A REST client for making HTTP requests.
 /// {@endtemplate}
-import 'multipart/rest_client_multipart_file.dart';
+library;
+import 'package:rest_client/src/multipart/rest_client_multipart_file.dart';
 
 abstract interface class RestClient {
   /// Sends a GET request to the given [path].

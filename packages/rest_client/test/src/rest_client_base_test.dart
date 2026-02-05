@@ -201,9 +201,9 @@ void main() {
 
     test('multipartReturns', () {
       final client = _ReturningRestClientBase(baseUrl: 'http://localhost:8080');
-      final file = RestClientMultipartFile.bytes(
+      const file = RestClientMultipartFile.bytes(
         field: 'file',
-        bytes: const [1, 2, 3],
+        bytes: [1, 2, 3],
         filename: 'file.bin',
       );
 

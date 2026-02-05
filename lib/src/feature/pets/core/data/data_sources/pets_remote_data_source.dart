@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/add_pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_dto.dart';
@@ -33,19 +31,18 @@ class PetsRemoteDataSource {
 
   Future<void> addPet({
     required AddPetDto dto,
-    required Uint8List? image,
+    required String? imagePath,
   }) async {
     final fields = dto.toJson().map((key, value) => MapEntry(key, value.toString()));
-    
+
     final response = await _restClient.multipart(
       '/pets/',
       fields: fields,
       files: [
-        if (image != null)
-          RestClientMultipartFile.bytes(
+        if (imagePath != null)
+          RestClientMultipartFile.path(
             field: 'image',
-            bytes: image,
-            filename: 'image_${image.hashCode}.jpeg',
+            path: imagePath,
           ),
       ],
     );

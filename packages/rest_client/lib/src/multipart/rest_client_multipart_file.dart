@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:rest_client/rest_client.dart';
 
 /// Описание файла для multipart-запроса.
 ///
@@ -10,10 +11,9 @@ import 'package:meta/meta.dart';
 final class RestClientMultipartFile {
   const RestClientMultipartFile.bytes({
     required this.field,
-    required List<int> bytes,
+    required this.bytes,
     required this.filename,
-  })  : bytes = bytes,
-        path = null;
+  }) : path = null;
 
   const RestClientMultipartFile.path({
     required this.field,
@@ -47,4 +47,3 @@ final class RestClientMultipartFile {
       'filename: $filename'
       ')';
 }
-

@@ -14,7 +14,7 @@ sealed class AddPetEvent extends Equatable {
     required PetSexEnum gender,
     required DateTime birthday,
     required bool castration,
-    required Uint8List? image,
+    required File? image,
   }) = AddPetEvent$AddingRequested;
 
   T map<T>({
@@ -34,7 +34,7 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
   final PetSexEnum gender;
   final DateTime birthday;
   final bool castration;
-  final Uint8List? image;
+  final File? image;
 
   const AddPetEvent$AddingRequested({
     required this.name,

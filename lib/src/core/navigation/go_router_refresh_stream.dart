@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:go_router/go_router.dart';
 
 /// Notifies [GoRouter] to re-evaluate `redirect` when a stream emits.
 ///
@@ -21,4 +22,3 @@ final class GoRouterRefreshStream extends ChangeNotifier {
     super.dispose();
   }
 }
-

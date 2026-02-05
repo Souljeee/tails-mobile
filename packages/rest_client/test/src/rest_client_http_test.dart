@@ -144,7 +144,7 @@ void main() {
         ],
       );
 
-      expect((result as Map)['ok'], isTrue);
+      expect((result! as Map)['ok'], isTrue);
     });
   });
 }

@@ -11,4 +11,3 @@ Future<http.MultipartFile> multipartFileFromPath({
         'Используйте RestClientMultipartFile.bytes(...).',
   );
 }
-

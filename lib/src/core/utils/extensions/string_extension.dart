@@ -7,4 +7,3 @@ extension StringExtension on String {
     return length == 0 ? this : '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
   }
 }
-

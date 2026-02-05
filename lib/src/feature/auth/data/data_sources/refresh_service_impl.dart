@@ -1,6 +1,4 @@
 import 'package:rest_client/rest_client.dart';
-import 'package:tails_mobile/src/feature/auth/exceptions/invalid_or_expired_toke_exception.dart';
-
 class RefreshServiceImpl implements RefreshService<OAuth2Token> {
   final RestClient restClient;
 

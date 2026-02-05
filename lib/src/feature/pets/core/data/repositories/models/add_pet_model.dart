@@ -10,7 +10,7 @@ class AddPetModel extends Equatable {
   final double weight;
   final PetSexEnum gender;
   final DateTime birthday;
-  final bool castration;
+  final bool hasCastration;
 
   const AddPetModel({
     required this.name,
@@ -20,7 +20,7 @@ class AddPetModel extends Equatable {
     required this.weight,
     required this.gender,
     required this.birthday,
-    required this.castration,
+    required this.hasCastration,
   });
 
   @override
@@ -32,6 +32,6 @@ class AddPetModel extends Equatable {
         weight,
         gender,
         birthday,
-        castration,
+        hasCastration,
       ];
 }

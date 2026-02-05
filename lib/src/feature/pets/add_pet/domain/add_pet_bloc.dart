@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -39,7 +39,7 @@ class AddPetBloc extends Bloc<AddPetEvent, AddPetState> {
           weight: event.weight,
           gender: event.gender,
           birthday: event.birthday,
-          castration: event.castration,
+          hasCastration: event.castration,
         ),
         image: event.image,
       );
