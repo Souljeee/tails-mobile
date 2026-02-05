@@ -8,7 +8,7 @@ import 'package:tails_mobile/src/feature/auth/presentation/auth_scope.dart';
 
 final class RedirectIfAuthorizedGuard extends Guard {
   @override
-  Pattern get matchPattern => RegExp(r'^/authorization$');
+  Pattern get matchPattern => RegExp('^/(auth|enter-code)');
 
   @override
   RedirectResult redirect(BuildContext context, GoRouterState state) {
@@ -28,7 +28,9 @@ final class RedirectIfAuthorizedGuard extends Guard {
 
 final class RedirectIfNotAuthorizedGuard extends Guard {
   @override
-  Pattern get matchPattern => RegExp(r'^/authorization$');
+  /// Не редиректим, пока пользователь находится в auth-флоу.
+  /// Иначе при переходе на `/enter-code` будет "петля" обратно на `/auth`.
+  Pattern get matchPattern => RegExp('^/(auth|enter-code)');
 
   @override
   bool get invertRedirect => true;

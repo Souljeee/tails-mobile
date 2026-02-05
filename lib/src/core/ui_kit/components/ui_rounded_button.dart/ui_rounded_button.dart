@@ -41,7 +41,7 @@ class UiRoundedButton extends StatelessWidget {
     this.icon,
   }) : _type = UiRoundedButtonType.filled;
 
-  UiRoundedButton.outlined({
+  const UiRoundedButton.outlined({
     super.key,
     this.onPressed,
     this.staticFillColor,

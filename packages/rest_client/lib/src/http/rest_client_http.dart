@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:rest_client/rest_client.dart';
 import 'package:rest_client/src/http/check_exception_io.dart'
     if (dart.library.js_interop) 'package:rest_client/src/http/check_exception_browser.dart';
+import 'package:rest_client/src/http/multipart_file_io.dart'
+    if (dart.library.js_interop) 'package:rest_client/src/http/multipart_file_browser.dart';
 
 // coverage:ignore-start
 /// Creates an [http.Client] based on the current platform.
@@ -56,7 +58,7 @@ final class RestClientHttp extends RestClientBase {
   final http.Client _client;
 
   @override
-  Future<Map<String, Object?>?> send({
+  Future<Object?> send({
     required String path,
     required String method,
     Map<String, String?>? queryParams,
@@ -74,6 +76,87 @@ final class RestClientHttp extends RestClientBase {
 
       if (headers != null) {
         request.headers.addAll(headers);
+      }
+
+      final response = await _client.send(request).then(http.Response.fromStream);
+
+      final result = await decodeResponse(
+        BytesResponseBody(response.bodyBytes),
+        statusCode: response.statusCode,
+      );
+
+      return result;
+    } on RestClientException {
+      rethrow;
+    } on http.ClientException catch (e, stack) {
+      final checkedException = checkHttpException(e);
+
+      if (checkedException != null) {
+        Error.throwWithStackTrace(checkedException, stack);
+      }
+
+      Error.throwWithStackTrace(
+        ClientException(message: e.message, cause: e),
+        stack,
+      );
+    }
+  }
+
+  @override
+  Future<Object?> sendMultipart({
+    required String path,
+    required String method,
+    Map<String, String?>? queryParams,
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    List<RestClientMultipartFile>? files,
+  }) async {
+    try {
+      final uri = buildUri(path: path, queryParams: queryParams);
+      final request = http.MultipartRequest(method, uri);
+
+      if (headers != null) {
+        request.headers.addAll(headers);
+      }
+
+      if (fields != null) {
+        request.fields.addAll(fields);
+      }
+
+      for (final file in files ?? const <RestClientMultipartFile>[]) {
+        if (file.bytes case final bytes?) {
+          final filename = file.filename;
+          if (filename == null || filename.isEmpty) {
+            throw const ClientException(
+              message:
+                  'Для RestClientMultipartFile.bytes(...) параметр filename обязателен и не должен быть пустым',
+            );
+          }
+
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              file.field,
+              bytes,
+              filename: filename,
+            ),
+          );
+          continue;
+        }
+
+        if (file.path case final path?) {
+          request.files.add(
+            await multipartFileFromPath(
+              field: file.field,
+              path: path,
+              filename: file.filename,
+            ),
+          );
+          continue;
+        }
+
+        throw const ClientException(
+          message: 'RestClientMultipartFile должен содержать bytes или path',
+        );
       }
 
       final response = await _client.send(request).then(http.Response.fromStream);

@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.da
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/pets/add_pet/persentation/add_pet_modal.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/pets_list/domain/pets_list_bloc.dart';
@@ -49,7 +50,12 @@ class _PetsScreenState extends State<PetsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(builder: (_) => const AddPetModal()),
+          );
+        },
         backgroundColor: context.uiColors.orangePrimary,
         child: Icon(
           Icons.add,
@@ -181,10 +187,11 @@ class _PetsEmptyList extends StatelessWidget {
     return Center(
       child: Column(
         children: [
+          const SizedBox(height: 120),
           SvgPicture.asset(
             context.uiIcons.emptyDogHouse.keyName,
-            width: 120,
-            height: 120,
+            width: 150,
+            height: 150,
           ),
           const SizedBox(height: 16),
           Text(
@@ -237,32 +244,34 @@ class _FetchingError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SvgPicture.asset(
-          context.uiIcons.sadDoc.keyName,
-          width: 120,
-          height: 120,
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'Ошибка загрузки',
-          style: context.uiFonts.header24Semibold,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Повторите позднее',
-          style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.brown),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-        UiButton.main(
-          label: 'Повторить',
-          onPressed: onRetry,
-        ),
-      ],
+    return Center(
+      child: Column(
+        children: [
+          const SizedBox(height: 120),
+          SvgPicture.asset(
+            context.uiIcons.sadDoc.keyName,
+            width: 150,
+            height: 150,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Ошибка загрузки',
+            style: context.uiFonts.header24Semibold,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Повторите позднее',
+            style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.brown),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          UiButton.main(
+            label: 'Повторить',
+            onPressed: onRetry,
+          ),
+        ],
+      ),
     );
   }
 }

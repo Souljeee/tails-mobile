@@ -75,6 +75,9 @@ dependencies:
   mask_text_input_formatter: ^2.9.0
   smooth_page_indicator: ^2.0.1
   json_annotation: ^4.9.0
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  flutter_picker_plus: ^1.5.4
 
 dev_dependencies:
   # Testing

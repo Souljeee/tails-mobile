@@ -17,6 +17,10 @@ class AuthRemoteDataSource {
     required this.restClient,
   });
 
+  /// Бекенд может отдавать expires как секунды или миллисекунды с эпохи.
+  /// Нормализуем к миллисекундам при создании токена.
+  int _toEpochMillis(int value) => value < 1000000000000 ? value * 1000 : value;
+
   /// Method to send a code to the user's phone number.
   ///
   /// Throws InvalidPhoneNumberFormatException if the phone number format is invalid.
@@ -74,13 +78,20 @@ class AuthRemoteDataSource {
         throw const ClientException(message: 'Response is null');
       }
 
-      final token = TokensDto.fromJson(response);
+      if (response is! Map) {
+        throw ClientException(
+          message: 'Unexpected response type for verify-code',
+          cause: response.runtimeType,
+        );
+      }
+
+      final token = TokensDto.fromJson(Map<String, dynamic>.from(response));
 
       return OAuth2Token(
         accessToken: token.access,
         refreshToken: token.refresh,
-        accessExpires: token.accessExpires,
-        refreshExpires: token.refreshExpires,
+        accessExpires: _toEpochMillis(token.accessExpires),
+        refreshExpires: _toEpochMillis(token.refreshExpires),
       );
     } on RestClientException catch (e) {
       if (e.statusCode == 400) {

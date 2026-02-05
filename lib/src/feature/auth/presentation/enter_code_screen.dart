@@ -39,6 +39,13 @@ class EnterCodeScreen extends StatelessWidget {
         child: BlocConsumer<AuthBloc, AuthState>(
           bloc: DependenciesScope.of(context).authorizationBloc,
           listener: (context, state) {
+            // После успешной авторизации уходим на главный экран.
+            // Это страхует от ситуаций, когда redirect не пересчитался вовремя.
+            // if (state.status == AuthorizationStatus.authorized) {
+            //   const PetsRoute().go(context);
+            //   return;
+            // }
+
             state.maybeMap(
               processing: (_) {
                 LoaderOverlay.of(context).showLoader();

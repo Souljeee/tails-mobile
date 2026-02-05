@@ -42,7 +42,7 @@ class UiBaseToolbar extends StatelessWidget {
               onPressed: onLeadingTap,
               icon: Icon(
                 Icons.arrow_back_ios_new,
-                size: 28,
+                size: 24,
                 color: context.uiColors.black50,
               ),
             )
