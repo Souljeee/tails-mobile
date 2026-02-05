@@ -1,6 +1,8 @@
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/add_pet_dto.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/breed_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_dto.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
 class PetsRemoteDataSource {
   final RestClient _restClient;
@@ -50,5 +52,25 @@ class PetsRemoteDataSource {
     if (response == null) {
       throw Exception('Failed to add pet');
     }
+  }
+
+  Future<List<BreedDto>> getBreeds({required PetTypeEnum petType}) async {
+    final response = await _restClient.get('/breeds/${petType.name}/');
+
+    if (response == null) {
+      throw Exception('Failed to get breeds');
+    }
+
+    if (response is! List) {
+      throw Exception('Failed to get breeds: expected JSON list, got ${response.runtimeType}');
+    }
+
+    return response
+        .map(
+          (e) => BreedDto.fromJson(
+            Map<String, dynamic>.from(e as Map),
+          ),
+        )
+        .toList();
   }
 }

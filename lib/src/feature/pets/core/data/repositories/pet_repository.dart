@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/add_pet_dto.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/breed_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/add_pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pets_repository_events.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
 class PetRepository {
   final PetsRemoteDataSource _petsRemoteDataSource;
@@ -32,6 +35,12 @@ class PetRepository {
     await _petsRemoteDataSource.addPet(dto: model.toDto(), imagePath: image?.path);
 
     _eventStreamController.add(const PetsRepositoryEventsEvent.petsAdded());
+  }
+
+  Future<List<BreedModel>> getBreeds({required PetTypeEnum petType}) async {
+    final breeds = await _petsRemoteDataSource.getBreeds(petType: petType);
+
+    return breeds.map((breed) => breed.toModel()).toList();
   }
 }
 
@@ -61,5 +70,13 @@ extension on AddPetModel {
         gender: gender,
         birthday: birthday,
         hasCastration: hasCastration,
+      );
+}
+
+
+extension on BreedDto {
+  BreedModel toModel() => BreedModel(
+        id: id,
+        name: name,
       );
 }
