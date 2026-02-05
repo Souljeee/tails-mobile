@@ -35,15 +35,17 @@ class PetsRemoteDataSource {
     required AddPetDto dto,
     required Uint8List? image,
   }) async {
+    final fields = dto.toJson().map((key, value) => MapEntry(key, value.toString()));
+    
     final response = await _restClient.multipart(
       '/pets/',
-      fields: dto.toJson().map((key, value) => MapEntry(key, value.toString())),
+      fields: fields,
       files: [
         if (image != null)
           RestClientMultipartFile.bytes(
             field: 'image',
             bytes: image,
-            filename: 'image_${image.hashCode}',
+            filename: 'image_${image.hashCode}.jpeg',
           ),
       ],
     );

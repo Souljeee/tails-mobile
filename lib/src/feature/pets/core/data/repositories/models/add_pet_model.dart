@@ -8,8 +8,8 @@ class AddPetModel extends Equatable {
   final String breed;
   final String color;
   final double weight;
-  final PetSexEnum sex;
-  final DateTime birthDate;
+  final PetSexEnum gender;
+  final DateTime birthday;
   final bool castration;
 
   const AddPetModel({
@@ -18,8 +18,8 @@ class AddPetModel extends Equatable {
     required this.breed,
     required this.color,
     required this.weight,
-    required this.sex,
-    required this.birthDate,
+    required this.gender,
+    required this.birthday,
     required this.castration,
   });
 
@@ -30,8 +30,8 @@ class AddPetModel extends Equatable {
         breed,
         color,
         weight,
-        sex,
-        birthDate,
+        gender,
+        birthday,
         castration,
       ];
 }

@@ -26,8 +26,8 @@ class AddPetFormData extends Equatable {
   final String? breed;
   final String? color;
   final double? weight;
-  final PetSexEnum? sex;
-  final DateTime? birthDate;
+  final PetSexEnum? gender;
+  final DateTime? birthday;
   final bool? castration;
   final File? image;
 
@@ -37,8 +37,8 @@ class AddPetFormData extends Equatable {
     this.breed,
     this.color,
     this.weight,
-    this.sex,
-    this.birthDate,
+    this.gender,
+    this.birthday,
     this.castration,
     this.image,
   });
@@ -48,8 +48,8 @@ class AddPetFormData extends Equatable {
       breed != null &&
       color != null &&
       weight != null &&
-      sex != null &&
-      birthDate != null &&
+      gender != null &&
+      birthday != null &&
       castration != null;
 
   AddPetFormData copyWith({
@@ -58,8 +58,8 @@ class AddPetFormData extends Equatable {
     CopyWithWrapper<String?>? breed,
     CopyWithWrapper<String?>? color,
     CopyWithWrapper<double?>? weight,
-    CopyWithWrapper<PetSexEnum?>? sex,
-    CopyWithWrapper<DateTime?>? birthDate,
+    CopyWithWrapper<PetSexEnum?>? gender,
+    CopyWithWrapper<DateTime?>? birthday,
     CopyWithWrapper<bool?>? castration,
     CopyWithWrapper<File?>? image,
   }) =>
@@ -69,8 +69,8 @@ class AddPetFormData extends Equatable {
         breed: breed?.value ?? this.breed,
         color: color?.value ?? this.color,
         weight: weight?.value ?? this.weight,
-        sex: sex?.value ?? this.sex,
-        birthDate: birthDate?.value ?? this.birthDate,
+        gender: gender?.value ?? this.gender,
+        birthday: birthday?.value ?? this.birthday,
         castration: castration?.value ?? this.castration,
         image: image?.value ?? this.image,
       );
@@ -82,8 +82,8 @@ class AddPetFormData extends Equatable {
         breed,
         color,
         weight,
-        sex,
-        birthDate,
+        gender,
+        birthday,
         castration,
         image,
       ];
@@ -101,7 +101,7 @@ class _AddPetModalState extends State<AddPetModal> {
     const AddPetFormData(
       castration: false,
       petType: PetTypeEnum.cat,
-      sex: PetSexEnum.male,
+      gender: PetSexEnum.male,
       breed: 'норм тип',
     ),
   );
@@ -155,8 +155,8 @@ class _AddPetModalState extends State<AddPetModal> {
     _formData.value = _formData.value.copyWith(petType: CopyWithWrapper.value(type));
   }
 
-  void _onSexChanged(PetSexEnum sex) {
-    _formData.value = _formData.value.copyWith(sex: CopyWithWrapper.value(sex));
+  void _onSexChanged(PetSexEnum gender) {
+    _formData.value = _formData.value.copyWith(gender: CopyWithWrapper.value(gender));
   }
 
   void _onWeightSelected(double weight) {
@@ -168,7 +168,7 @@ class _AddPetModalState extends State<AddPetModal> {
   }
 
   void _onBirthDateSelected(DateTime date) {
-    _formData.value = _formData.value.copyWith(birthDate: CopyWithWrapper.value(date));
+    _formData.value = _formData.value.copyWith(birthday: CopyWithWrapper.value(date));
   }
 
   @override
@@ -303,7 +303,7 @@ class _AddPetModalState extends State<AddPetModal> {
                   valueListenable: _formData,
                   builder: (context, formData, _) {
                     return CastrationSection(
-                      sex: formData.sex ?? PetSexEnum.male,
+                      gender: formData.gender ?? PetSexEnum.male,
                       onSelected: _onCastrationSelected,
                     );
                   }),
@@ -346,8 +346,8 @@ class _AddPetModalState extends State<AddPetModal> {
                                       breed: formData.breed!,
                                       color: formData.color!,
                                       weight: formData.weight!,
-                                      sex: formData.sex!,
-                                      birthDate: formData.birthDate!,
+                                      gender: formData.gender!,
+                                      birthday: formData.birthday!,
                                       castration: formData.castration!,
                                       image: formData.image?.readAsBytesSync(),
                                     ),

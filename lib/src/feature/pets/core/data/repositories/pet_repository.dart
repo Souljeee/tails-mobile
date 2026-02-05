@@ -50,8 +50,8 @@ extension on AddPetModel {
         breed: breed,
         color: color,
         weight: weight,
-        sex: sex,
-        birthDate: birthDate,
+        gender: gender,
+        birthday: birthday,
         castration: castration,
       );
 }

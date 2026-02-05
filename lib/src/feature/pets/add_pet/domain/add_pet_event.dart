@@ -11,8 +11,8 @@ sealed class AddPetEvent extends Equatable {
     required String breed,
     required String color,
     required double weight,
-    required PetSexEnum sex,
-    required DateTime birthDate,
+    required PetSexEnum gender,
+    required DateTime birthday,
     required bool castration,
     required Uint8List? image,
   }) = AddPetEvent$AddingRequested;
@@ -31,8 +31,8 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
   final String breed;
   final String color;
   final double weight;
-  final PetSexEnum sex;
-  final DateTime birthDate;
+  final PetSexEnum gender;
+  final DateTime birthday;
   final bool castration;
   final Uint8List? image;
 
@@ -42,8 +42,8 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
     required this.breed,
     required this.color,
     required this.weight,
-    required this.sex,
-    required this.birthDate,
+    required this.gender,
+    required this.birthday,
     required this.castration,
     this.image,
   });
@@ -55,8 +55,8 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
         breed,
         color,
         weight,
-        sex,
-        birthDate,
+        gender,
+        birthday,
         castration,
         image,
       ];

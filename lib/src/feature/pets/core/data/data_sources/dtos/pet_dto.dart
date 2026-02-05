@@ -6,7 +6,7 @@ part 'pet_dto.g.dart';
 
 @JsonSerializable()
 class PetDto extends Equatable {
-  final String id;
+  final int id;
   final PetTypeEnum petType;
   final String name;
   final String breed;

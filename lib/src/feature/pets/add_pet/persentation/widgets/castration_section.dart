@@ -4,11 +4,11 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 
 class CastrationSection extends StatefulWidget {
-  final PetSexEnum sex;
+  final PetSexEnum gender;
   final void Function(bool) onSelected;
 
   const CastrationSection({
-    required this.sex,
+    required this.gender,
     required this.onSelected,
     super.key,
   });
@@ -45,7 +45,7 @@ class _CastrationSectionState extends State<CastrationSection> {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  widget.sex == PetSexEnum.male ? 'Кастрирован' : 'Стерилизована',
+                  widget.gender == PetSexEnum.male ? 'Кастрирован' : 'Стерилизована',
                   style: context.uiFonts.header20Medium,
                 ),
               ),

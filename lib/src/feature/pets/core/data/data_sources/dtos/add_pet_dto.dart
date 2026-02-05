@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
@@ -12,8 +13,12 @@ class AddPetDto extends Equatable {
   final String breed;
   final String color;
   final double weight;
-  final PetSexEnum sex;
-  final DateTime birthDate;
+  final PetSexEnum gender;
+  @JsonKey(
+    fromJson: _birthdayFromJson,
+    toJson: _birthdayToJson,
+  )
+  final DateTime birthday;
   final bool castration;
 
   const AddPetDto({
@@ -22,8 +27,8 @@ class AddPetDto extends Equatable {
     required this.breed,
     required this.color,
     required this.weight,
-    required this.sex,
-    required this.birthDate,
+    required this.gender,
+    required this.birthday,
     required this.castration,
   });
 
@@ -34,12 +39,16 @@ class AddPetDto extends Equatable {
         breed,
         color,
         weight,
-        sex,
-        birthDate,
+        gender,
+        birthday,
         castration,
       ];
 
   factory AddPetDto.fromJson(Map<String, dynamic> json) => _$AddPetDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$AddPetDtoToJson(this);
+
+  static String _birthdayToJson(DateTime birthday) => DateFormat('yyyy-MM-dd').format(birthday.toLocal());
+
+  static DateTime _birthdayFromJson(String birthday) => DateFormat('yyyy-MM-dd').parse(birthday);
 }
