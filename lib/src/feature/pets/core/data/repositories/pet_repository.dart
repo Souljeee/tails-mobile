@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/add_pet_dto.dart';
@@ -5,11 +6,16 @@ import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_dt
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/add_pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/pets_repository_events.dart';
 
 class PetRepository {
   final PetsRemoteDataSource _petsRemoteDataSource;
 
-  const PetRepository({
+  final _eventStreamController = StreamController<PetsRepositoryEventsEvent>.broadcast();
+
+  Stream<PetsRepositoryEventsEvent> get eventStream => _eventStreamController.stream;
+
+  PetRepository({
     required PetsRemoteDataSource petsRemoteDataSource,
   }) : _petsRemoteDataSource = petsRemoteDataSource;
 
@@ -24,6 +30,8 @@ class PetRepository {
     required File? image,
   }) async {
     await _petsRemoteDataSource.addPet(dto: model.toDto(), imagePath: image?.path);
+
+    _eventStreamController.add(const PetsRepositoryEventsEvent.petsAdded());
   }
 }
 
