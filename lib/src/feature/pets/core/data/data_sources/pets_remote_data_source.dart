@@ -55,7 +55,10 @@ class PetsRemoteDataSource {
   }
 
   Future<List<BreedDto>> getBreeds({required PetTypeEnum petType}) async {
-    final response = await _restClient.get('/breeds/${petType.name}/');
+    final response = await _restClient.get(
+      '/breeds/',
+      queryParams: {'type': petType.name},
+    );
 
     if (response == null) {
       throw Exception('Failed to get breeds');
