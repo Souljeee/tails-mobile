@@ -17,8 +17,10 @@ import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/pet_t
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/photo_upload_widget.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/sex_section.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/weight_picker.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/pets/select_breed/presentation/select_breed_modal.dart';
 
 class AddPetFormData extends Equatable {
   final String? name;
@@ -223,8 +225,17 @@ class _AddPetModalState extends State<AddPetModal> {
               ),
               const SizedBox(height: 8),
               GestureDetector(
-                onTap: () {
-                  // Вести на выбор породы
+                onTap: () async {
+                  final BreedModel? breed = await Navigator.of(context).push<BreedModel>(
+                    MaterialPageRoute(
+                      builder: (context) => SelectBreedModal(petType: _formData.value.petType ?? PetTypeEnum.cat),
+                    ),
+                  );
+
+                  if (breed != null) {
+                    _breedController.text = breed.name;
+                    _formData.value = _formData.value.copyWith(breed: CopyWithWrapper.value(breed.name));
+                  }
                 },
                 child: AbsorbPointer(
                   child: UiTextField(
