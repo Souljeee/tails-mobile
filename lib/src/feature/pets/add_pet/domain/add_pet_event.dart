@@ -8,7 +8,7 @@ sealed class AddPetEvent extends Equatable {
   const factory AddPetEvent.addingRequested({
     required String name,
     required PetTypeEnum petType,
-    required String breed,
+    required int breedId,
     required String color,
     required double weight,
     required PetSexEnum gender,
@@ -28,7 +28,7 @@ sealed class AddPetEvent extends Equatable {
 final class AddPetEvent$AddingRequested extends AddPetEvent {
   final String name;
   final PetTypeEnum petType;
-  final String breed;
+  final int breedId;
   final String color;
   final double weight;
   final PetSexEnum gender;
@@ -39,7 +39,7 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
   const AddPetEvent$AddingRequested({
     required this.name,
     required this.petType,
-    required this.breed,
+    required this.breedId,
     required this.color,
     required this.weight,
     required this.gender,
@@ -52,7 +52,7 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
   List<Object?> get props => [
         name,
         petType,
-        breed,
+        breedId,
         color,
         weight,
         gender,
