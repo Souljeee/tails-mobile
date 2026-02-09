@@ -25,7 +25,7 @@ import 'package:tails_mobile/src/feature/pets/select_breed/presentation/select_b
 class AddPetFormData extends Equatable {
   final String? name;
   final PetTypeEnum? petType;
-  final String? breed;
+  final int? breedId;
   final String? color;
   final double? weight;
   final PetSexEnum? gender;
@@ -36,7 +36,7 @@ class AddPetFormData extends Equatable {
   const AddPetFormData({
     this.name,
     this.petType,
-    this.breed,
+    this.breedId,
     this.color,
     this.weight,
     this.gender,
@@ -47,7 +47,7 @@ class AddPetFormData extends Equatable {
 
   bool get isValid =>
       name != null &&
-      breed != null &&
+      breedId != null &&
       color != null &&
       weight != null &&
       gender != null &&
@@ -57,7 +57,7 @@ class AddPetFormData extends Equatable {
   AddPetFormData copyWith({
     CopyWithWrapper<String?>? name,
     CopyWithWrapper<PetTypeEnum?>? petType,
-    CopyWithWrapper<String?>? breed,
+    CopyWithWrapper<int?>? breedId,
     CopyWithWrapper<String?>? color,
     CopyWithWrapper<double?>? weight,
     CopyWithWrapper<PetSexEnum?>? gender,
@@ -68,7 +68,7 @@ class AddPetFormData extends Equatable {
       AddPetFormData(
         name: name?.value ?? this.name,
         petType: petType?.value ?? this.petType,
-        breed: breed?.value ?? this.breed,
+        breedId: breedId?.value ?? this.breedId,
         color: color?.value ?? this.color,
         weight: weight?.value ?? this.weight,
         gender: gender?.value ?? this.gender,
@@ -81,7 +81,7 @@ class AddPetFormData extends Equatable {
   List<Object?> get props => [
         name,
         petType,
-        breed,
+        breedId,
         color,
         weight,
         gender,
@@ -104,7 +104,6 @@ class _AddPetModalState extends State<AddPetModal> {
       castration: false,
       petType: PetTypeEnum.cat,
       gender: PetSexEnum.male,
-      breed: 'норм тип',
     ),
   );
 
@@ -123,7 +122,6 @@ class _AddPetModalState extends State<AddPetModal> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _nameController.addListener(_nameListener);
       _colorController.addListener(_colorListener);
-      _breedController.addListener(_breedListener);
     });
   }
 
@@ -145,8 +143,8 @@ class _AddPetModalState extends State<AddPetModal> {
     _formData.value = _formData.value.copyWith(color: CopyWithWrapper.value(_colorController.text));
   }
 
-  void _breedListener() {
-    _formData.value = _formData.value.copyWith(breed: CopyWithWrapper.value(_breedController.text));
+  void _onBreedSelected(BreedModel breed) {
+    _formData.value = _formData.value.copyWith(breedId: CopyWithWrapper.value(breed.id));
   }
 
   void _onImageSelected(File image) {
@@ -234,7 +232,7 @@ class _AddPetModalState extends State<AddPetModal> {
 
                   if (breed != null) {
                     _breedController.text = breed.name;
-                    _formData.value = _formData.value.copyWith(breed: CopyWithWrapper.value(breed.name));
+                    _onBreedSelected(breed);
                   }
                 },
                 child: AbsorbPointer(
@@ -354,7 +352,7 @@ class _AddPetModalState extends State<AddPetModal> {
                                     AddPetEvent.addingRequested(
                                       name: formData.name!,
                                       petType: formData.petType!,
-                                      breed: formData.breed!,
+                                      breedId: formData.breedId!,
                                       color: formData.color!,
                                       weight: formData.weight!,
                                       gender: formData.gender!,

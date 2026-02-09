@@ -10,7 +10,8 @@ part 'add_pet_dto.g.dart';
 class AddPetDto extends Equatable {
   final String name;
   final PetTypeEnum petType;
-  final String breed;
+  @JsonKey(name: 'breed')
+  final int breedId;
   final String color;
   final double weight;
   final PetSexEnum gender;
@@ -24,7 +25,7 @@ class AddPetDto extends Equatable {
   const AddPetDto({
     required this.name,
     required this.petType,
-    required this.breed,
+    required this.breedId,
     required this.color,
     required this.weight,
     required this.gender,
@@ -36,7 +37,7 @@ class AddPetDto extends Equatable {
   List<Object?> get props => [
         name,
         petType,
-        breed,
+        breedId,
         color,
         weight,
         gender,

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/breed_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
 part 'pet_dto.g.dart';
@@ -9,7 +10,8 @@ class PetDto extends Equatable {
   final int id;
   final PetTypeEnum petType;
   final String name;
-  final String breed;
+  @JsonKey(name: 'breed_obj')
+  final BreedDto breed;
   final String gender;
   final DateTime birthday;
   final String color;

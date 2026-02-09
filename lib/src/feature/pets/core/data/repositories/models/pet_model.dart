@@ -1,11 +1,12 @@
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
 class PetModel extends Equatable{
   final int id;
   final PetTypeEnum petType;
   final String name;
-  final String breed;
+  final BreedModel breed;
   final String gender;
   final DateTime birthday;
   final String color;

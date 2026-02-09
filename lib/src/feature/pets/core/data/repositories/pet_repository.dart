@@ -49,7 +49,7 @@ extension on PetDto {
         id: id,
         petType: petType,
         name: name,
-        breed: breed,
+        breed: breed.toModel(),
         gender: gender,
         birthday: birthday,
         color: color,
@@ -64,7 +64,7 @@ extension on AddPetModel {
   AddPetDto toDto() => AddPetDto(
         name: name,
         petType: petType,
-        breed: breed,
+        breedId: breedId,
         color: color,
         weight: weight,
         gender: gender,

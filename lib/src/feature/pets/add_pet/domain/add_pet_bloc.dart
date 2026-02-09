@@ -34,7 +34,7 @@ class AddPetBloc extends Bloc<AddPetEvent, AddPetState> {
         model: AddPetModel(
           name: event.name,
           petType: event.petType,
-          breed: event.breed,
+          breedId: event.breedId,
           color: event.color,
           weight: event.weight,
           gender: event.gender,

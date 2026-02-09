@@ -5,7 +5,7 @@ import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 class AddPetModel extends Equatable {
   final String name;
   final PetTypeEnum petType;
-  final String breed;
+  final int breedId;
   final String color;
   final double weight;
   final PetSexEnum gender;
@@ -15,7 +15,7 @@ class AddPetModel extends Equatable {
   const AddPetModel({
     required this.name,
     required this.petType,
-    required this.breed,
+    required this.breedId,
     required this.color,
     required this.weight,
     required this.gender,
@@ -27,7 +27,7 @@ class AddPetModel extends Equatable {
   List<Object?> get props => [
         name,
         petType,
-        breed,
+        breedId,
         color,
         weight,
         gender,
