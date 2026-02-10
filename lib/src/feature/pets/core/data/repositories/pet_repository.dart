@@ -3,10 +3,12 @@ import 'dart:io';
 
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/add_pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/breed_dto.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_details_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/add_pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_details_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pets_repository_events.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
@@ -26,6 +28,12 @@ class PetRepository {
     final pets = await _petsRemoteDataSource.getPets();
 
     return pets.map((pet) => pet.toModel()).toList();
+  }
+
+  Future<PetDetailsModel> getPetDetails({required int id}) async {
+    final petDetails = await _petsRemoteDataSource.getPetDetails(id: id);
+
+    return petDetails.toModel();
   }
 
   Future<void> addPet({
@@ -78,5 +86,21 @@ extension on BreedDto {
   BreedModel toModel() => BreedModel(
         id: id,
         name: name,
+      );
+}
+
+
+extension on PetDetailsDto {
+  PetDetailsModel toModel() => PetDetailsModel(
+        id: id,
+        petType: petType,
+        name: name,
+        breed: breed.toModel(),
+        gender: gender,
+        birthday: birthday,
+        color: color,
+        image: image,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
       );
 }
