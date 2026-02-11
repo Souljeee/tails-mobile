@@ -31,7 +31,8 @@ class PetDetailsBloc extends Bloc<PetDetailsEvent, PetDetailsState> {
 
       final petData = await _petRepository.getPetDetails(id: event.id);
 
-      emit(PetDetailsState.success(petData: petData));
+      //emit(PetDetailsState.success(petData: petData));
+      emit(const PetDetailsState.error());
     } catch (e, s) {
       addError(e, s);
 

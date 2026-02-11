@@ -253,6 +253,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Женский'**
   String get female;
+
+  /// No description provided for @error.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ошибка'**
+  String get error;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

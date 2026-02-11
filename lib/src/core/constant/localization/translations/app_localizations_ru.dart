@@ -126,4 +126,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get female => 'Женский';
+
+  @override
+  String get error => 'Ошибка';
 }

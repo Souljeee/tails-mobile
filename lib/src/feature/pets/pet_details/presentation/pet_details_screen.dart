@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_errors/ui_fetching_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
@@ -234,7 +235,11 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
               ),
             );
           },
-          error: (_) => const SizedBox.shrink(),
+          error: (_) => _PetDetailsFetchingError(
+            onRetry: () => _petDetailsBloc.add(
+              PetDetailsEvent.fetchRequested(id: widget.id),
+            ),
+          ),
         );
       },
     );
@@ -546,6 +551,33 @@ class _PetDetailsShimmer extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PetDetailsFetchingError extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _PetDetailsFetchingError({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Text(
+          context.l10n.error,
+          style: context.uiFonts.header24Semibold,
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          onPressed: () => Navigator.maybePop(context),
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: SafeArea(
+        child: UiFetchingError(onRetry: onRetry),
       ),
     );
   }
