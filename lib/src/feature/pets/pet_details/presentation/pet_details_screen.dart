@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
@@ -64,7 +65,7 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
       bloc: _petDetailsBloc,
       builder: (context, state) {
         return state.map(
-          loading: (_) => const SizedBox.shrink(),
+          loading: (_) => const _PetDetailsShimmer(),
           success: (state) {
             return Scaffold(
               backgroundColor: Colors.white,
@@ -468,6 +469,83 @@ class _PillRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PetDetailsShimmer extends StatelessWidget {
+  const _PetDetailsShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return UiKitShimmer(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  UiKitShimmerLoading(
+                    height: 320,
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: UiKitShimmerLoading(
+                          height: 100,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: UiKitShimmerLoading(
+                          height: 100,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: UiKitShimmerLoading(
+                          height: 100,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: UiKitShimmerLoading(
+                          height: 100,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  ...List.generate(
+                    3,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: UiKitShimmerLoading(
+                        height: 100,
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
