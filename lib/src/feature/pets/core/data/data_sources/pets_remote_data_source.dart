@@ -93,4 +93,12 @@ class PetsRemoteDataSource {
         )
         .toList();
   }
+
+  Future<void> deletePet({required int id}) async {
+    final response = await _restClient.delete('/pets/$id/');
+
+    if (response == null) {
+      throw Exception('Failed to delete pet');
+    }
+  }
 }

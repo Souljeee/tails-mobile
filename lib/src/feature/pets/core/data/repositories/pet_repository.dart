@@ -50,6 +50,12 @@ class PetRepository {
 
     return breeds.map((breed) => breed.toModel()).toList();
   }
+
+  Future<void> deletePet({required int id}) async {
+    await _petsRemoteDataSource.deletePet(id: id);
+
+    _eventStreamController.add(const PetsRepositoryEventsEvent.petDeleted());
+  }
 }
 
 extension on PetDto {
