@@ -38,6 +38,7 @@ class PetsListBloc extends Bloc<PetsListEvent, PetsListState> {
     _petsRepositoryEventsSubscription = _petRepository.eventStream.listen((event) {
       event.mapOrNull(
         petsAdded: (event) => add(const PetsListEvent.fetchRequested()),
+        petDeleted: (event) => add(const PetsListEvent.fetchRequested()),
       );
     });
   }

@@ -259,6 +259,30 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Ошибка'**
   String get error;
+
+  /// No description provided for @deletePetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить питомца'**
+  String get deletePetTitle;
+
+  /// No description provided for @deletePetSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы уверены, что хотите удалить этого питомца? Это действие нельзя будет отменить.'**
+  String get deletePetSubtitle;
+
+  /// No description provided for @deletePetCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get deletePetCancel;
+
+  /// No description provided for @deletePetDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить'**
+  String get deletePetDelete;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
