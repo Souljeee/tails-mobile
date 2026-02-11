@@ -193,6 +193,72 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Вс'**
   String get sunday;
+
+  /// No description provided for @birthday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата рождения'**
+  String get birthday;
+
+  /// No description provided for @color.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрас'**
+  String get color;
+
+  /// No description provided for @status.
+  ///
+  /// In ru, this message translates to:
+  /// **'Статус'**
+  String get status;
+
+  /// No description provided for @sterilized.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кастрирован'**
+  String get sterilized;
+
+  /// No description provided for @weight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вес'**
+  String get weight;
+
+  /// No description provided for @type.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип'**
+  String get type;
+
+  /// No description provided for @breed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода'**
+  String get breed;
+
+  /// No description provided for @gender.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пол'**
+  String get gender;
+
+  /// No description provided for @male.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мужской'**
+  String get male;
+
+  /// No description provided for @female.
+  ///
+  /// In ru, this message translates to:
+  /// **'Женский'**
+  String get female;
+
+  /// No description provided for @error.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ошибка'**
+  String get error;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

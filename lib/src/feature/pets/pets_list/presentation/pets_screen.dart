@@ -10,6 +10,7 @@ import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scop
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/add_pet_modal.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/pets/pet_details/presentation/pet_details_screen.dart';
 import 'package:tails_mobile/src/feature/pets/pets_list/domain/pets_list_bloc.dart';
 
 class PetsScreen extends StatefulWidget {
@@ -156,7 +157,12 @@ class _PetItem extends StatelessWidget {
                       ),
                       const SizedBox(width: 16),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(builder: (_) => PetDetailsScreen(id: pet.id)),
+                          );
+                        },
                         icon: const Icon(Icons.arrow_forward_ios),
                         iconSize: 16,
                         color: context.uiColors.black100.withValues(alpha: 0.5),

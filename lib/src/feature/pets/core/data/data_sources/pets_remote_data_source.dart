@@ -1,6 +1,7 @@
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/add_pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/breed_dto.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_details_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
@@ -29,6 +30,22 @@ class PetsRemoteDataSource {
           ),
         )
         .toList();
+  }
+
+  Future<PetDetailsDto> getPetDetails({required int id}) async {
+    final response = await _restClient.get('/pets/$id/');
+
+    if (response == null) {
+      throw Exception('Failed to get pet details');
+    }
+    
+    if (response is! Map) {
+      throw Exception('Failed to get pet details: expected JSON map, got ${response.runtimeType}');
+    }
+
+    return PetDetailsDto.fromJson(
+      Map<String, dynamic>.from(response),
+    );
   }
 
   Future<void> addPet({

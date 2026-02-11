@@ -96,4 +96,37 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get sunday => 'Вс';
+
+  @override
+  String get birthday => 'Дата рождения';
+
+  @override
+  String get color => 'Окрас';
+
+  @override
+  String get status => 'Статус';
+
+  @override
+  String get sterilized => 'Кастрирован';
+
+  @override
+  String get weight => 'Вес';
+
+  @override
+  String get type => 'Тип';
+
+  @override
+  String get breed => 'Порода';
+
+  @override
+  String get gender => 'Пол';
+
+  @override
+  String get male => 'Мужской';
+
+  @override
+  String get female => 'Женский';
+
+  @override
+  String get error => 'Ошибка';
 }

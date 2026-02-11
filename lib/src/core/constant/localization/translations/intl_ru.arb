@@ -47,5 +47,16 @@
   "thursday": "Чт",
   "friday": "Пт",
   "saturday": "Сб",
-  "sunday": "Вс"
+  "sunday": "Вс",
+  "birthday": "Дата рождения",
+  "color": "Окрас",
+  "status": "Статус",
+  "sterilized": "Кастрирован",
+  "weight": "Вес",
+  "type": "Тип",
+  "breed": "Порода",
+  "gender": "Пол",
+  "male": "Мужской",
+  "female": "Женский",
+  "error": "Ошибка"
 }
