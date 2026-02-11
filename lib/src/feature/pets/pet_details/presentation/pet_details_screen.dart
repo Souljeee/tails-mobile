@@ -1,7 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
+import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
+import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/pets/pet_details/domain/pet_details_bloc.dart';
 
 class PetDetailsScreen extends StatefulWidget {
-  const PetDetailsScreen({super.key});
+  final int id;
+
+  const PetDetailsScreen({
+    required this.id,
+    super.key,
+  });
 
   @override
   State<PetDetailsScreen> createState() => _PetDetailsScreenState();
@@ -12,6 +27,15 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
   static const _overlap = 28.0;
 
   double _scrollOffset = 0;
+
+  late final PetDetailsBloc _petDetailsBloc =
+      PetDetailsBloc(petRepository: DependenciesScope.of(context).petRepository);
+
+  @override
+  void initState() {
+    super.initState();
+    _petDetailsBloc.add(PetDetailsEvent.fetchRequested(id: widget.id));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,173 +56,206 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
     // Имя "ушло" под аппбар, когда эта позиция < topPadding + kToolbarHeight.
     const cardTopPadding = 18.0;
     const nameApproxHeight = 36.0; // примерная высота текста имени
-    final nameTopOnScreen =
-        (_imageHeight - _overlap + cardTopPadding) - _scrollOffset;
+    final nameTopOnScreen = (_imageHeight - _overlap + cardTopPadding) - _scrollOffset;
     final appBarBottom = topPadding + kToolbarHeight;
     final showTitleInAppBar = nameTopOnScreen + nameApproxHeight < appBarBottom;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // ── 1. Фоновое изображение ──
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: currentImageHeight,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.network(
-                  'https://images.unsplash.com/photo-1543852786-1cf6624b9987'
-                  '?auto=format&fit=crop&w=1200&q=80',
-                  fit: BoxFit.cover,
-                ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0x66000000),
-                        Color(0x00000000),
-                        Color(0x00000000),
-                        Color(0x99000000),
-                      ],
-                      stops: [0, 0.25, 0.7, 1],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // ── 2. Скроллируемый контент ──
-          NotificationListener<ScrollNotification>(
-            onNotification: (n) {
-              setState(() => _scrollOffset = n.metrics.pixels);
-              return false;
-            },
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              child: Column(
+    return BlocBuilder<PetDetailsBloc, PetDetailsState>(
+      bloc: _petDetailsBloc,
+      builder: (context, state) {
+        return state.map(
+          loading: (_) => const SizedBox.shrink(),
+          success: (state) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: Stack(
                 children: [
-                  // Прозрачный отступ — равен высоте фото минус overlap.
-                  SizedBox(height: _imageHeight - _overlap),
-
-                  // Карточка с информацией.
-                  // ClipRect обрезает тень снизу, оставляя только верхнюю.
-                  ClipRect(
-                    clipper: const _TopShadowClipper(shadowExtent: 22),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(28)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x1A000000),
-                            blurRadius: 20,
-                            offset: Offset(0, -2),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const _Header(
-                            name: 'Барсик',
-                            status: 'Активен',
-                            id: '482910',
-                          ),
-                          const SizedBox(height: 18),
-                          const _InfoGrid(),
-                          const SizedBox(height: 14),
-                          const _PillRow(
-                            icon: Icons.cake_outlined,
-                            title: 'Дата рождения',
-                            value: '12.05.2021 (3 года)',
-                          ),
-                          const SizedBox(height: 10),
-                          const _PillRow(
-                            icon: Icons.palette_outlined,
-                            title: 'Окрас',
-                            value: 'Рыжий мраморный',
-                          ),
-                          const SizedBox(height: 10),
-                          const _PillRow(
-                            icon: Icons.verified_user_outlined,
-                            title: 'Статус',
-                            value: 'Кастрирован',
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
-                  ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ── 3. Верхняя панель (back + edit + title), всегда поверх ──
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              color: t < 0.05 ? Colors.white : Colors.transparent,
-              child: SafeArea(
-                bottom: false,
-                child: SizedBox(
-                  height: kToolbarHeight,
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 4),
-                      _CircleIconButton(
-                        icon: Icons.arrow_back,
-                        onPressed: () => Navigator.maybePop(context),
-                      ),
-                      Expanded(
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 200),
-                          opacity: showTitleInAppBar ? 1.0 : 0.0,
-                          child: Text(
-                            'Барсик',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF111111),
+                  // ── 1. Фоновое изображение ──
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: currentImageHeight,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          state.petData.image,
+                          fit: BoxFit.cover,
+                        ),
+                        const DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0x66000000),
+                                Color(0x00000000),
+                                Color(0x00000000),
+                                Color(0x99000000),
+                              ],
+                              stops: [0, 0.25, 0.7, 1],
                             ),
                           ),
                         ),
-                      ),
-                      _CircleIconButton(
-                        icon: Icons.delete_outline,
-                        onPressed: () {},
-                      ),
-                      _CircleIconButton(
-                        icon: Icons.edit,
-                        onPressed: () {},
-                      ),
-                      const SizedBox(width: 4),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+
+                  // ── 2. Скроллируемый контент ──
+                  NotificationListener<ScrollNotification>(
+                    onNotification: (n) {
+                      setState(() => _scrollOffset = n.metrics.pixels);
+                      return false;
+                    },
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
+                      child: Column(
+                        children: [
+                          // Прозрачный отступ — равен высоте фото минус overlap.
+                          const SizedBox(height: _imageHeight - _overlap),
+
+                          // Карточка с информацией.
+                          // ClipRect обрезает тень снизу, оставляя только верхнюю.
+                          ClipRect(
+                            clipper: const _TopShadowClipper(shadowExtent: 22),
+                            child: DecoratedBox(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0x1A000000),
+                                    blurRadius: 20,
+                                    offset: Offset(0, -2),
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      state.petData.name.toFirstLetterUpperCase(),
+                                      style: context.uiFonts.header28Semibold.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 18),
+                                    _InfoGrid(
+                                      petTypeEnum: state.petData.petType,
+                                      breedModel: state.petData.breed,
+                                      petSexEnum: state.petData.gender,
+                                      weight: state.petData.weight,
+                                    ),
+                                    const SizedBox(height: 14),
+                                    _PillRow(
+                                      icon: Icons.cake_outlined,
+                                      title: 'Дата рождения',
+                                      value: _getFormattedBirthDate(state.petData.birthday),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    _PillRow(
+                                      icon: Icons.palette_outlined,
+                                      title: 'Окрас',
+                                      value: state.petData.color,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    const _PillRow(
+                                      icon: Icons.verified_user_outlined,
+                                      title: 'Статус',
+                                      value: 'Кастрирован',
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // ── 3. Верхняя панель (back + edit + title), всегда поверх ──
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      color: t < 0.05 ? Colors.white : Colors.transparent,
+                      child: SafeArea(
+                        bottom: false,
+                        child: SizedBox(
+                          height: kToolbarHeight,
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 4),
+                              _CircleIconButton(
+                                icon: Icons.arrow_back,
+                                onPressed: () => Navigator.maybePop(context),
+                              ),
+                              Expanded(
+                                child: AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 200),
+                                  opacity: showTitleInAppBar ? 1.0 : 0.0,
+                                  child: Text(
+                                    state.petData.name.toFirstLetterUpperCase(),
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF111111),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              _CircleIconButton(
+                                icon: Icons.delete_outline,
+                                onPressed: () {},
+                              ),
+                              _CircleIconButton(
+                                icon: Icons.edit,
+                                onPressed: () {},
+                              ),
+                              const SizedBox(width: 4),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-        ],
-      ),
+            );
+          },
+          error: (_) => const SizedBox.shrink(),
+        );
+      },
     );
+  }
+
+  String _getFormattedBirthDate(DateTime birthday) {
+    final String date = DateFormat('dd.MM.yyyy').format(birthday);
+
+    final buffer = StringBuffer(date);
+
+    final age = DateTime.now().difference(birthday).inDays;
+
+    final years = age ~/ 365;
+    final months = (age % 365) ~/ 30;
+
+    if (years > 0) {
+      buffer.write(' (${context.l10n.petAgeYearsAndMonths(years, months)})');
+    } else {
+      buffer.write(' (${context.l10n.petAgeMonths(months)})');
+    }
+
+    return buffer.toString();
   }
 }
 
@@ -215,10 +272,10 @@ class _TopShadowClipper extends CustomClipper<Rect> {
   Rect getClip(Size size) {
     // Расширяем прямоугольник вверх на shadowExtent, но не вниз.
     return Rect.fromLTRB(
-      -shadowExtent,  // чуть шире по бокам (для blur)
-      -shadowExtent,  // выше — для тени сверху
+      -shadowExtent, // чуть шире по бокам (для blur)
+      -shadowExtent, // выше — для тени сверху
       size.width + shadowExtent,
-      size.height,    // ровно по нижнему краю — тень снизу обрезана
+      size.height, // ровно по нижнему краю — тень снизу обрезана
     );
   }
 
@@ -241,119 +298,74 @@ class _CircleIconButton extends StatelessWidget {
     return IconButton(
       onPressed: onPressed,
       icon: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: Color(0xE6FFFFFF),
+        decoration: BoxDecoration(
+          color: context.uiColors.black5,
           shape: BoxShape.circle,
         ),
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Icon(icon, color: const Color(0xFF1A1A1A)),
+          child: Icon(
+            icon,
+            color: context.uiColors.black100,
+          ),
         ),
       ),
     );
   }
 }
 
-class _Header extends StatelessWidget {
-  final String name;
-  final String status;
-  final String id;
+class _InfoGrid extends StatelessWidget {
+  final PetTypeEnum petTypeEnum;
+  final BreedModel breedModel;
+  final PetSexEnum petSexEnum;
+  final double weight;
 
-  const _Header({
-    required this.name,
-    required this.status,
-    required this.id,
+  const _InfoGrid({
+    required this.petTypeEnum,
+    required this.breedModel,
+    required this.petSexEnum,
+    required this.weight,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          name,
-          style: theme.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w800,
-            color: const Color(0xFF111111),
-          ),
-        ),
-        const SizedBox(height: 6),
         Row(
-          children: [
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFE7D1),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                status,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: const Color(0xFFDA8A3A),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'ID: $id',
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: const Color(0xFF8A8A8A),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _InfoGrid extends StatelessWidget {
-  const _InfoGrid();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Row(
           children: [
             Expanded(
               child: _InfoTile(
                 icon: Icons.pets_outlined,
                 title: 'Тип',
-                value: 'Кошка',
+                value: petTypeEnum.getLocalizedName(context.l10n),
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: _InfoTile(
                 icon: Icons.badge_outlined,
                 title: 'Порода',
-                value: 'Мейн-кун',
+                value: breedModel.name,
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        const Row(
+        Row(
           children: [
             Expanded(
               child: _InfoTile(
                 icon: Icons.male,
                 title: 'Пол',
-                value: 'Кошка',
+                value: petSexEnum.fullName,
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: _InfoTile(
                 icon: Icons.bar_chart_outlined,
                 title: 'Вес',
-                value: 'Мейн-кун',
+                value: '$weight кг',
               ),
             ),
           ],
@@ -376,34 +388,31 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAF9F7),
+        color: context.uiColors.black5,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF0EDE7)),
+        border: Border.all(color: context.uiColors.black20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: const Color(0xFFDA8A3A)),
+          Icon(icon, color: context.uiColors.orangePrimary),
           const SizedBox(height: 10),
           Text(
             title.toUpperCase(),
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: const Color(0xFF9A9A9A),
+            style: context.uiFonts.text12Regular.copyWith(
+              color: context.uiColors.black50,
               fontWeight: FontWeight.w800,
-              letterSpacing: 0.4,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: const Color(0xFF1A1A1A),
-              fontWeight: FontWeight.w700,
+            style: context.uiFonts.text16Semibold.copyWith(
+              color: context.uiColors.black100,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ],
@@ -425,18 +434,16 @@ class _PillRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAF9F7),
+        color: context.uiColors.black5,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF0EDE7)),
+        border: Border.all(color: context.uiColors.black20),
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFFDA8A3A)),
+          Icon(icon, color: context.uiColors.orangePrimary),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -444,97 +451,21 @@ class _PillRow extends StatelessWidget {
               children: [
                 Text(
                   title.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: const Color(0xFF9A9A9A),
+                  style: context.uiFonts.text12Regular.copyWith(
+                    color: context.uiColors.black50,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 0.4,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: const Color(0xFF1A1A1A),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SwitchRow extends StatefulWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-  final bool initialValue;
-
-  const _SwitchRow({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.initialValue,
-  });
-
-  @override
-  State<_SwitchRow> createState() => _SwitchRowState();
-}
-
-class _SwitchRowState extends State<_SwitchRow> {
-  late bool _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = widget.initialValue;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFAF9F7),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF0EDE7)),
-      ),
-      child: Row(
-        children: [
-          Icon(widget.icon, color: const Color(0xFFDA8A3A)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.title.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: const Color(0xFF9A9A9A),
+                  style: context.uiFonts.text16Semibold.copyWith(
+                    color: context.uiColors.black100,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  widget.value,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: const Color(0xFF1A1A1A),
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
-          ),
-          Switch.adaptive(
-            value: _value,
-            onChanged: (v) => setState(() => _value = v),
-            activeColor: const Color(0xFFDA8A3A),
           ),
         ],
       ),

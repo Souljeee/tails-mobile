@@ -160,7 +160,7 @@ class _PetItem extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute<void>(builder: (_) => const PetDetailsScreen()),
+                            MaterialPageRoute<void>(builder: (_) => PetDetailsScreen(id: pet.id)),
                           );
                         },
                         icon: const Icon(Icons.arrow_forward_ios),

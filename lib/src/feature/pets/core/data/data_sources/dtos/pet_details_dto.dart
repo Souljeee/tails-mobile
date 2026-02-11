@@ -17,6 +17,8 @@ class PetDetailsDto extends Equatable {
   final DateTime birthday;
   final String color;
   final String image;
+  @JsonKey(fromJson: _weightFromJson)
+  final double weight;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -29,6 +31,7 @@ class PetDetailsDto extends Equatable {
     required this.birthday,
     required this.color,
     required this.image,
+    required this.weight,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -36,6 +39,8 @@ class PetDetailsDto extends Equatable {
   factory PetDetailsDto.fromJson(Map<String, dynamic> json) => _$PetDetailsDtoFromJson(json);
   
   Map<String, dynamic> toJson() => _$PetDetailsDtoToJson(this);
+
+  static double _weightFromJson(dynamic weight) => double.parse(weight.toString());
 
   @override
   List<Object?> get props => [
@@ -47,6 +52,7 @@ class PetDetailsDto extends Equatable {
         birthday,
         color,
         image,
+        weight,
         createdAt,
         updatedAt,
       ];

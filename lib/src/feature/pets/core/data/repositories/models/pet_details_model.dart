@@ -12,6 +12,7 @@ class PetDetailsModel extends Equatable{
   final DateTime birthday;
   final String color;
   final String image;
+  final double weight;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -24,6 +25,7 @@ class PetDetailsModel extends Equatable{
     required this.birthday,
     required this.color,
     required this.image,
+    required this.weight,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -38,6 +40,7 @@ class PetDetailsModel extends Equatable{
     birthday,
     color,
     image,
+    weight,
     createdAt,
     updatedAt,
   ];

@@ -100,6 +100,7 @@ extension on PetDetailsDto {
         birthday: birthday,
         color: color,
         image: image,
+        weight: weight,
         createdAt: createdAt,
         updatedAt: updatedAt,
       );

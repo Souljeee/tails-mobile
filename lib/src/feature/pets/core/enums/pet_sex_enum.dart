@@ -13,4 +13,9 @@ extension PetSexEnumExtension on PetSexEnum {
         PetSexEnum.male => 'Муж.',
         PetSexEnum.female => 'Жен.',
       };
+
+  String get fullName => switch (this) {
+        PetSexEnum.male => 'Мужcкой',
+        PetSexEnum.female => 'Женский',
+      };
 }
