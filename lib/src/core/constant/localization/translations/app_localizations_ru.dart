@@ -129,4 +129,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get error => 'Ошибка';
+
+  @override
+  String get deletePetTitle => 'Удалить питомца';
+
+  @override
+  String get deletePetSubtitle =>
+      'Вы уверены, что хотите удалить этого питомца? Это действие нельзя будет отменить.';
+
+  @override
+  String get deletePetCancel => 'Отмена';
+
+  @override
+  String get deletePetDelete => 'Удалить';
 }

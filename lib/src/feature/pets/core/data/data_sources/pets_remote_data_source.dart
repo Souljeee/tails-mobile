@@ -38,7 +38,7 @@ class PetsRemoteDataSource {
     if (response == null) {
       throw Exception('Failed to get pet details');
     }
-    
+
     if (response is! Map) {
       throw Exception('Failed to get pet details: expected JSON map, got ${response.runtimeType}');
     }
@@ -93,4 +93,6 @@ class PetsRemoteDataSource {
         )
         .toList();
   }
+
+  Future<void> deletePet({required int id}) => _restClient.delete('/pets/$id/');
 }
