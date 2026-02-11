@@ -155,20 +155,20 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
                                     const SizedBox(height: 14),
                                     _PillRow(
                                       icon: Icons.cake_outlined,
-                                      title: 'Дата рождения',
+                                      title: context.l10n.birthday,
                                       value: _getFormattedBirthDate(state.petData.birthday),
                                     ),
                                     const SizedBox(height: 10),
                                     _PillRow(
                                       icon: Icons.palette_outlined,
-                                      title: 'Окрас',
+                                      title: context.l10n.color,
                                       value: state.petData.color,
                                     ),
                                     const SizedBox(height: 10),
-                                    const _PillRow(
+                                    _PillRow(
                                       icon: Icons.verified_user_outlined,
-                                      title: 'Статус',
-                                      value: 'Кастрирован',
+                                      title: context.l10n.status,
+                                      value: context.l10n.sterilized,
                                     ),
                                     const SizedBox(height: 16),
                                   ],
@@ -336,7 +336,7 @@ class _InfoGrid extends StatelessWidget {
             Expanded(
               child: _InfoTile(
                 icon: Icons.pets_outlined,
-                title: 'Тип',
+                title: context.l10n.type,
                 value: petTypeEnum.getLocalizedName(context.l10n),
               ),
             ),
@@ -344,7 +344,7 @@ class _InfoGrid extends StatelessWidget {
             Expanded(
               child: _InfoTile(
                 icon: Icons.badge_outlined,
-                title: 'Порода',
+                title: context.l10n.breed,
                 value: breedModel.name,
               ),
             ),
@@ -356,7 +356,7 @@ class _InfoGrid extends StatelessWidget {
             Expanded(
               child: _InfoTile(
                 icon: Icons.male,
-                title: 'Пол',
+                title: context.l10n.gender,
                 value: petSexEnum.fullName,
               ),
             ),
@@ -364,7 +364,7 @@ class _InfoGrid extends StatelessWidget {
             Expanded(
               child: _InfoTile(
                 icon: Icons.bar_chart_outlined,
-                title: 'Вес',
+                title: context.l10n.weight,
                 value: '$weight кг',
               ),
             ),
