@@ -49,8 +49,11 @@ class EditPetFormData extends Equatable {
 
   bool get isValid =>
       name != null &&
+      name!.trim().isNotEmpty &&
+      petType != null &&
       breedId != null &&
       color != null &&
+      color!.trim().isNotEmpty &&
       weight != null &&
       gender != null &&
       birthday != null &&
@@ -111,6 +114,7 @@ class _EditPetModalState extends State<EditPetModal> {
       weight: widget.pet.weight,
       gender: widget.pet.gender,
       birthday: widget.pet.birthday,
+      castration: widget.pet.hasCastration,
     ),
   );
 
@@ -131,14 +135,15 @@ class _EditPetModalState extends State<EditPetModal> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _nameController.addListener(_nameListener);
-      _colorController.addListener(_colorListener);
-    });
+    _nameController.addListener(_nameListener);
+    _colorController.addListener(_colorListener);
   }
 
   @override
   void dispose() {
+    _formData.dispose();
+    _editPetBloc.close();
+
     _nameController.dispose();
     _birthDateController.dispose();
     _colorController.dispose();
@@ -334,7 +339,7 @@ class _EditPetModalState extends State<EditPetModal> {
                     valueListenable: _formData,
                     builder: (context, formData, _) {
 
-                      final isFormValid = formData.isValid && _isFormValid(formData);
+                      final isFormValid = formData.isValid && _hasChanges(formData);
 
                       return UiButton.main(
                         isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
@@ -372,14 +377,29 @@ class _EditPetModalState extends State<EditPetModal> {
     );
   }
 
-  bool _isFormValid(EditPetFormData formData) {
-    return formData.name != widget.pet.name ||
+  bool _hasChanges(EditPetFormData formData) {
+    String norm(String? s) => (s ?? '').trim();
+
+    bool sameDate(DateTime a, DateTime b) =>
+        a.year == b.year && a.month == b.month && a.day == b.day;
+
+    final initialBirthday = widget.pet.birthday;
+    final currentBirthday = formData.birthday;
+    final birthdayChanged = currentBirthday == null ? false : !sameDate(currentBirthday, initialBirthday);
+
+    final initialWeight = widget.pet.weight;
+    final currentWeight = formData.weight;
+    final weightChanged = currentWeight == null ? false : (currentWeight - initialWeight).abs() > 1e-9;
+
+    return norm(formData.name) != norm(widget.pet.name) ||
         formData.petType != widget.pet.petType ||
         formData.breedId != widget.pet.breed.id ||
-        formData.color != widget.pet.color ||
-        formData.weight != widget.pet.weight ||
+        norm(formData.color) != norm(widget.pet.color) ||
+        weightChanged ||
         formData.gender != widget.pet.gender ||
-        formData.birthday != widget.pet.birthday || 
-        formData.castration != widget.pet.hasCastration;
+        birthdayChanged ||
+        formData.castration != widget.pet.hasCastration ||
+        // Важно: иначе смена фото сама по себе не активирует кнопку
+        formData.image != null;
   }
 }
