@@ -21,6 +21,7 @@ class PetDetailsDto extends Equatable {
   final double weight;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool hasCastration;
 
   const PetDetailsDto({
     required this.id,
@@ -34,6 +35,7 @@ class PetDetailsDto extends Equatable {
     required this.weight,
     required this.createdAt,
     required this.updatedAt,
+    required this.hasCastration,
   });
 
   factory PetDetailsDto.fromJson(Map<String, dynamic> json) => _$PetDetailsDtoFromJson(json);
@@ -55,5 +57,6 @@ class PetDetailsDto extends Equatable {
         weight,
         createdAt,
         updatedAt,
+        hasCastration,
       ];
 }

@@ -10,11 +10,16 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 class PhotoUploadWidget extends StatefulWidget {
   const PhotoUploadWidget({
     required this.onImageSelected,
+    this.initialImageUrl,
     super.key,
   });
 
   /// Callback, вызываемый при выборе изображения
   final void Function(File image) onImageSelected;
+
+  /// Начальное изображение питомца (например, с сервера).
+  /// Если пользователь выберет фото с устройства, оно будет показано вместо этого изображения.
+  final String? initialImageUrl;
 
   @override
   State<PhotoUploadWidget> createState() => _PhotoUploadWidgetState();
@@ -23,6 +28,8 @@ class PhotoUploadWidget extends StatefulWidget {
 class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+
+  bool get _hasInitialImageUrl => widget.initialImageUrl?.trim().isNotEmpty == true;
 
   Future<void> _showImageSourceBottomSheet() async {
     await showModalBottomSheet<void>(
@@ -139,11 +146,34 @@ class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
                           _selectedImage!,
                           fit: BoxFit.cover,
                         )
-                      : Icon(
-                          Icons.pets,
-                          size: 64,
-                          color: context.uiColors.black40,
-                        ),
+                      : _hasInitialImageUrl
+                          ? Image.network(
+                              widget.initialImageUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Icon(
+                                Icons.pets,
+                                size: 64,
+                                color: context.uiColors.black40,
+                              ),
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: SizedBox(
+                                    width: 28,
+                                    height: 28,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: context.uiColors.orangePrimary,
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : Icon(
+                              Icons.pets,
+                              size: 64,
+                              color: context.uiColors.black40,
+                            ),
                 ),
               ),
               Positioned(
@@ -178,7 +208,7 @@ class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
           GestureDetector(
             onTap: _showImageSourceBottomSheet,
             child: Text(
-              'Добавить фото',
+              _hasInitialImageUrl ? 'Изменить фото' : 'Добавить фото',
               style: TextStyle(
                 fontSize: 16,
                 color: context.uiColors.brown,

@@ -15,6 +15,7 @@ class PetDetailsModel extends Equatable{
   final double weight;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool hasCastration;
 
   const PetDetailsModel({
     required this.id,
@@ -28,6 +29,7 @@ class PetDetailsModel extends Equatable{
     required this.weight,
     required this.createdAt,
     required this.updatedAt,
+    required this.hasCastration,
   });
   
   @override
@@ -43,5 +45,6 @@ class PetDetailsModel extends Equatable{
     weight,
     createdAt,
     updatedAt,
+    hasCastration,
   ];
 }

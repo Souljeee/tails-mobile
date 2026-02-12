@@ -13,15 +13,13 @@ import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/bree
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/delete_pet/presentation/delete_pet_bottom_sheet.dart';
+import 'package:tails_mobile/src/feature/pets/edit_pet/presentation/edit_pet_modal.dart';
 import 'package:tails_mobile/src/feature/pets/pet_details/domain/pet_details_bloc.dart';
 
 class PetDetailsScreen extends StatefulWidget {
   final int id;
 
-  const PetDetailsScreen({
-    required this.id,
-    super.key,
-  });
+  const PetDetailsScreen({required this.id, super.key});
 
   @override
   State<PetDetailsScreen> createState() => _PetDetailsScreenState();
@@ -33,8 +31,10 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
 
   double _scrollOffset = 0;
 
-  late final PetDetailsBloc _petDetailsBloc =
-      PetDetailsBloc(petRepository: DependenciesScope.of(context).petRepository);
+  late final PetDetailsBloc _petDetailsBloc = PetDetailsBloc(
+    petRepository: DependenciesScope.of(context).petRepository,
+    petId: widget.id,
+  );
 
   @override
   void initState() {
@@ -84,10 +84,7 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(
-                          state.petData.image,
-                          fit: BoxFit.cover,
-                        ),
+                        Image.network(state.petData.image, fit: BoxFit.cover),
                         const DecoratedBox(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -114,9 +111,7 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
                       return false;
                     },
                     child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics(),
-                      ),
+                      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                       child: Column(
                         children: [
                           // Прозрачный отступ — равен высоте фото минус overlap.
@@ -227,7 +222,7 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
                                     petId: widget.id,
                                   );
 
-                                  if(result == null){
+                                  if (result == null) {
                                     return;
                                   }
 
@@ -254,7 +249,14 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
                               ),
                               _CircleIconButton(
                                 icon: Icons.edit,
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditPetModal(pet: state.petData),
+                                    ),
+                                  );
+                                },
                               ),
                               const SizedBox(width: 4),
                             ],
@@ -268,9 +270,7 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
             );
           },
           error: (_) => _PetDetailsFetchingError(
-            onRetry: () => _petDetailsBloc.add(
-              PetDetailsEvent.fetchRequested(id: widget.id),
-            ),
+            onRetry: () => _petDetailsBloc.add(PetDetailsEvent.fetchRequested(id: widget.id)),
           ),
         );
       },
@@ -326,26 +326,17 @@ class _CircleIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  const _CircleIconButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _CircleIconButton({required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onPressed,
       icon: DecoratedBox(
-        decoration: BoxDecoration(
-          color: context.uiColors.black5,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: context.uiColors.black5, shape: BoxShape.circle),
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Icon(
-            icon,
-            color: context.uiColors.black100,
-          ),
+          child: Icon(icon, color: context.uiColors.black100),
         ),
       ),
     );
@@ -418,11 +409,7 @@ class _InfoTile extends StatelessWidget {
   final String title;
   final String value;
 
-  const _InfoTile({
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
+  const _InfoTile({required this.icon, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -464,11 +451,7 @@ class _PillRow extends StatelessWidget {
   final String title;
   final String value;
 
-  const _PillRow({
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
+  const _PillRow({required this.icon, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -527,10 +510,7 @@ class _PetDetailsShimmer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  UiKitShimmerLoading(
-                    height: 320,
-                    borderRadius: BorderRadius.circular(32),
-                  ),
+                  UiKitShimmerLoading(height: 320, borderRadius: BorderRadius.circular(32)),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -577,7 +557,7 @@ class _PetDetailsShimmer extends StatelessWidget {
                         borderRadius: BorderRadius.circular(32),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -598,19 +578,14 @@ class _PetDetailsFetchingError extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text(
-          context.l10n.error,
-          style: context.uiFonts.header24Semibold,
-        ),
+        title: Text(context.l10n.error, style: context.uiFonts.header24Semibold),
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.maybePop(context),
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: SafeArea(
-        child: UiFetchingError(onRetry: onRetry),
-      ),
+      body: SafeArea(child: UiFetchingError(onRetry: onRetry)),
     );
   }
 }

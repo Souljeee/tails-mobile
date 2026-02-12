@@ -6,10 +6,12 @@ import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 class CastrationSection extends StatefulWidget {
   final PetSexEnum gender;
   final void Function(bool) onSelected;
+  final bool initialSelection;
 
   const CastrationSection({
     required this.gender,
     required this.onSelected,
+    this.initialSelection = false,
     super.key,
   });
 
@@ -18,7 +20,7 @@ class CastrationSection extends StatefulWidget {
 }
 
 class _CastrationSectionState extends State<CastrationSection> {
-  bool _isSelected = false;
+  late bool _isSelected = widget.initialSelection;
 
   @override
   Widget build(BuildContext context) {

@@ -4,9 +4,11 @@ import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/weigh
 
 class WeightPicker extends StatefulWidget {
   final void Function(double) onWeightSelected;
+  final double? initialWeight;
 
   const WeightPicker({
     required this.onWeightSelected,
+    this.initialWeight,
     super.key,
   });
 
@@ -15,7 +17,7 @@ class WeightPicker extends StatefulWidget {
 }
 
 class _WeightPickerState extends State<WeightPicker> {
-  double? _weight;
+  late double? _weight = widget.initialWeight;
 
   String _formatWeight(double weightKg) {
     final kg = weightKg.floor().clamp(0, 100);

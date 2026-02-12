@@ -5,31 +5,32 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_popup/ui_popup.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 
 class CalendarPopup extends StatefulWidget {
-  static Future<DateTime?> show({required BuildContext context}) => showUiPopup(
+  final DateTime? initialDate;
+
+  static Future<DateTime?> show({required BuildContext context, DateTime? initialDate}) =>
+      showUiPopup(
         context: context,
-        child: const CalendarPopup._(),
+        child: CalendarPopup._(initialDate: initialDate),
       );
 
-  const CalendarPopup._();
+  const CalendarPopup._({this.initialDate});
 
   @override
   State<CalendarPopup> createState() => _CalendarPopupState();
 }
 
 class _CalendarPopupState extends State<CalendarPopup> {
-  DateTime? _seletedDate;
+  late DateTime? _seletedDate = widget.initialDate;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Выберите дату рождения',
-          style: context.uiFonts.header28Semibold,
-        ),
-        const SizedBox(height: 16),
+        Text('Выберите дату рождения', style: context.uiFonts.header28Semibold),
+        const SizedBox(height: 16), 
         MonthCalendar(
+          initialMonth: widget.initialDate?.monthStart,
           onDateTap: (date) {
             setState(() {
               _seletedDate = date;

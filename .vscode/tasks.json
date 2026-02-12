@@ -5,7 +5,7 @@
             "label": "Get dependencies",
             "type": "shell",
             "command": [
-                "flutter pub get"
+                "fvm flutter pub get"
             ],
             "group": {
                 "kind": "none",
@@ -30,7 +30,7 @@
             "type": "shell",
             "command": [
                 // do not include codegen files
-                "find lib test -name '*.dart' ! -name '*.g.dart' | xargs dart format --fix -l 80"
+                "find lib test -name '*.dart' ! -name '*.g.dart' | xargs fvm dart format --fix -l 80"
             ],
             "group": {
                 "kind": "none",
@@ -42,7 +42,7 @@
             "label": "Run tests",
             "type": "shell",
             "command": [
-                "flutter test ."
+                "fvm flutter test ."
             ],
             "group": {
                 "kind": "none",
