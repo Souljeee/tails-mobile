@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +12,7 @@ import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scop
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/pets/delete_pet/presentation/delete_pet_bottom_sheet.dart';
 import 'package:tails_mobile/src/feature/pets/pet_details/domain/pet_details_bloc.dart';
 
 class PetDetailsScreen extends StatefulWidget {
@@ -218,7 +221,36 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
                               ),
                               _CircleIconButton(
                                 icon: Icons.delete_outline,
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final result = await DeletePetBottomSheet.show(
+                                    context: context,
+                                    petId: widget.id,
+                                  );
+
+                                  if(result == null){
+                                    return;
+                                  }
+
+                                  if (context.mounted) {
+                                    if (result == DeletePetStatus.deleted) {
+                                      unawaited(Navigator.maybePop(context));
+                                    }
+
+                                    if (result == DeletePetStatus.error) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            context.l10n.tryLater,
+                                            style: context.uiFonts.text16Regular.copyWith(
+                                              color: context.uiColors.white,
+                                            ),
+                                          ),
+                                          backgroundColor: context.uiColors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
                               ),
                               _CircleIconButton(
                                 icon: Icons.edit,

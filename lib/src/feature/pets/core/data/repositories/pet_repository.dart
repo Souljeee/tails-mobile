@@ -54,6 +54,12 @@ class PetRepository {
 
     _eventStreamController.add(const PetsRepositoryEventsEvent.petEdited());
   }
+
+  Future<void> deletePet({required int id}) async {
+    await _petsRemoteDataSource.deletePet(id: id);
+
+    _eventStreamController.add(const PetsRepositoryEventsEvent.petDeleted());
+  }
 }
 
 extension on PetDto {

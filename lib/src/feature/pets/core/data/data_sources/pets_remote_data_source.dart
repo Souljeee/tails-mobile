@@ -85,4 +85,6 @@ class PetsRemoteDataSource {
       throw Exception('Failed to edit pet');
     }
   }
+
+  Future<void> deletePet({required int id}) => _restClient.delete('/pets/$id/');
 }
