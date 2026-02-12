@@ -17,6 +17,7 @@ import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/photo
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/sex_section.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/weight_picker.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/edit_pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_details_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
@@ -103,7 +104,6 @@ class EditPetModal extends StatefulWidget {
 class _EditPetModalState extends State<EditPetModal> {
   late final ValueNotifier<EditPetFormData> _formData = ValueNotifier(
     EditPetFormData(
-      image: File.fromUri(Uri.https(widget.pet.image)),
       name: widget.pet.name,
       petType: widget.pet.petType,
       breedId: widget.pet.breed.id,
@@ -200,7 +200,10 @@ class _EditPetModalState extends State<EditPetModal> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              PhotoUploadWidget(onImageSelected: _onImageSelected),
+              PhotoUploadWidget(
+                onImageSelected: _onImageSelected,
+                initialImageUrl: widget.pet.image,
+              ),
               const SizedBox(height: 40),
               PetTypeSelection(onTypeChanged: _onTypeChanged),
               const SizedBox(height: 16),
@@ -251,7 +254,10 @@ class _EditPetModalState extends State<EditPetModal> {
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () async {
-                  final DateTime? selectedDate = await CalendarPopup.show(context: context);
+                  final DateTime? selectedDate = await CalendarPopup.show(
+                    context: context,
+                    initialDate: _formData.value.birthday ?? widget.pet.birthday,
+                  );
 
                   if (selectedDate != null) {
                     _birthDateController.text = DateFormat('dd.MM.yyyy').format(selectedDate);
@@ -277,7 +283,7 @@ class _EditPetModalState extends State<EditPetModal> {
                 ),
               ),
               const SizedBox(height: 16),
-              WeightPicker(onWeightSelected: _onWeightSelected),
+              WeightPicker(onWeightSelected: _onWeightSelected, initialWeight: widget.pet.weight),
               const SizedBox(height: 16),
               Text('Окрас', style: context.uiFonts.header20Medium),
               const SizedBox(height: 8),
@@ -298,6 +304,7 @@ class _EditPetModalState extends State<EditPetModal> {
                 valueListenable: _formData,
                 builder: (context, formData, _) {
                   return CastrationSection(
+                    initialSelection: widget.pet.hasCastration,
                     gender: formData.gender ?? PetSexEnum.male,
                     onSelected: _onCastrationSelected,
                   );
@@ -326,13 +333,30 @@ class _EditPetModalState extends State<EditPetModal> {
                   return ValueListenableBuilder<EditPetFormData>(
                     valueListenable: _formData,
                     builder: (context, formData, _) {
+
+                      final isFormValid = formData.isValid && _isFormValid(formData);
+
                       return UiButton.main(
                         isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
                         label: 'Сохранить',
-                        onPressed: formData.isValid
+                        onPressed: isFormValid
                             ? state.mapOrNull(
                                 initial: (_) => () {
-                                  // TODO: Implement editing pet
+                                  _editPetBloc.add(
+                                    EditPetEvent.editingRequested(
+                                      petId: widget.pet.id,
+                                      pet: EditPetModel(
+                                        name: formData.name,
+                                        petType: formData.petType,
+                                        breedId: formData.breedId,
+                                        color: formData.color,
+                                        weight: formData.weight,
+                                        gender: formData.gender,
+                                        birthday: formData.birthday,
+                                      ),
+                                      image: _formData.value.image,
+                                    ),
+                                  );
                                 },
                               )
                             : null,
@@ -346,5 +370,16 @@ class _EditPetModalState extends State<EditPetModal> {
         ),
       ),
     );
+  }
+
+  bool _isFormValid(EditPetFormData formData) {
+    return formData.name != widget.pet.name ||
+        formData.petType != widget.pet.petType ||
+        formData.breedId != widget.pet.breed.id ||
+        formData.color != widget.pet.color ||
+        formData.weight != widget.pet.weight ||
+        formData.gender != widget.pet.gender ||
+        formData.birthday != widget.pet.birthday || 
+        formData.castration != widget.pet.hasCastration;
   }
 }

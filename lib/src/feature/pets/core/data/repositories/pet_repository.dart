@@ -107,6 +107,7 @@ extension on PetDetailsDto {
     weight: weight,
     createdAt: createdAt,
     updatedAt: updatedAt,
+    hasCastration: hasCastration,
   );
 }
 
