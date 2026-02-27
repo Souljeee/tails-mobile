@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 
 part 'schedule_event_dto.g.dart';
 
@@ -13,12 +14,16 @@ class ScheduleEventDto extends Equatable {
   final String? description;
   final String? time;
   final int? timeZoneOffset;
+  final ScheduleEventTypeEnum type;
+  final bool done;
   final RecurrenceDto? recurrence;
 
   const ScheduleEventDto({
     required this.id,
     required this.petId,
     required this.title,
+    required this.type,
+    required this.done,
     this.description,
     this.time,
     this.timeZoneOffset,
@@ -30,7 +35,17 @@ class ScheduleEventDto extends Equatable {
   Map<String, dynamic> toJson() => _$ScheduleEventDtoToJson(this);
 
   @override
-  List<Object?> get props => [id, petId, title, description, time, recurrence];
+  List<Object?> get props => [
+    id,
+    petId,
+    title,
+    description,
+    time,
+    timeZoneOffset,
+    type,
+    done,
+    recurrence,
+  ];
 }
 
 @JsonSerializable()

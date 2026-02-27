@@ -6,27 +6,24 @@ class ScheduleRemoteDataSource {
 
   final RestClient restClient;
 
-  Future<ScheduleEventDtoList> getScheduleEvents({
-    required int petId,
+  Future<List<ScheduleEventDto>> getScheduleEvents({
     required DateTime startDate,
     required DateTime endDate,
+    int? petId,
   }) async {
     final response = await restClient.get(
       '/event/period/',
       queryParams: {
-        'pet_id': petId.toString(),
+        if (petId != null) 'pet_id': petId.toString(),
         'start_date': startDate.toIso8601String(),
         'end_date': endDate.toIso8601String(),
       },
     );
 
-    if (response == null || response is! Map<String, dynamic>) {
+    if (response == null || response is! List<dynamic>) {
       throw Exception('Invalid response');
     }
 
-    return response.map(
-      (key, value) =>
-          MapEntry(DateTime.parse(key), ScheduleEventDto.fromJson(value as Map<String, dynamic>)),
-    );
+    return response.map((value) => ScheduleEventDto.fromJson(value as Map<String, dynamic>)).toList();
   }
 }
