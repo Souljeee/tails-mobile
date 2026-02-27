@@ -1,38 +1,32 @@
 import 'package:equatable/equatable.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 
-part 'schedule_event_dto.g.dart';
+typedef ScheduleEventModelList = Map<DateTime, ScheduleEventModel>;
 
-typedef ScheduleEventDtoList = Map<DateTime, ScheduleEventDto>;
-
-@JsonSerializable()
-class ScheduleEventDto extends Equatable {
+class ScheduleEventModel extends Equatable {
   final String id;
   final int petId;
   final String title;
   final String? description;
   final String? time;
+  final DateTime date;
   final int? timeZoneOffset;
   final ScheduleEventTypeEnum type;
   final bool done;
-  final RecurrenceDto? recurrence;
+  final RecurrenceModel? recurrence;
 
-  const ScheduleEventDto({
+  const ScheduleEventModel({
     required this.id,
     required this.petId,
     required this.title,
     required this.type,
     required this.done,
+    required this.date,
     this.description,
     this.time,
     this.timeZoneOffset,
     this.recurrence,
   });
-
-  factory ScheduleEventDto.fromJson(Map<String, dynamic> json) => _$ScheduleEventDtoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ScheduleEventDtoToJson(this);
 
   @override
   List<Object?> get props => [
@@ -41,6 +35,7 @@ class ScheduleEventDto extends Equatable {
     title,
     description,
     time,
+    date,
     timeZoneOffset,
     type,
     done,
@@ -48,8 +43,7 @@ class ScheduleEventDto extends Equatable {
   ];
 }
 
-@JsonSerializable()
-class RecurrenceDto extends Equatable {
+class RecurrenceModel extends Equatable {
   final String frequency;
   final int interval;
   final List<String>? weekDays;
@@ -58,7 +52,7 @@ class RecurrenceDto extends Equatable {
   final String? endDate;
   final int? endCount;
 
-  const RecurrenceDto({
+  const RecurrenceModel({
     required this.frequency,
     required this.interval,
     required this.endType,
@@ -67,10 +61,6 @@ class RecurrenceDto extends Equatable {
     this.endDate,
     this.endCount,
   });
-
-  factory RecurrenceDto.fromJson(Map<String, dynamic> json) => _$RecurrenceDtoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$RecurrenceDtoToJson(this);
 
   @override
   List<Object?> get props => [frequency, interval, weekDays, monthDays, endType, endDate, endCount];

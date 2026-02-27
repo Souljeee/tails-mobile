@@ -1,5 +1,5 @@
 import 'package:rest_client/rest_client.dart';
-import 'package:tails_mobile/src/feature/schedule/core/data/dtos/schedule_event_dto.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
 
 class ScheduleRemoteDataSource {
   const ScheduleRemoteDataSource({required this.restClient});
