@@ -406,7 +406,7 @@ class _DateItemState extends State<_DateItem> {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         height: 36,
-        margin: const EdgeInsets.all(8),
+        margin: const EdgeInsets.all(4),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: _dateBackgroundColor,

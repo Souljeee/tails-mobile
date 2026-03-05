@@ -6,21 +6,11 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 
-class ScheduleCalendar extends StatefulWidget {
-  const ScheduleCalendar({super.key});
+class ScheduleCalendar extends StatelessWidget {
+  final DateTime selectedDate;
+  final void Function(DateTime date) onDateTap;
 
-  @override
-  State<ScheduleCalendar> createState() => _ScheduleCalendarState();
-}
-
-class _ScheduleCalendarState extends State<ScheduleCalendar> {
-  DateTime selectedDate = DateTime.now();
-
-  void _onDateTap(DateTime date) {
-    setState(() {
-      selectedDate = date;
-    });
-  }
+  const ScheduleCalendar({required this.selectedDate, required this.onDateTap, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +22,14 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
           borderRadius: BorderRadius.circular(16),
         ),
         child: MonthCalendar(
-          onDateTap: _onDateTap,
+          onDateTap: onDateTap,
           style: CalendarStyle(
-            resolveDateTextColor: (date) => selectedDate.isSameDate(date) ? context.uiColors.white : context.uiColors.black80,
-            resolveDateBackgroundColor: (date) => selectedDate.isSameDate(date) ? context.uiColors.orangePrimary : Colors.transparent,
+            resolveDateTextColor: (date) => selectedDate.isSameDate(date)
+                ? context.uiColors.white
+                : context.uiColors.black80,
+            resolveDateBackgroundColor: (date) => selectedDate.isSameDate(date)
+                ? context.uiColors.orangePrimary
+                : Colors.transparent,
           ),
           headerBuilder:
               (
@@ -49,7 +43,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                     .format(month)
                     .replaceAll(' г.', '')
                     .toFirstLetterUpperCase();
-                    
+
                 return Row(
                   children: [
                     GestureDetector(
