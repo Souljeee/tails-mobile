@@ -18,6 +18,7 @@ class UiBaseToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      toolbarHeight: 90,
       elevation: 0,
       centerTitle: false,
       surfaceTintColor: Colors.transparent,
@@ -26,7 +27,7 @@ class UiBaseToolbar extends StatelessWidget {
       actions: actions,
       title: Container(
         alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.only(left: 20),
+        padding: const EdgeInsets.only(left: 16),
         child: Text(
           title,
           style: context.uiFonts.header32Semibold.copyWith(

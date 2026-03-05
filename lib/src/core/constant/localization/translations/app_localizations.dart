@@ -283,6 +283,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Удалить'**
   String get deletePetDelete;
+
+  /// No description provided for @all.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get all;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

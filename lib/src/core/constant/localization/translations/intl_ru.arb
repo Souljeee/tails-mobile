@@ -62,5 +62,6 @@
   "deletePetTitle": "Удалить питомца",
   "deletePetSubtitle": "Вы уверены, что хотите удалить этого питомца? Это действие нельзя будет отменить.",
   "deletePetCancel": "Отмена",
-  "deletePetDelete": "Удалить"
+  "deletePetDelete": "Удалить",
+  "all": "Все"
 }
