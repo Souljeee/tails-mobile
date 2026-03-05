@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/utils/app_bloc_observer.dart';
 import 'package:tails_mobile/src/core/utils/bloc_transformer.dart';
@@ -31,6 +32,8 @@ sealed class AppRunner {
         if (!kReleaseMode) const PrintingLogObserver(logLevel: LogLevel.trace),
       ],
     ).create();
+
+    Intl.defaultLocale = 'ru_RU';
 
     await runZonedGuarded(
       () async {

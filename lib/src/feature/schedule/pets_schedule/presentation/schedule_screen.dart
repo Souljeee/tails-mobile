@@ -5,6 +5,7 @@ import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/bree
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/pets_chip_list.dart';
+import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/schedule_calendar.dart';
 
 class ScheduleScreen extends StatelessWidget {
   const ScheduleScreen({super.key});
@@ -82,9 +83,16 @@ class ScheduleScreen extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: PetsChipList(
-                pets: _mockedPetList,
-                onSelectedPetsChanged: (selectedPetIds) {},
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PetsChipList(
+                    pets: _mockedPetList,
+                    onSelectedPetsChanged: (selectedPetIds) {},
+                  ),
+                  const SizedBox(height: 24),
+                  const ScheduleCalendar(),
+                ],
               ),
             ),
           ],
