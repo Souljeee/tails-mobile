@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_app_bar/ui_app_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
-import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
