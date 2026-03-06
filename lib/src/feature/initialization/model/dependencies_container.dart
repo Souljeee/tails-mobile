@@ -8,6 +8,7 @@ import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 
 /// {@template dependencies_container}
@@ -29,6 +30,7 @@ class DependenciesContainer {
     required this.sendCodeBloc,
     required this.codeTimerBloc,
     required this.petRepository,
+    required this.scheduleRepository,
   });
 
   /// [Logger] instance, used to log messages.
@@ -63,6 +65,9 @@ class DependenciesContainer {
 
   /// [PetRepository] instance, used to fetch pet data from the remote source.
   final PetRepository petRepository;
+
+  /// [ScheduleRepository] instance, used to fetch schedule data from the remote source.
+  final ScheduleRepository scheduleRepository;
 }
 
 /// {@template testing_dependencies_container}

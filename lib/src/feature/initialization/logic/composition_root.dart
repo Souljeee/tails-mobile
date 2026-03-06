@@ -19,6 +19,8 @@ import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.da
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/schedule_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 import 'package:tails_mobile/src/feature/settings/data/app_settings_datasource.dart';
 import 'package:tails_mobile/src/feature/settings/data/app_settings_repository.dart';
@@ -186,6 +188,10 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final petRepository = PetRepository(petsRemoteDataSource: petsRemoteDataSource);
 
+    final scheduleRemoteDataSource = ScheduleRemoteDataSource(restClient: restClient);
+
+    final scheduleRepository = ScheduleRepository(scheduleRemoteDataSource: scheduleRemoteDataSource);
+
     return DependenciesContainer(
       logger: logger,
       config: config,
@@ -198,6 +204,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       sendCodeBloc: sendCodeBloc,
       codeTimerBloc: codeTimerBloc,
       petRepository: petRepository,
+      scheduleRepository: scheduleRepository,
     );
   }
 }
