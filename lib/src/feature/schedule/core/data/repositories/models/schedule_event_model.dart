@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 
-typedef ScheduleEventModelList = Map<DateTime, ScheduleEventModel>;
+typedef ScheduleEventModelList = Map<DateTime, List<ScheduleEventModel>>;
 
 class ScheduleEventModel extends Equatable {
   final String id;

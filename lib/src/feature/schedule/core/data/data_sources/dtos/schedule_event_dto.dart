@@ -4,7 +4,7 @@ import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_
 
 part 'schedule_event_dto.g.dart';
 
-typedef ScheduleEventDtoList = Map<DateTime, ScheduleEventDto>;
+typedef ScheduleEventDtoList = Map<DateTime, List<ScheduleEventDto>>;
 
 @JsonSerializable()
 class ScheduleEventDto extends Equatable {

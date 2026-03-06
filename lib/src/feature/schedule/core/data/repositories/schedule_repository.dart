@@ -19,15 +19,11 @@ class ScheduleRepository {
       petId: petId,
     );
 
-    final eventsModels = events.map((event) => event.toModel()).toList();
-
-    eventsModels.sort((a, b) => a.date.compareTo(b.date));
-
-    final eventsMap = Map<DateTime, ScheduleEventModel>.fromEntries(
-      eventsModels.map((event) => MapEntry(event.date, event)),
+    final eventEntries = events.entries.map(
+      (entry) => MapEntry(entry.key, entry.value.map((event) => event.toModel()).toList()),
     );
 
-    return eventsMap;
+    return Map<DateTime, List<ScheduleEventModel>>.fromEntries(eventEntries);
   }
 }
 
