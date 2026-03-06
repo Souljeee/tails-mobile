@@ -8,7 +8,6 @@ sealed class ScheduleState extends Equatable {
   const factory ScheduleState.loading() = ScheduleState$Loading;
 
   const factory ScheduleState.success({
-    required List<PetModel> pets,
     required ScheduleEventModelList scheduleEvents,
   }) = ScheduleState$Success;
 
@@ -60,30 +59,25 @@ final class ScheduleState$Loading extends ScheduleState {
 
 final class ScheduleState$Success extends ScheduleState {
   final ScheduleEventModelList scheduleEvents;
-  final List<PetModel> pets;
   final PaginationStatusEnum paginationStatus;
 
   const ScheduleState$Success({
     required this.scheduleEvents,
-    required this.pets,
     this.paginationStatus = PaginationStatusEnum.idle,
   });
 
   ScheduleState$Success copyWith({
     CopyWithWrapper<ScheduleEventModelList>? scheduleEvents,
-    CopyWithWrapper<List<PetModel>>? pets,
     CopyWithWrapper<PaginationStatusEnum>? paginationStatus,
   }) =>
       ScheduleState$Success(
         scheduleEvents: scheduleEvents?.value ?? this.scheduleEvents,
-        pets: pets?.value ?? this.pets,
         paginationStatus: paginationStatus?.value ?? this.paginationStatus,
       );
 
   @override
   List<Object?> get props => [
         scheduleEvents,
-        pets,
         paginationStatus,
       ];
 }
