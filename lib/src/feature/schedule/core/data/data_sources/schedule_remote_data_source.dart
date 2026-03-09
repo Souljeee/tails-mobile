@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
 
@@ -12,11 +13,11 @@ class ScheduleRemoteDataSource {
     int? petId,
   }) async {
     final response = await restClient.get(
-      '/event/period/',
+      '/event_schedule/period/',
       queryParams: {
         if (petId != null) 'pet_id': petId.toString(),
-        'start_date': startDate.toIso8601String(),
-        'end_date': endDate.toIso8601String(),
+        'date_from': DateFormat('yyyy-MM-dd').format(startDate),
+        'date_to': DateFormat('yyyy-MM-dd').format(endDate),
       },
     );
 

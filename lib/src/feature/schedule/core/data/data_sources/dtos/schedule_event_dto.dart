@@ -9,6 +9,7 @@ typedef ScheduleEventDtoList = Map<DateTime, List<ScheduleEventDto>>;
 @JsonSerializable()
 class ScheduleEventDto extends Equatable {
   final String id;
+  @JsonKey(name: 'pet')
   final int petId;
   final String title;
   final String? description;

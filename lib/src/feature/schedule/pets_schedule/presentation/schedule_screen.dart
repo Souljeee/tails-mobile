@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_app_bar/ui_app_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
@@ -23,7 +24,7 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTime.now().withoutTime;
 
   String get formattedSelectedDate => DateFormat.MMMMd().format(selectedDate);
 
@@ -33,8 +34,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   late final ScheduleBloc _scheduleBloc = ScheduleBloc(
     scheduleRepository: DependenciesScope.of(context).scheduleRepository,
   );
-
-  late List<ScheduleEventModel> _events = List.of(_mockedScheduleEvents);
 
   @override
   void initState() {
@@ -54,24 +53,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   void _loadData() {
     _petsBloc.add(const PetsEvent.petsRequested());
     _scheduleBloc.add(ScheduleEvent.fetchRequested(startDate: selectedDate, endDate: selectedDate));
-  }
-
-  void _toggleEvent(int index) {
-    setState(() {
-      final event = _events[index];
-      _events[index] = ScheduleEventModel(
-        id: event.id,
-        petId: event.petId,
-        title: event.title,
-        type: event.type,
-        done: !event.done,
-        date: event.date,
-        description: event.description,
-        time: event.time,
-        timeZoneOffset: event.timeZoneOffset,
-        recurrence: event.recurrence,
-      );
-    });
   }
 
   @override
@@ -125,23 +106,36 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 ],
               ),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverList.separated(
-                itemCount: _events.length,
-                itemBuilder: (context, index) {
-                  return ScheduleEventItem(
-                    event: _events[index],
-                    pet: _petsBloc.state.mapOrNull<PetModel?>(
-                      success: (state) => state.pets.firstWhereOrNull(
-                        (pet) => pet.id == _events[index].petId,
+            BlocBuilder<ScheduleBloc, ScheduleState>(
+              bloc: _scheduleBloc,
+              builder: (context, state) {
+                return state.map(
+                  error: (_) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+                  loading: (_) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+                  success: (state) {
+                    final events = state.scheduleEvents[selectedDate] ?? [];
+
+                    return SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverList.separated(
+                        itemCount: events.length,
+                        itemBuilder: (context, index) {
+                          return ScheduleEventItem(
+                            event: events[index],
+                            pet: _petsBloc.state.mapOrNull<PetModel?>(
+                              success: (state) => state.pets.firstWhereOrNull(
+                                (pet) => pet.id == events[index].petId,
+                              ),
+                            ),
+                            onToggle: (){},
+                          );
+                        },
+                        separatorBuilder: (context, index) => const SizedBox(height: 8),
                       ),
-                    ),
-                    onToggle: () => _toggleEvent(index),
-                  );
-                },
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-              ),
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),
@@ -173,48 +167,3 @@ class _PetsShimmer extends StatelessWidget {
     );
   }
 }
-
-final _mockedScheduleEvents = [
-  ScheduleEventModel(
-    id: '1',
-    petId: 1,
-    title: 'Event 1',
-    type: ScheduleEventTypeEnum.deworming,
-    done: false,
-    date: DateTime.now(),
-    time: '12:00',
-  ),
-  ScheduleEventModel(
-    id: '2',
-    petId: 2,
-    title: 'Event 2',
-    type: ScheduleEventTypeEnum.yearlyVaccination,
-    done: false,
-    date: DateTime.now(),
-  ),
-  ScheduleEventModel(
-    id: '3',
-    petId: 3,
-    title: 'Event 3',
-    type: ScheduleEventTypeEnum.rabiesVaccination,
-    done: false,
-    date: DateTime.now(),
-  ),
-  ScheduleEventModel(
-    id: '4',
-    petId: 4,
-    title: 'Event 4',
-    type: ScheduleEventTypeEnum.weeklyPills,
-    done: false,
-    date: DateTime.now(),
-    time: '13:00',
-  ),
-  ScheduleEventModel(
-    id: '5',
-    petId: 5,
-    title: 'Event 5',
-    type: ScheduleEventTypeEnum.dailyPills,
-    done: false,
-    date: DateTime.now(),
-  ),
-];
