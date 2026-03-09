@@ -25,6 +25,13 @@ class ScheduleRepository {
 
     return Map<DateTime, List<ScheduleEventModel>>.fromEntries(eventEntries);
   }
+
+  Future<void> markEventAsDone({
+    required String eventId,
+    required DateTime date,
+  }) async {
+    await _scheduleRemoteDataSource.markEventAsDone(eventId: eventId, date: date);
+  }
 }
 
 extension on ScheduleEventDto {

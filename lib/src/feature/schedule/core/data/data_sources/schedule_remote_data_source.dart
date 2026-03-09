@@ -38,4 +38,16 @@ class ScheduleRemoteDataSource {
 
     return events;
   }
+
+  Future<void> markEventAsDone({
+    required String eventId,
+    required DateTime date,
+  }) async {
+    await restClient.put(
+      '/event_schedule/$eventId/mark_done/',
+      body: {
+        'date': DateFormat('yyyy-MM-dd').format(date),
+      },
+    );
+  }
 }
