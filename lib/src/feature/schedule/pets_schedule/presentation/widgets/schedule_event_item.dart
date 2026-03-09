@@ -50,6 +50,7 @@ class ScheduleEventItem extends StatelessWidget {
                     duration: const Duration(milliseconds: _animationMiliseconds),
                     child: Text(event.title),
                   ),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
                       if (event.time != null) ...[
@@ -60,7 +61,7 @@ class ScheduleEventItem extends StatelessWidget {
                             color: context.uiColors.orangePrimary,
                           ),
                           duration: const Duration(milliseconds: _animationMiliseconds),
-                          child: Text(event.time.toString()),
+                          child: Text(event.time!.substring(0, 5)),
                         ),
                         const SizedBox(width: 8),
                       ],

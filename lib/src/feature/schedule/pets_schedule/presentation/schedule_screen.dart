@@ -137,6 +137,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 );
               },
             ),
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: 72 + 16), // FAB height (56) + FAB margin (16) + extra gap (16)
+            ),
           ],
         ),
       ),
