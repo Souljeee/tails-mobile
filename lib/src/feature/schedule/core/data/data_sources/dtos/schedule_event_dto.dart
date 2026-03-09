@@ -57,10 +57,15 @@ class ScheduleEventDto extends Equatable {
 class RecurrenceDto extends Equatable {
   final String frequency;
   final int interval;
-  final List<String>? weekDays;
+  @JsonKey(includeIfNull: false)
+  final List<int>? weekDays;
+  @JsonKey(includeIfNull: false)
   final List<int>? monthDays;
-  final String endType;
+  @JsonKey(includeIfNull: false)
+  final String? endType;
+  @JsonKey(includeIfNull: false)
   final String? endDate;
+  @JsonKey(includeIfNull: false)
   final int? endCount;
 
   const RecurrenceDto({

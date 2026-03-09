@@ -46,9 +46,9 @@ class ScheduleEventModel extends Equatable {
 class RecurrenceModel extends Equatable {
   final String frequency;
   final int interval;
-  final List<String>? weekDays;
+  final List<int>? weekDays;
   final List<int>? monthDays;
-  final String endType;
+  final String? endType;
   final String? endDate;
   final int? endCount;
 
