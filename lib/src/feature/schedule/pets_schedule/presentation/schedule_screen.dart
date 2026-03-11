@@ -24,9 +24,12 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  DateTime selectedDate = DateTime.now().withoutTime;
+  DateTime _selectedDate = DateTime.now().withoutTime;
 
-  String get formattedSelectedDate => DateFormat.MMMMd().format(selectedDate);
+  final _startDate = DateTime.now().subtract(const Duration(days: 180));
+  final _endDate = DateTime.now().add(const Duration(days: 180));
+
+  String get _formattedSelectedDate => DateFormat.MMMMd().format(_selectedDate);
 
   late final PetsBloc _petsBloc = PetsBloc(
     petRepository: DependenciesScope.of(context).petRepository,
@@ -51,11 +54,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   void _loadData() {
-    final startDate = DateTime.now().subtract(const Duration(days: 180));
-    final endDate = DateTime.now().add(const Duration(days: 180));
-    
     _petsBloc.add(const PetsEvent.petsRequested());
-    _scheduleBloc.add(ScheduleEvent.fetchRequested(startDate: startDate, endDate: endDate));
+    _scheduleBloc.add(ScheduleEvent.fetchRequested(startDate: _startDate, endDate: _endDate));
   }
 
   @override
@@ -85,7 +85,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         loading: (_) => const _PetsShimmer(),
                         success: (state) => PetsChipList(
                           pets: state.pets,
-                          onSelectedPetsChanged: (selectedPetIds) {},
+                          onSelectedPetsChanged: (selectedPetId) {
+                            _scheduleBloc.add(
+                              ScheduleEvent.fetchRequested(
+                                startDate: _startDate,
+                                endDate: _endDate,
+                                petId: selectedPetId,
+                              ),
+                            );
+                          },
                         ),
                         error: (_) => const SizedBox.shrink(),
                       );
@@ -93,17 +101,17 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   ),
                   const SizedBox(height: 24),
                   ScheduleCalendar(
-                    selectedDate: selectedDate,
+                    selectedDate: _selectedDate,
                     onDateTap: (date) {
                       setState(() {
-                        selectedDate = date;
+                        _selectedDate = date;
                       });
                     },
                   ),
                   const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(formattedSelectedDate, style: context.uiFonts.header24Semibold),
+                    child: Text(_formattedSelectedDate, style: context.uiFonts.header24Semibold),
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -116,7 +124,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   error: (_) => const SliverToBoxAdapter(child: SizedBox.shrink()),
                   loading: (_) => const SliverToBoxAdapter(child: SizedBox.shrink()),
                   success: (state) {
-                    final events = state.scheduleEvents[selectedDate] ?? [];
+                    final events = state.scheduleEvents[_selectedDate] ?? [];
 
                     return SliverPadding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -134,7 +142,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               _scheduleBloc.add(
                                 ScheduleEvent.markDoneRequested(
                                   eventId: events[index].id,
-                                  date: selectedDate,
+                                  date: _selectedDate,
                                   value: !events[index].done,
                                 ),
                               );

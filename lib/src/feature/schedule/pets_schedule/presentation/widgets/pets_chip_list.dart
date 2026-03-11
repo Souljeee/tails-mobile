@@ -4,7 +4,7 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 
-typedef OnSelectedPetsChanged = void Function(List<int> selectedPetIds);
+typedef OnSelectedPetsChanged = void Function(int? selectedPetId);
 
 class PetsChipList extends StatefulWidget {
   final List<PetModel> pets;
@@ -17,7 +17,7 @@ class PetsChipList extends StatefulWidget {
 }
 
 class _PetsChipListState extends State<PetsChipList> {
-  final List<int> selectedPetIds = [];
+  int? selectedPetId;
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +31,11 @@ class _PetsChipListState extends State<PetsChipList> {
         itemBuilder: (context, index) {
           if (index == 0) {
             return _AllPetsChip(
-              selected: selectedPetIds.isEmpty,
+              selected: selectedPetId == null,
               onSelected: ({required bool selected}) {
                 setState(() {
-                  selectedPetIds.clear();
-                  widget.onSelectedPetsChanged(selectedPetIds);
+                  selectedPetId = null;
+                  widget.onSelectedPetsChanged(selectedPetId);
                 });
               },
             );
@@ -45,16 +45,14 @@ class _PetsChipListState extends State<PetsChipList> {
 
           return _PetChip(
             pet: pet,
-            selected: selectedPetIds.contains(pet.id),
+            selected: selectedPetId == pet.id,
             onSelected: ({required bool selected}) {
               setState(() {
                 if (selected) {
-                  selectedPetIds.add(pet.id);
-                } else {
-                  selectedPetIds.remove(pet.id);
+                  selectedPetId = pet.id;
                 }
 
-                widget.onSelectedPetsChanged(selectedPetIds);
+                widget.onSelectedPetsChanged(selectedPetId);
               });
             },
           );
