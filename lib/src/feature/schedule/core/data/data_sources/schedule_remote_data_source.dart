@@ -43,7 +43,7 @@ class ScheduleRemoteDataSource {
     required String eventId,
     required DateTime date,
   }) async {
-    await restClient.put(
+    await restClient.post(
       '/event_schedule/$eventId/mark_done/',
       body: {
         'date': DateFormat('yyyy-MM-dd').format(date),

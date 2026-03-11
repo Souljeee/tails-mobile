@@ -18,7 +18,9 @@ class PetsBloc extends Bloc<PetsEvent, PetsState> {
     : _petRepository = petRepository,
       super(const PetsState.loading()) {
     on<PetsEvent>(
-      (event, emit) => event.map(petsRequested: (event) => _onPetsRequested(event, emit)),
+      (event, emit) => event.map(
+        petsRequested: (event) => _onPetsRequested(event, emit),
+      ),
     );
 
     _listenPetsRepository();

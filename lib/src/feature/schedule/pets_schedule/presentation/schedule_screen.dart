@@ -51,8 +51,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   void _loadData() {
+    final startDate = DateTime.now().subtract(const Duration(days: 180));
+    final endDate = DateTime.now().add(const Duration(days: 180));
+    
     _petsBloc.add(const PetsEvent.petsRequested());
-    _scheduleBloc.add(ScheduleEvent.fetchRequested(startDate: selectedDate, endDate: selectedDate));
+    _scheduleBloc.add(ScheduleEvent.fetchRequested(startDate: startDate, endDate: endDate));
   }
 
   @override
@@ -127,7 +130,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                 (pet) => pet.id == events[index].petId,
                               ),
                             ),
-                            onToggle: (){},
+                            onToggle: () {
+                              _scheduleBloc.add(
+                                ScheduleEvent.markDoneRequested(
+                                  eventId: events[index].id,
+                                  date: selectedDate,
+                                  value: !events[index].done,
+                                ),
+                              );
+                            },
                           );
                         },
                         separatorBuilder: (context, index) => const SizedBox(height: 8),
@@ -138,7 +149,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               },
             ),
             const SliverPadding(
-              padding: EdgeInsets.only(bottom: 72 + 16), // FAB height (56) + FAB margin (16) + extra gap (16)
+              padding: EdgeInsets.only(
+                bottom: 72 + 16,
+              ), // FAB height (56) + FAB margin (16) + extra gap (16)
             ),
           ],
         ),
