@@ -123,7 +123,7 @@ class _PetAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(100),
-      child: SizedBox.square(dimension: 32, child: CachedNetworkImage(imageUrl: image)),
+      child: SizedBox.square(dimension: 32, child: CachedNetworkImage(imageUrl: image, fit: BoxFit.cover)),
     );
   }
 }
