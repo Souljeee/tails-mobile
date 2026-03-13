@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 
@@ -10,21 +11,23 @@ typedef OnDateTapCallback = void Function(DateTime date);
 typedef OnMonthChangeCallback = void Function(DateTime date);
 typedef DateColorResolver = Color Function(DateTime date);
 typedef ShowBadgeResolver = bool Function(DateTime date);
+typedef CalendarHeaderBuilder =
+    Widget Function(
+      DateTime month,
+      VoidCallback nextMonthButtonHandler,
+      VoidCallback previousMonthButtonHandler,
+      VoidCallback nextYearButtonHandler,
+      VoidCallback previousYearButtonHandler,
+    );
 
 class DateConstraints extends Equatable {
   final DateTime? minDate;
   final DateTime? maxDate;
 
-  const DateConstraints({
-    this.minDate,
-    this.maxDate,
-  });
+  const DateConstraints({this.minDate, this.maxDate});
 
   @override
-  List<Object?> get props => [
-        minDate,
-        maxDate,
-      ];
+  List<Object?> get props => [minDate, maxDate];
 }
 
 class CalendarStyle extends Equatable {
@@ -46,26 +49,23 @@ class CalendarStyle extends Equatable {
 
   @override
   List<Object?> get props => [
-        resolveDateTextColor,
-        resolveDateBackgroundColor,
-        resolveDateBorderColor,
-        iconBackgroundColor,
-        iconColor,
-        backgroundColor,
-      ];
+    resolveDateTextColor,
+    resolveDateBackgroundColor,
+    resolveDateBorderColor,
+    iconBackgroundColor,
+    iconColor,
+    backgroundColor,
+  ];
 }
 
 class _CalendarStyleProvider extends InheritedWidget {
   final CalendarStyle calendarStyle;
 
-  const _CalendarStyleProvider({
-    required this.calendarStyle,
-    required super.child,
-  });
+  const _CalendarStyleProvider({required this.calendarStyle, required super.child});
 
   static CalendarStyle of(BuildContext context) {
-    final _CalendarStyleProvider? result =
-        context.dependOnInheritedWidgetOfExactType<_CalendarStyleProvider>();
+    final _CalendarStyleProvider? result = context
+        .dependOnInheritedWidgetOfExactType<_CalendarStyleProvider>();
 
     assert(result != null, 'No CalendarStyleProvider found in context');
 
@@ -81,15 +81,12 @@ class _CalendarStyleProvider extends InheritedWidget {
 class _DateConstraintsProvider extends InheritedWidget {
   final DateConstraints dateConstraints;
 
-  const _DateConstraintsProvider({
-    required this.dateConstraints,
-    required super.child,
-  });
+  const _DateConstraintsProvider({required this.dateConstraints, required super.child});
 
   // ignore: unused_element
   static DateConstraints of(BuildContext context) {
-    final _DateConstraintsProvider? result =
-        context.dependOnInheritedWidgetOfExactType<_DateConstraintsProvider>();
+    final _DateConstraintsProvider? result = context
+        .dependOnInheritedWidgetOfExactType<_DateConstraintsProvider>();
 
     assert(result != null, 'No DateConstraintsProvider found in context');
 
@@ -109,6 +106,7 @@ class MonthCalendar extends StatefulWidget {
   final DateConstraints? dateConstraints;
   final Widget? badgeWidget;
   final OnMonthChangeCallback? onChangeMonth;
+  final CalendarHeaderBuilder? headerBuilder;
 
   const MonthCalendar({
     this.initialMonth,
@@ -117,6 +115,7 @@ class MonthCalendar extends StatefulWidget {
     this.style,
     this.badgeWidget,
     this.onChangeMonth,
+    this.headerBuilder,
     super.key,
   });
 
@@ -127,9 +126,8 @@ class MonthCalendar extends StatefulWidget {
 class _MonthCalendarState extends State<MonthCalendar> {
   late DateTime selectedMonth = widget.initialMonth ?? DateTime.now().monthStart;
 
-  CalendarStyle get _defaultStyle => CalendarStyle(
-        resolveDateTextColor: (_) => context.uiColors.black50,
-      );
+  CalendarStyle get _defaultStyle =>
+      CalendarStyle(resolveDateTextColor: (_) => context.uiColors.black50);
 
   DateConstraints get _defaultConstraints => const DateConstraints();
 
@@ -143,59 +141,74 @@ class _MonthCalendarState extends State<MonthCalendar> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _CalendarHeader(
-              month: selectedMonth,
-              nextYearButtonHandler: () {
-                setState(() {
-                  selectedMonth = selectedMonth.addYear(1);
-
-                  widget.onChangeMonth?.call(selectedMonth);
-                });
-              },
-              previousYearButtonHandler: () {
-                setState(() {
-                  selectedMonth = selectedMonth.subtractYear(1);
-
-                  widget.onChangeMonth?.call(selectedMonth);
-                });
-              },
-              nextMonthButtonHandler: () {
-                setState(() {
-                  selectedMonth = selectedMonth.addMonth(1);
-
-                  widget.onChangeMonth?.call(selectedMonth);
-                });
-              },
-              previousMonthButtonHandler: () {
-                setState(() {
-                  selectedMonth = selectedMonth.subtractMonth(1);
-
-                  widget.onChangeMonth?.call(selectedMonth);
-                });
-              },
-            ),
+            const SizedBox(height: 8),
+            widget.headerBuilder?.call(
+                  selectedMonth,
+                  _onNextMonthButtonHandler,
+                  _onPreviousMonthButtonHandler,
+                  _onNextYearButtonHandler,
+                  _onPreviousYearButtonHandler,
+                ) ??
+                _DefaultCalendarHeader(
+                  month: selectedMonth,
+                  nextYearButtonHandler: _onNextYearButtonHandler,
+                  previousYearButtonHandler: _onPreviousYearButtonHandler,
+                  nextMonthButtonHandler: _onNextMonthButtonHandler,
+                  previousMonthButtonHandler: _onPreviousMonthButtonHandler,
+                ),
             const SizedBox(height: 12),
             _CalendarBody(
               selectedMonth: selectedMonth,
               onDateTap: widget.onDateTap,
               badgeWidget: widget.badgeWidget,
             ),
-            const SizedBox(height: 12),
           ],
         ),
       ),
     );
   }
+
+  void _onNextYearButtonHandler() {
+    setState(() {
+      selectedMonth = selectedMonth.addYear(1);
+
+      widget.onChangeMonth?.call(selectedMonth);
+    });
+  }
+
+  void _onPreviousYearButtonHandler() {
+    setState(() {
+      selectedMonth = selectedMonth.subtractYear(1);
+
+      widget.onChangeMonth?.call(selectedMonth);
+    });
+  }
+
+  void _onNextMonthButtonHandler() {
+    setState(() {
+      selectedMonth = selectedMonth.addMonth(1);
+
+      widget.onChangeMonth?.call(selectedMonth);
+    });
+  }
+
+  void _onPreviousMonthButtonHandler() {
+    setState(() {
+      selectedMonth = selectedMonth.subtractMonth(1);
+
+      widget.onChangeMonth?.call(selectedMonth);
+    });
+  }
 }
 
-class _CalendarHeader extends StatelessWidget {
+class _DefaultCalendarHeader extends StatelessWidget {
   final DateTime month;
   final VoidCallback nextMonthButtonHandler;
   final VoidCallback previousMonthButtonHandler;
   final VoidCallback nextYearButtonHandler;
   final VoidCallback previousYearButtonHandler;
 
-  const _CalendarHeader({
+  const _DefaultCalendarHeader({
     required this.month,
     required this.nextMonthButtonHandler,
     required this.previousMonthButtonHandler,
@@ -207,18 +220,12 @@ class _CalendarHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final String formattedSelectedMonth = DateFormat.yMMMM()
         .format(month)
-        .replaceAll(
-          ' г.',
-          '',
-        )
+        .replaceAll(' г.', '')
         .toFirstLetterUpperCase();
 
     return Row(
       children: [
-        Text(
-          formattedSelectedMonth,
-          style: context.uiFonts.text20Semibold,
-        ),
+        Text(formattedSelectedMonth, style: context.uiFonts.text20Semibold),
         const Spacer(),
         _CalendarHeaderButton(
           iconPath: context.uiIcons.doubleArrowLeft.keyName,
@@ -248,10 +255,7 @@ class _CalendarHeaderButton extends StatelessWidget {
   final String iconPath;
   final VoidCallback onTap;
 
-  const _CalendarHeaderButton({
-    required this.iconPath,
-    required this.onTap,
-  });
+  const _CalendarHeaderButton({required this.iconPath, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -260,10 +264,7 @@ class _CalendarHeaderButton extends StatelessWidget {
       child: SizedBox.square(
         dimension: 42,
         child: Center(
-          child: UiSvgImage(
-            svgPath: iconPath,
-            color: context.uiColors.orangePrimary,
-          ),
+          child: UiSvgImage(svgPath: iconPath, color: context.uiColors.orangePrimary),
         ),
       ),
     );
@@ -275,11 +276,7 @@ class _CalendarBody extends StatefulWidget {
   final OnDateTapCallback? onDateTap;
   final Widget? badgeWidget;
 
-  const _CalendarBody({
-    required this.selectedMonth,
-    required this.onDateTap,
-    this.badgeWidget,
-  });
+  const _CalendarBody({required this.selectedMonth, required this.onDateTap, this.badgeWidget});
 
   @override
   State<_CalendarBody> createState() => _CalendarBodyState();
@@ -307,10 +304,7 @@ class _CalendarBodyState extends State<_CalendarBody> {
     );
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: _backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: _backgroundColor, borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
           const SizedBox(height: 8),
@@ -322,8 +316,9 @@ class _CalendarBodyState extends State<_CalendarBody> {
                   .map(
                     (day) => Text(
                       day,
-                      style:
-                          context.uiFonts.text14Regular.copyWith(color: context.uiColors.black50),
+                      style: context.uiFonts.text14Regular.copyWith(
+                        color: context.uiColors.black50,
+                      ),
                     ),
                   )
                   .toList(),
@@ -410,16 +405,13 @@ class _DateItemState extends State<_DateItem> {
       onTap: widget.isActiveMonth && widget.onTap != null ? () => widget.onTap!(widget.date) : null,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        height: 42,
-        margin: const EdgeInsets.all(8),
+        height: 36,
+        margin: const EdgeInsets.all(4),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: _dateBackgroundColor,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: _dateBorderColor,
-            width: 2,
-          ),
+          border: Border.all(color: _dateBorderColor, width: 2),
         ),
         duration: const Duration(milliseconds: 100),
         child: Stack(
@@ -427,12 +419,8 @@ class _DateItemState extends State<_DateItem> {
           children: [
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 100),
-              style: context.uiFonts.header20Medium.copyWith(color: _dateTextColor),
-              child: Center(
-                child: Text(
-                  widget.date.day.toString(),
-                ),
-              ),
+              style: context.uiFonts.text16Semibold.copyWith(color: _dateTextColor),
+              child: Center(child: Text(widget.date.day.toString())),
             ),
           ],
         ),
@@ -445,10 +433,7 @@ class _CalendarMonthData {
   final int year;
   final int month;
 
-  const _CalendarMonthData({
-    required this.year,
-    required this.month,
-  });
+  const _CalendarMonthData({required this.year, required this.month});
 
   static const _daysInWeekCount = 7;
 
@@ -464,20 +449,17 @@ class _CalendarMonthData {
     DateTime firstDayOfWeek = firstDayMonth.subtract(Duration(days: _firstDayOffset));
 
     for (var weekIndex = 0; weekIndex < _weeksCount; weekIndex++) {
-      final week = List<_CalendarDayData>.generate(
-        _daysInWeekCount,
-        (index) {
-          final date = firstDayOfWeek.add(Duration(days: index));
+      final week = List<_CalendarDayData>.generate(_daysInWeekCount, (index) {
+        final date = firstDayOfWeek.add(Duration(days: index));
 
-          final isActiveMonth = date.year == year && date.month == month;
+        final isActiveMonth = date.year == year && date.month == month;
 
-          return _CalendarDayData(
-            date: date,
-            isActiveMonth: isActiveMonth,
-            isActiveDate: date.isToday,
-          );
-        },
-      );
+        return _CalendarDayData(
+          date: date,
+          isActiveMonth: isActiveMonth,
+          isActiveDate: date.isToday,
+        );
+      });
 
       res.add(week);
 
@@ -498,46 +480,4 @@ class _CalendarDayData {
     required this.isActiveMonth,
     required this.isActiveDate,
   });
-}
-
-extension DateTimeExtension on DateTime {
-  DateTime get monthStart => DateTime(year, month);
-
-  DateTime addMonth(int count) {
-    return DateTime(year, month + count, day);
-  }
-
-  DateTime subtractMonth(int count) {
-    return DateTime(year, month - count, day);
-  }
-
-  DateTime subtractYear(int count) {
-    return DateTime(year - count, month, day);
-  }
-
-  DateTime addYear(int count) {
-    return DateTime(year + count, month, day);
-  }
-
-  bool isSameDate(DateTime date) {
-    return year == date.year && month == date.month && day == date.day;
-  }
-
-  bool get isToday {
-    return isSameDate(DateTime.now());
-  }
-
-  DateTime roundToSeconds() {
-    return DateTime(year, month, day, hour, minute, second);
-  }
-
-  bool isInRange({
-    required DateTime rangeStart,
-    required DateTime rangeFinish,
-  }) {
-    return isAfter(rangeStart.subtract(const Duration(days: 1))) &&
-        isBefore(rangeFinish.add(const Duration(days: 1)));
-  }
-
-  DateTime get withoutTime => DateTime(year, month, day);
 }

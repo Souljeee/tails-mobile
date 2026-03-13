@@ -142,4 +142,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deletePetDelete => 'Удалить';
+
+  @override
+  String get all => 'Все';
 }

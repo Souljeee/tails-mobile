@@ -4,6 +4,7 @@ import 'package:tails_mobile/src/core/navigation/scaffold_with_navbar.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_screen.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/enter_code_screen.dart';
 import 'package:tails_mobile/src/feature/pets/pets_list/presentation/pets_screen.dart';
+import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/schedule_screen.dart';
 
 part 'routes.g.dart';
 
@@ -29,11 +30,11 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
             ),
           ],
         ),
-        TypedStatefulShellBranch<CalendarBranch>(
+        TypedStatefulShellBranch<ScheduleBranch>(
           routes: [
-            TypedGoRoute<CalendarRoute>(
-              path: '/calendar',
-              name: 'calendar',
+            TypedGoRoute<ScheduleRoute>(
+              path: '/schedule',
+              name: 'schedule',
             ),
           ],
         ),
@@ -73,7 +74,7 @@ class HomeShellRoute extends StatefulShellRouteData {
   ) {
     if ([
       const PetsRoute().location,
-      const CalendarRoute().location,
+      const ScheduleRoute().location,
       const ProfileRoute().location,
     ].contains(state.uri.path)) {
       return ScaffoldWithNavBar(navigationShell: navigationShell);
@@ -89,8 +90,8 @@ class PetsBranch extends StatefulShellBranchData {
   const PetsBranch();
 }
 
-class CalendarBranch extends StatefulShellBranchData {
-  const CalendarBranch();
+class ScheduleBranch extends StatefulShellBranchData {
+  const ScheduleBranch();
 }
 
 class ProfileBranch extends StatefulShellBranchData {
@@ -122,11 +123,11 @@ class PetsRoute extends GoRouteData with $PetsRoute {
   Widget build(BuildContext context, GoRouterState state) => const PetsScreen();
 }
 
-class CalendarRoute extends GoRouteData with $CalendarRoute {
-  const CalendarRoute();
+class ScheduleRoute extends GoRouteData with $ScheduleRoute {
+  const ScheduleRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const SizedBox();
+  Widget build(BuildContext context, GoRouterState state) => const ScheduleScreen();
 }
 
 class ProfileRoute extends GoRouteData with $ProfileRoute {

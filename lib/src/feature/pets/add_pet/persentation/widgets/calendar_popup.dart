@@ -3,6 +3,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_popup/ui_popup.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
 
 class CalendarPopup extends StatefulWidget {
   final DateTime? initialDate;
