@@ -26,11 +26,16 @@ class ScheduleRepository {
     return Map<DateTime, List<ScheduleEventModel>>.fromEntries(eventEntries);
   }
 
-  Future<void> markEventAsDone({
+  Future<void> updateEventDoneStatus({
+    required bool value,
     required String eventId,
     required DateTime date,
   }) async {
-    await _scheduleRemoteDataSource.markEventAsDone(eventId: eventId, date: date);
+    if (value) {
+      await _scheduleRemoteDataSource.markEventAsDone(eventId: eventId, date: date);
+    } else {
+      await _scheduleRemoteDataSource.markEventAsUndone(eventId: eventId, date: date);
+    }
   }
 }
 

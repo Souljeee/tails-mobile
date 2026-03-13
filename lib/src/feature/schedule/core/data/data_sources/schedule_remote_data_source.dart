@@ -50,4 +50,16 @@ class ScheduleRemoteDataSource {
       },
     );
   }
+
+  Future<void> markEventAsUndone({
+    required String eventId,
+    required DateTime date,
+  }) async {
+    await restClient.post(
+      '/event_schedule/$eventId/mark_undone/',
+      body: {
+        'date': DateFormat('yyyy-MM-dd').format(date),
+      },
+    );
+  }
 }

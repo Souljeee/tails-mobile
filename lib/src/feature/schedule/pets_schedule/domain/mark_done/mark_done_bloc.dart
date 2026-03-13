@@ -25,14 +25,18 @@ class MarkDoneBloc extends Bloc<MarkDoneEvent, MarkDoneState> {
     try {
       emit(const MarkDoneState.loading());
 
-      await _scheduleRepository.markEventAsDone(eventId: event.eventId, date: event.date);
+      await _scheduleRepository.updateEventDoneStatus(
+        value: event.value,
+        eventId: event.eventId,
+        date: event.date,
+      );
 
       emit(const MarkDoneState.success());
     } catch (e, s) {
       addError(e, s);
 
       emit(const MarkDoneState.error());
-    }finally {
+    } finally {
       emit(const MarkDoneState.idle());
     }
   }

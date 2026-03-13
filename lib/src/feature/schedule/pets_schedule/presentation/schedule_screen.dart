@@ -138,13 +138,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                 (pet) => pet.id == events[index].petId,
                               ),
                             ),
-                            onToggle: () {
+                            onToggle: (value) {
                               _scheduleBloc.add(
                                 ScheduleEvent.markDoneRequested(
                                   eventId: events[index].id,
                                   date: _selectedDate,
-                                  value: !events[index].done,
-                                ),
+                                  value: value,
+                                ),  
                               );
                             },
                           );

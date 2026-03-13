@@ -15,7 +15,7 @@ const int _animationMiliseconds = 300;
 class ScheduleEventItem extends StatefulWidget {
   final ScheduleEventModel event;
   final PetModel? pet;
-  final VoidCallback? onToggle;
+  final void Function(bool value)? onToggle;
 
   const ScheduleEventItem({required this.event, this.pet, this.onToggle, super.key});
 
@@ -41,7 +41,7 @@ class _ScheduleEventItemState extends State<ScheduleEventItem> {
       listener: (context, state) {
         state.mapOrNull(
           error: (state) {
-            widget.onToggle?.call();
+            widget.onToggle?.call(!widget.event.done);
 
             _showErrorSnackBar();
           },
@@ -111,10 +111,11 @@ class _ScheduleEventItemState extends State<ScheduleEventItem> {
               UiCheckbox(
                 isChecked: widget.event.done,
                 onTap: () {
-                  widget.onToggle?.call();
+                  widget.onToggle?.call(!widget.event.done);
 
                   _markDoneBloc.add(
                     MarkDoneEvent.markDoneRequested(
+                      value: !widget.event.done,
                       eventId: widget.event.id,
                       date: widget.event.date,
                     ),
