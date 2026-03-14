@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
@@ -32,32 +33,51 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: true,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text('Новое событие', style: context.uiFonts.header24Semibold),
+    // 84px — отступы из ui_popup (top: 52 + bottom: 32)
+    final maxHeight = MediaQuery.of(context).size.height * 0.85 - 84;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Flexible(
+            child: ListView(
+            shrinkWrap: true,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text('Новое событие', style: context.uiFonts.header24Semibold),
+              ),
+              const SizedBox(height: 16),
+              _PetsList(
+                pets: widget.pets,
+                selectedPetId: _selectedPetId,
+                onPetSelected: (petId) {
+                  setState(() {
+                    _selectedPetId = petId;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              _EventTitle(controller: _eventTitleController),
+              const SizedBox(height: 16),
+              _DateTimeFields(dateController: _dateController, timeController: _timeController),
+              const SizedBox(height: 16),
+              _RecurrenceSelector(controller: _recurrenceController),
+              const SizedBox(height: 16),
+              _NotesField(controller: _notesController),
+            ],
+          ),
         ),
         const SizedBox(height: 16),
-        _PetsList(
-          pets: widget.pets,
-          selectedPetId: _selectedPetId,
-          onPetSelected: (petId) {
-            setState(() {
-              _selectedPetId = petId;
-            });
-          },
+        UiButton.main(
+          label: 'Готово',
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        const SizedBox(height: 16),
-        _EventTitle(controller: _eventTitleController),
-        const SizedBox(height: 16),
-        _DateTimeFields(dateController: _dateController, timeController: _timeController),
-        const SizedBox(height: 16),
-        _RecurrenceSelector(controller: _recurrenceController),
-        const SizedBox(height: 16),
-        _NotesField(controller: _notesController),
       ],
+    ),
     );
   }
 }

@@ -19,23 +19,6 @@ Future<T?> showUiPopup<T>({
           children: [
             Stack(
               children: [
-                if (showCloseButton)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20, top: 20),
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: Icon(
-                           Icons.close,
-                          size: 32,
-                          color: context.uiColors.black30,
-                        ),
-                      ),
-                    ),
-                  ),
                 Padding(
                   padding: const EdgeInsets.only(
                     top: 52,
@@ -45,6 +28,21 @@ Future<T?> showUiPopup<T>({
                   ),
                   child: child,
                 ),
+                if (showCloseButton)
+                  Positioned(
+                    top: 20,
+                    right: 20,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        size: 32,
+                        color: context.uiColors.black30,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ],
