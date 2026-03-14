@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/create_event_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
 
 class ScheduleRemoteDataSource {
@@ -37,6 +38,13 @@ class ScheduleRemoteDataSource {
     );
 
     return events;
+  }
+
+  Future<void> createEvent({required CreateEventDto dto}) async {
+    await restClient.post(
+      '/event_schedule/',
+      body: dto.toJson(),
+    );
   }
 
   Future<void> markEventAsDone({
