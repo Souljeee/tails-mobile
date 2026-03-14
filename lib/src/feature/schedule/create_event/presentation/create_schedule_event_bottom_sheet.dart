@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
@@ -32,6 +33,12 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   final UiTextFieldController _notesController = UiTextFieldController();
 
   @override
+  void initState() {
+    super.initState();
+    _dateController.text = DateFormat('dd.MM.yyyy').format(widget.date);
+  }
+
+  @override
   Widget build(BuildContext context) {
     // 84px — отступы из ui_popup (top: 52 + bottom: 32)
     final maxHeight = MediaQuery.of(context).size.height * 0.85 - 84;
@@ -44,41 +51,42 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
         children: [
           Flexible(
             child: ListView(
-            shrinkWrap: true,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text('Новое событие', style: context.uiFonts.header24Semibold),
-              ),
-              const SizedBox(height: 16),
-              _PetsList(
-                pets: widget.pets,
-                selectedPetId: _selectedPetId,
-                onPetSelected: (petId) {
-                  setState(() {
-                    _selectedPetId = petId;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              _EventTitle(controller: _eventTitleController),
-              const SizedBox(height: 16),
-              _DateTimeFields(dateController: _dateController, timeController: _timeController),
-              const SizedBox(height: 16),
-              _RecurrenceSelector(controller: _recurrenceController),
-              const SizedBox(height: 16),
-              _NotesField(controller: _notesController),
-            ],
+              shrinkWrap: true,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('Новое событие', style: context.uiFonts.header24Semibold),
+                ),
+                const SizedBox(height: 16),
+                _PetsList(
+                  pets: widget.pets,
+                  selectedPetId: _selectedPetId,
+                  onPetSelected: (petId) {
+                    setState(() {
+                      _selectedPetId = petId;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                _EventTitle(controller: _eventTitleController),
+                const SizedBox(height: 16),
+                _DateTimeFields(dateController: _dateController, timeController: _timeController),
+                const SizedBox(height: 16),
+                _RecurrenceSelector(controller: _recurrenceController),
+                const SizedBox(height: 16),
+                _NotesField(controller: _notesController),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        UiButton.main(
-          label: 'Готово',
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-    ),
+          const SizedBox(height: 16),
+          UiButton.main(label: 'Готово', onPressed: _createEvent),
+        ],
+      ),
     );
+  }
+
+  void _createEvent() {
+    // TODO: создание события
   }
 }
 
@@ -118,17 +126,36 @@ class _RecurrenceSelector extends StatelessWidget {
           style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black60),
         ),
         const SizedBox(height: 8),
-        UiTextField(controller: controller, placeholderText: 'Повторение'),
+        GestureDetector(
+          onTap: () {
+            // TODO: настройка повторения
+          },
+          child: IgnorePointer(
+            child: UiTextField(
+              controller: controller,
+              placeholderText: 'Повторение',
+              suffixIcon: Icons.keyboard_arrow_down_outlined,
+              suffixIconColor: context.uiColors.orangePrimary,
+            ),
+          ),
+        ),
       ],
     );
   }
 }
 
-class _DateTimeFields extends StatelessWidget {
+class _DateTimeFields extends StatefulWidget {
   const _DateTimeFields({required this.dateController, required this.timeController});
 
   final UiTextFieldController dateController;
   final UiTextFieldController timeController;
+
+  @override
+  State<_DateTimeFields> createState() => _DateTimeFieldsState();
+}
+
+class _DateTimeFieldsState extends State<_DateTimeFields> {
+  final String _timeInputMask = '##:##';
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +171,7 @@ class _DateTimeFields extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               UiTextField(
-                controller: dateController,
+                controller: widget.dateController,
                 placeholderText: 'ДД.ММ.ГГГГ',
                 trailingIcon: Icon(
                   Icons.calendar_today,
@@ -166,8 +193,10 @@ class _DateTimeFields extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               UiTextField(
-                controller: timeController,
+                controller: widget.timeController,
                 placeholderText: 'чч:мм',
+                inputMask: _timeInputMask,
+                inputFilter: {'#': RegExp('[0-9]')},
                 trailingIcon: Icon(
                   Icons.access_time,
                   size: 24,
