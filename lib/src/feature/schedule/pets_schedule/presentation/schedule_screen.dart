@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_app_bar/ui_app_bar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_popup/ui_popup.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
@@ -10,6 +11,7 @@ import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scop
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/create_event/presentation/create_schedule_event_bottom_sheet.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/pets/pets_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/schedule/schedule_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/pets_chip_list.dart';
@@ -25,6 +27,7 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   DateTime _selectedDate = DateTime.now().withoutTime;
+  int? _selectedPetId;
 
   final _startDate = DateTime.now().subtract(const Duration(days: 180));
   final _endDate = DateTime.now().add(const Duration(days: 180));
@@ -65,7 +68,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       appBar: const UiAppBar.baseToolBar(title: 'Календарь'),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Implement add event
+          showUiPopup<void>(
+            context: context,
+            child: CreateScheduleEventBottomSheet(
+              date: _selectedDate,
+              pets:
+                  _petsBloc.state.mapOrNull<List<PetModel>?>(success: (state) => state.pets) ?? [],
+              selectedPetId: _selectedPetId,
+            ),
+          );
         },
         backgroundColor: context.uiColors.orangePrimary,
         child: Icon(Icons.add, color: context.uiColors.white),
@@ -86,6 +97,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         success: (state) => PetsChipList(
                           pets: state.pets,
                           onSelectedPetsChanged: (selectedPetId) {
+                            setState(() {
+                              _selectedPetId = selectedPetId;
+                            });
+
                             _scheduleBloc.add(
                               ScheduleEvent.fetchRequested(
                                 startDate: _startDate,
@@ -144,7 +159,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                   eventId: events[index].id,
                                   date: _selectedDate,
                                   value: value,
-                                ),  
+                                ),
                               );
                             },
                           );
