@@ -316,7 +316,7 @@ class _DateTimeFieldsState extends State<_DateTimeFields> {
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
-                        _isTimePickerOpen.value = !_isTimePickerOpen.value;
+                        _isTimePickerOpen.value = true;
                       },
                       child: IgnorePointer(
                         child: ValueListenableBuilder(
