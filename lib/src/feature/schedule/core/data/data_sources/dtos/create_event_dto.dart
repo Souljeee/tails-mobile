@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/recurrence_dto.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 
 part 'create_event_dto.g.dart';
 
@@ -12,7 +13,7 @@ class CreateEventDto extends Equatable {
   final int? timezoneOffset;
   final DateTime date;
   final int petId;
-  final int type;
+  final ScheduleEventTypeEnum type;
   final bool isRecurring;
   final RecurrenceDto? recurrence;
 

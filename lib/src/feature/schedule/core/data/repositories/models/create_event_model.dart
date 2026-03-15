@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_model.dart';
 
 class CreateEventModel extends Equatable {
@@ -7,7 +8,7 @@ class CreateEventModel extends Equatable {
   final String? time;
   final DateTime date;
   final int petId;
-  final int type;
+  final ScheduleEventTypeEnum type;
   final bool isRecurring;
   final RecurrenceModel? recurrence;
 

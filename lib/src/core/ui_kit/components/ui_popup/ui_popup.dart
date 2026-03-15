@@ -8,12 +8,14 @@ Future<T?> showUiPopup<T>({
   required Widget child,
   bool showCloseButton = true,
   bool isDismissible = true,
+  bool useRootNavigator = false,
 }) {
   return showModalBottomSheet<T>(
     backgroundColor: context.uiColors.white,
     isScrollControlled: true,
     context: context,
     isDismissible: isDismissible,
+    useRootNavigator: useRootNavigator,
     builder:
         (context) => Wrap(
           children: [
