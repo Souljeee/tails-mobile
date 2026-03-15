@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_picker_plus/flutter_picker_plus.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_flyout/ui_flyout.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 
 class TimePickerCarouselPopup extends StatefulWidget {
