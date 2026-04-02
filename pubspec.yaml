@@ -42,7 +42,7 @@ dependencies:
   # Storing data
   shared_preferences: ^2.3.2
   drift: ^2.21.0
-  drift_flutter: ^0.2.1
+  drift_flutter: ^0.3.0
   flutter_secure_storage: ^10.0.0
 
   # Routing
