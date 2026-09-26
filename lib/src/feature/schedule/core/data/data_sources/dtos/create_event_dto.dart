@@ -1,0 +1,60 @@
+import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/recurrence_dto.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
+
+part 'create_event_dto.g.dart';
+
+@JsonSerializable()
+class CreateEventDto extends Equatable {
+  final String title;
+  final String? description;
+  @JsonKey(toJson: _timeToJson)
+  final String? time;
+  final int timezoneOffset;
+  @JsonKey(name: 'start_date', toJson: _dateToJson)
+  final DateTime date;
+  @JsonKey(name: 'pet')
+  final int petId;
+  final ScheduleEventTypeEnum type;
+  final bool isRecurring;
+  final RecurrenceDto? recurrence;
+
+  const CreateEventDto({
+    required this.petId,
+    required this.title,
+    required this.description,
+    required this.time,
+    required this.date,
+    required this.timezoneOffset,
+    required this.type,
+    required this.isRecurring,
+    this.recurrence,
+  });
+
+  factory CreateEventDto.fromJson(Map<String, dynamic> json) => _$CreateEventDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CreateEventDtoToJson(this);
+
+  @override
+  List<Object?> get props => [
+    petId,
+    title,
+    description,
+    time,
+    date,
+    type,
+    isRecurring,
+    recurrence,
+    timezoneOffset,
+  ];
+}
+
+String _dateToJson(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
+
+String? _timeToJson(String? time) {
+  final normalizedTime = time?.trim();
+
+  return normalizedTime == null || normalizedTime.isEmpty ? null : normalizedTime;
+}

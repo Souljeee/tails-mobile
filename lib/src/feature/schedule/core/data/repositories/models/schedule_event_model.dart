@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_model.dart';
 
 typedef ScheduleEventModelList = Map<DateTime, List<ScheduleEventModel>>;
 
@@ -66,27 +67,4 @@ class ScheduleEventModel extends Equatable {
     done,
     recurrence,
   ];
-}
-
-class RecurrenceModel extends Equatable {
-  final String frequency;
-  final int interval;
-  final List<int>? weekDays;
-  final List<int>? monthDays;
-  final String? endType;
-  final String? endDate;
-  final int? endCount;
-
-  const RecurrenceModel({
-    required this.frequency,
-    required this.interval,
-    required this.endType,
-    this.weekDays,
-    this.monthDays,
-    this.endDate,
-    this.endCount,
-  });
-
-  @override
-  List<Object?> get props => [frequency, interval, weekDays, monthDays, endType, endDate, endCount];
 }
