@@ -51,6 +51,7 @@ class _PetsScreenState extends State<PetsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'pets_floating_action_button',
         onPressed: () {
           Navigator.push(
             context,

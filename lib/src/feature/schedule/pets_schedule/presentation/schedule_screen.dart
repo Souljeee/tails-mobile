@@ -108,6 +108,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       backgroundColor: context.uiColors.grayMain,
       appBar: const UiAppBar.baseToolBar(title: 'Календарь'),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'schedule_floating_action_button',
         onPressed: _openCreateEventBottomSheet,
         backgroundColor: context.uiColors.orangePrimary,
         child: Icon(Icons.add, color: context.uiColors.white),
