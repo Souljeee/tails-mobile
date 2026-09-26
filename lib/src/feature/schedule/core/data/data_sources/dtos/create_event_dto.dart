@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/recurrence_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
@@ -9,9 +10,12 @@ part 'create_event_dto.g.dart';
 class CreateEventDto extends Equatable {
   final String title;
   final String? description;
+  @JsonKey(toJson: _timeToJson)
   final String? time;
-  final int? timezoneOffset;
+  final int timezoneOffset;
+  @JsonKey(name: 'start_date', toJson: _dateToJson)
   final DateTime date;
+  @JsonKey(name: 'pet')
   final int petId;
   final ScheduleEventTypeEnum type;
   final bool isRecurring;
@@ -23,9 +27,9 @@ class CreateEventDto extends Equatable {
     required this.description,
     required this.time,
     required this.date,
+    required this.timezoneOffset,
     required this.type,
     required this.isRecurring,
-    this.timezoneOffset,
     this.recurrence,
   });
 
@@ -47,3 +51,10 @@ class CreateEventDto extends Equatable {
   ];
 }
 
+String _dateToJson(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
+
+String? _timeToJson(String? time) {
+  final normalizedTime = time?.trim();
+
+  return normalizedTime == null || normalizedTime.isEmpty ? null : normalizedTime;
+}

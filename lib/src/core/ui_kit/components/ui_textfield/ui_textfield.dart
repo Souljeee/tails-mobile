@@ -51,10 +51,7 @@ class UiTextField extends StatefulWidget {
     this.placeholderStyle,
     this.alwaysShowBorder = false,
     super.key,
-  }) : assert(
-          !(!isFocusable && focusNode != null),
-          'focusNode must be null if focusable = false',
-        );
+  }) : assert(!(!isFocusable && focusNode != null), 'focusNode must be null if focusable = false');
 
   final UiTextFieldController controller;
   final bool? enabled;
@@ -118,8 +115,9 @@ class _UiTextFieldState extends State<UiTextField> {
   TextStyle get _labelStyle {
     final enabled = widget.enabled ?? true;
     final baseStyle = _scaleLabel ? context.uiFonts.text12Regular : context.uiFonts.text16Regular;
-    final color =
-        enabled ? context.uiColors.black40 : context.uiColors.black40.withValues(alpha: 0.5);
+    final color = enabled
+        ? context.uiColors.black40
+        : context.uiColors.black40.withValues(alpha: 0.5);
 
     return baseStyle.copyWith(color: color);
   }
@@ -136,7 +134,8 @@ class _UiTextFieldState extends State<UiTextField> {
     }
 
     // Показываем ошибку только если поле было "тронуто"
-    if (_controller.touched && widget.controller.validators.hasValidationMessage(_controller.text)) {
+    if (_controller.touched &&
+        widget.controller.validators.hasValidationMessage(_controller.text)) {
       states.add(_InputState.error);
     }
 
@@ -216,7 +215,7 @@ class _UiTextFieldState extends State<UiTextField> {
     final enabled = widget.enabled ?? true;
 
     // Показываем ошибки только если поле было "тронуто"
-    final bool hasValidationErrors = 
+    final bool hasValidationErrors =
         _controller.touched && _controller.validators.hasValidationMessage(_controller.text);
 
     return Column(
@@ -256,7 +255,8 @@ class _UiTextFieldState extends State<UiTextField> {
                 maxLines: widget.maxLines,
                 minLines: widget.minLines,
                 cursorColor: colors.black100,
-                style: widget.inputTextStyle ??
+                style:
+                    widget.inputTextStyle ??
                     themeTypography.text16Regular.copyWith(
                       color: enabled ? colors.black100 : colors.black100.withValues(alpha: 0.5),
                     ),
@@ -265,35 +265,37 @@ class _UiTextFieldState extends State<UiTextField> {
                   isDense: true,
                   hintText: widget.labelText == null ? widget.placeholderText : null,
                   hintMaxLines: widget.labelMaxLines,
-                  hintStyle: widget.placeholderStyle ??
+                  hintStyle:
+                      widget.placeholderStyle ??
                       themeTypography.text16Regular.copyWith(
                         color: colors.black50,
                         overflow: TextOverflow.ellipsis,
                       ),
                   prefixIcon: widget.trailingIcon == null
                       ? null
-                      : GestureDetector(
-                          onTap: widget.onTrailingTap,
-                          child: widget.trailingIcon,
-                        ),
-                  prefixIconConstraints:
-                      widget.trailingIcon == null ? null : widget.trailingConstraints,
+                      : GestureDetector(onTap: widget.onTrailingTap, child: widget.trailingIcon),
+                  prefixIconConstraints: widget.trailingIcon == null
+                      ? null
+                      : widget.trailingConstraints,
                   // prefix: GestureDetector(
                   //   onTap: widget.onTrailingTap,
                   //   child: widget.trailingIcon,
                   // ),
                   //prefixText: '+7',
                   //prefixIconConstraints: const BoxConstraints(minWidth: 44, maxWidth: 44, minHeight: 44, maxHeight: 44),
-                  suffixIcon: _SuffixWidget(
-                    secondaryText: widget.secondaryText,
-                    suffixIcon: widget.suffixIcon,
-                    hasFocus: _hasFocus,
-                    suffixIconColor: widget.suffixIconColor,
-                    onSuffixTap: widget.onSuffixTap,
-                    alwaysShowTrailing: widget.alwaysShowTrailing,
-                  ),
+                  suffixIcon: widget.secondaryText == null && widget.suffixIcon == null
+                      ? null
+                      : _SuffixWidget(
+                          secondaryText: widget.secondaryText,
+                          suffixIcon: widget.suffixIcon,
+                          hasFocus: _hasFocus,
+                          suffixIconColor: widget.suffixIconColor,
+                          onSuffixTap: widget.onSuffixTap,
+                          alwaysShowTrailing: widget.alwaysShowTrailing,
+                        ),
                   filled: true,
-                  fillColor: widget.fillColor ??
+                  fillColor:
+                      widget.fillColor ??
                       (enabled ? colors.black5 : colors.black5.withValues(alpha: 0.5)),
                   contentPadding: widget.labelText != null
                       ? const EdgeInsets.fromLTRB(16, 31, 16, 11)
@@ -324,24 +326,24 @@ class _UiTextFieldState extends State<UiTextField> {
                   ...widget.trailingFormatters,
                 ],
               ),
-            if (widget.labelText != null)
-              IgnorePointer(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: _labelPadding,
-                  child: AnimatedDefaultTextStyle(
+              if (widget.labelText != null)
+                IgnorePointer(
+                  child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    style: _labelStyle,
-                    child: Text(
-                      widget.labelText ?? '',
-                      maxLines: widget.labelMaxLines,
-                      overflow: TextOverflow.ellipsis,
+                    padding: _labelPadding,
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: _labelStyle,
+                      child: Text(
+                        widget.labelText ?? '',
+                        maxLines: widget.labelMaxLines,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
-        ),
+            ],
+          ),
         ),
         if (hasValidationErrors && widget.maxLength == null)
           Padding(
@@ -402,11 +404,7 @@ class _SuffixWidget extends StatelessWidget {
             IconButton(
               padding: EdgeInsets.zero,
               onPressed: onSuffixTap,
-              icon: Icon(
-                suffixIcon,
-                size: 28,
-                color: suffixIconColor ?? context.uiColors.black100,
-              ),
+              icon: Icon(suffixIcon, size: 28, color: suffixIconColor ?? context.uiColors.black100),
             ),
         ],
       );

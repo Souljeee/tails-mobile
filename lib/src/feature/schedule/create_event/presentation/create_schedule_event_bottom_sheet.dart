@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_flyout/ui_flyout.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
+import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
@@ -92,7 +94,11 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
                 const SizedBox(height: 16),
                 _EventTitle(controller: _eventTitleController),
                 const SizedBox(height: 16),
-                _DateTimeFields(dateController: _dateController, timeController: _timeController),
+                _DateTimeFields(
+                  initialDate: widget.date,
+                  dateController: _dateController,
+                  timeController: _timeController,
+                ),
                 const SizedBox(height: 16),
                 _RecurrenceSelector(controller: _recurrenceController),
                 const SizedBox(height: 16),
@@ -123,12 +129,13 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   }
 
   void _createEvent() {
-    final date = DateTime.parse(_dateController.text);
+    final date = DateFormat('dd.MM.yyyy').parseStrict(_dateController.text.trim());
+    final time = _timeController.text.trim();
 
     final createEventModel = CreateEventModel(
       title: _eventTitleController.text,
       date: date,
-      time: _timeController.text,
+      time: time.isEmpty ? null : time,
       recurrence: null,
       description: _notesController.text,
       petId: _createEventUio.value.petId!,
@@ -231,8 +238,13 @@ class _RecurrenceSelector extends StatelessWidget {
 }
 
 class _DateTimeFields extends StatefulWidget {
-  const _DateTimeFields({required this.dateController, required this.timeController});
+  const _DateTimeFields({
+    required this.initialDate,
+    required this.dateController,
+    required this.timeController,
+  });
 
+  final DateTime initialDate;
   final UiTextFieldController dateController;
   final UiTextFieldController timeController;
 
@@ -243,6 +255,7 @@ class _DateTimeFields extends StatefulWidget {
 class _DateTimeFieldsState extends State<_DateTimeFields> {
   final String _timeInputMask = '##:##';
   final ValueNotifier<bool> _isTimePickerOpen = ValueNotifier(false);
+  final ValueNotifier<bool> _isDatePickerOpen = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -257,14 +270,49 @@ class _DateTimeFieldsState extends State<_DateTimeFields> {
                 style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black60),
               ),
               const SizedBox(height: 8),
-              UiTextField(
-                controller: widget.dateController,
-                placeholderText: 'ДД.ММ.ГГГГ',
-                trailingIcon: Icon(
-                  Icons.calendar_today,
-                  size: 24,
-                  color: context.uiColors.orangePrimary,
-                ),
+              ValueListenableBuilder(
+                valueListenable: _isDatePickerOpen,
+                builder: (context, isOpen, child) {
+                  return UiFlyout(
+                    isOpen: isOpen,
+                    anchor: const UiFlyoutAnchor(
+                      offset: Offset(16, 0),
+                      anchorAlignment: Alignment.centerLeft,
+                      flyoutAlignment: Alignment.centerLeft,
+                    ),
+                    flyoutBuilder: (context) {
+                      return TapRegion(
+                        onTapOutside: (_) {
+                          _isDatePickerOpen.value = false;
+                        },
+                        child: _DatePickerCalendarPopup(
+                          initialDate: widget.initialDate,
+                          onDateSelected: (date) {
+                            widget.dateController.text = DateFormat('dd.MM.yyyy').format(date);
+                            _isDatePickerOpen.value = false;
+                          },
+                        ),
+                      );
+                    },
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        _isDatePickerOpen.value = true;
+                      },
+                      child: IgnorePointer(
+                        child: UiTextField(
+                          controller: widget.dateController,
+                          placeholderText: 'ДД.ММ.ГГГГ',
+                          trailingIcon: Icon(
+                            Icons.calendar_today,
+                            size: 24,
+                            color: context.uiColors.orangePrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -284,20 +332,18 @@ class _DateTimeFieldsState extends State<_DateTimeFields> {
                 builder: (context, isOpen, child) {
                   return UiFlyout(
                     isOpen: isOpen,
-                    anchor: const UiFlyoutAnchor( 
-                      offset: Offset(0, 16),
-                    ),
+                    anchor: const UiFlyoutAnchor(offset: Offset(0, 16)),
                     flyoutBuilder: (context) {
                       String hour = DateTime.now().hour.toString();
                       String minute = DateTime.now().minute.toString();
-              
+
                       if (widget.timeController.text.isNotEmpty) {
                         hour = widget.timeController.text.split(':')[0];
                         minute = widget.timeController.text.split(':')[1];
                       }
-              
+
                       return TapRegion(
-                        onTapOutside: (_){
+                        onTapOutside: (_) {
                           _isTimePickerOpen.value = false;
                         },
                         child: TimePickerCarouselPopup(
@@ -365,6 +411,87 @@ class _EventTitle extends StatelessWidget {
         const SizedBox(height: 8),
         UiTextField(controller: controller, placeholderText: 'Например, "Покормить кота"'),
       ],
+    );
+  }
+}
+
+class _DatePickerCalendarPopup extends StatelessWidget {
+  const _DatePickerCalendarPopup({required this.initialDate, required this.onDateSelected});
+
+  final DateTime initialDate;
+  final OnDateTapCallback onDateSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: context.uiColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: context.uiColors.black100.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: SizedBox(
+          width: 320,
+          child: MonthCalendar(
+            initialMonth: initialDate,
+            onDateTap: onDateSelected,
+            headerBuilder: (month, nextMonthButtonHandler, previousMonthButtonHandler, _, _) {
+              final formattedMonth = DateFormat.yMMMM()
+                  .format(month)
+                  .replaceAll(' г.', '')
+                  .toFirstLetterUpperCase();
+
+              return Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      formattedMonth,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.uiFonts.text20Semibold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: previousMonthButtonHandler,
+                    icon: const Icon(Icons.chevron_left),
+                    color: context.uiColors.orangePrimary,
+                  ),
+                  IconButton(
+                    onPressed: nextMonthButtonHandler,
+                    icon: const Icon(Icons.chevron_right),
+                    color: context.uiColors.orangePrimary,
+                  ),
+                ],
+              );
+            },
+            style: CalendarStyle(
+              resolveDateTextColor: (date) {
+                if (date.year == initialDate.year &&
+                    date.month == initialDate.month &&
+                    date.day == initialDate.day) {
+                  return context.uiColors.white;
+                }
+                return context.uiColors.black100;
+              },
+              resolveDateBackgroundColor: (date) {
+                if (date.year == initialDate.year &&
+                    date.month == initialDate.month &&
+                    date.day == initialDate.day) {
+                  return context.uiColors.orangePrimary;
+                }
+                return Colors.transparent;
+              },
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

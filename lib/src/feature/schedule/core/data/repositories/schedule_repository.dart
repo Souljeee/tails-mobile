@@ -80,6 +80,7 @@ extension on CreateEventModel {
     description: description,
     time: time,
     date: date,
+    timezoneOffset: date.timeZoneOffset.inMinutes,
     petId: petId,
     type: type,
     isRecurring: isRecurring,
