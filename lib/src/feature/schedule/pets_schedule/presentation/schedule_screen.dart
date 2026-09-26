@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_popup/ui_popup.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/create_schedule_event_bottom_sheet.dart';
@@ -66,7 +67,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Future<void> _openCreateEventBottomSheet() async {
-    final isEventCreated = await showUiPopup<bool>(
+    final result = await showUiPopup<CreateScheduleEventResult>(
       context: context,
       child: CreateScheduleEventBottomSheet(
         date: _selectedDate,
@@ -79,9 +80,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       return;
     }
 
-    if (isEventCreated ?? false) {
-      _reloadSchedule();
+    switch (result) {
+      case CreateScheduleEventResult.success:
+        _reloadSchedule();
+      case CreateScheduleEventResult.error:
+        _showCreateEventErrorSnackBar();
+      case null:
+        break;
     }
+  }
+
+  void _showCreateEventErrorSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          context.l10n.tryLater,
+          style: context.uiFonts.text14Regular.copyWith(color: context.uiColors.white),
+        ),
+        backgroundColor: context.uiColors.red,
+      ),
+    );
   }
 
   @override

@@ -18,6 +18,8 @@ import 'package:tails_mobile/src/feature/schedule/create_event/domain/create_eve
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/uio/create_event_uio.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/time_picker_carousel_popup.dart';
 
+enum CreateScheduleEventResult { success, error }
+
 class CreateScheduleEventBottomSheet extends StatefulWidget {
   final DateTime date;
   final List<PetModel> pets;
@@ -111,7 +113,8 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
             bloc: _createEventBloc,
             listener: (context, state) {
               state.mapOrNull(
-                success: (_) => Navigator.of(context).pop(true),
+                success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
+                error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
               );
             },
             builder: (context, state) {
