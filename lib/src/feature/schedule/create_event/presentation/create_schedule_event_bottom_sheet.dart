@@ -109,7 +109,11 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
           const SizedBox(height: 16),
           BlocConsumer<CreateEventBloc, CreateEventState>(
             bloc: _createEventBloc,
-            listener: (context, state) {},
+            listener: (context, state) {
+              state.mapOrNull(
+                success: (_) => Navigator.of(context).pop(true),
+              );
+            },
             builder: (context, state) {
               return ValueListenableBuilder(
                 valueListenable: _createEventUio,

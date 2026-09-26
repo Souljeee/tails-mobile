@@ -9,8 +9,6 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
-import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
-import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/create_schedule_event_bottom_sheet.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/pets/pets_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/schedule/schedule_bloc.dart';
@@ -58,7 +56,32 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   void _loadData() {
     _petsBloc.add(const PetsEvent.petsRequested());
-    _scheduleBloc.add(ScheduleEvent.fetchRequested(startDate: _startDate, endDate: _endDate));
+    _reloadSchedule();
+  }
+
+  void _reloadSchedule() {
+    _scheduleBloc.add(
+      ScheduleEvent.fetchRequested(startDate: _startDate, endDate: _endDate, petId: _selectedPetId),
+    );
+  }
+
+  Future<void> _openCreateEventBottomSheet() async {
+    final isEventCreated = await showUiPopup<bool>(
+      context: context,
+      child: CreateScheduleEventBottomSheet(
+        date: _selectedDate,
+        pets: _petsBloc.state.mapOrNull<List<PetModel>?>(success: (state) => state.pets) ?? [],
+        selectedPetId: _selectedPetId,
+      ),
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (isEventCreated ?? false) {
+      _reloadSchedule();
+    }
   }
 
   @override
@@ -67,17 +90,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       backgroundColor: context.uiColors.grayMain,
       appBar: const UiAppBar.baseToolBar(title: 'Календарь'),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showUiPopup<void>(
-            context: context,
-            child: CreateScheduleEventBottomSheet(
-              date: _selectedDate,
-              pets:
-                  _petsBloc.state.mapOrNull<List<PetModel>?>(success: (state) => state.pets) ?? [],
-              selectedPetId: _selectedPetId,
-            ),
-          );
-        },
+        onPressed: _openCreateEventBottomSheet,
         backgroundColor: context.uiColors.orangePrimary,
         child: Icon(Icons.add, color: context.uiColors.white),
       ),
