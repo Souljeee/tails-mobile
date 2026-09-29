@@ -160,4 +160,56 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get navAddEvent => 'Добавить событие';
+
+  @override
+  String get authSlide1Title => 'Профиль любимца';
+
+  @override
+  String get authSlide1Subtitle =>
+      'Имя, порода, дата рождения и заметки — чтобы ничего не терялось.';
+
+  @override
+  String get authSlide2Title => 'Календарь питомца';
+
+  @override
+  String get authSlide2Subtitle => 'Все запланированные события в одном списке и по датам.';
+
+  @override
+  String get authSlide3Title => 'Ничего не забыть';
+
+  @override
+  String get authSlide3Subtitle =>
+      'Создавайте напоминания о важных делах для питомца за пару секунд.';
+
+  @override
+  String get authPhoneTitle => 'Введите ваш номер телефона';
+
+  @override
+  String get authPhoneSubtitle => 'Мы отправим вам безопасный код подтверждения';
+
+  @override
+  String get authPhoneLabel => 'Номер телефона';
+
+  @override
+  String get authGetCode => 'Получить код';
+
+  @override
+  String get authConsentPrefix => 'Нажимая «Получить код», вы соглашаетесь с нашими ';
+
+  @override
+  String get authTerms => 'Условиями использования';
+
+  @override
+  String get authConsentAnd => ' и ';
+
+  @override
+  String get authPrivacy => 'Политикой конфиденциальности';
+
+  @override
+  String get enterCodeBack => 'Назад';
+
+  @override
+  String enterCodeDigitLabel(int index, int count) {
+    return 'Цифра $index из $count';
+  }
 }

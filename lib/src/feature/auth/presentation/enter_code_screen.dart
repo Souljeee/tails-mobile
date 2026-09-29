@@ -2,108 +2,124 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_badge/ui_icon_badge.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_loader_overlay/loader_overlay.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_text_link/ui_text_link.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_top_bar/ui_top_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_scope.dart';
+import 'package:tails_mobile/src/feature/auth/presentation/utils/phone_format.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 
 class EnterCodeScreen extends StatelessWidget {
   final String phoneNumber;
 
-  const EnterCodeScreen({
-    required this.phoneNumber,
-    super.key,
-  });
+  const EnterCodeScreen({required this.phoneNumber, super.key});
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.uiPalette;
+    final fonts = context.uiFonts;
+
     return Scaffold(
-      backgroundColor: context.uiColors.grayMain,
-      appBar: AppBar(
-        backgroundColor: context.uiColors.grayMain,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.maybePop(context);
-          },
-          icon: Icon(
-            Icons.keyboard_arrow_left,
-            size: 32,
-            color: context.uiColors.black100,
+      backgroundColor: palette.canvas,
+      body: Column(
+        children: [
+          UiTopBar(
+            title: '',
+            backLabel: context.l10n.enterCodeBack,
+            onBack: () => Navigator.maybePop(context),
           ),
-        ),
-      ),
-      body: SafeArea(
-        child: BlocConsumer<AuthBloc, AuthState>(
-          bloc: DependenciesScope.of(context).authorizationBloc,
-          listener: (context, state) {
-            if (state.status == AuthorizationStatus.authorized) {
-              // Важно: `CodeTimerBloc` живёт дольше экрана (dependency scope),
-              // поэтому при успешной авторизации нужно явно остановить таймер.
-              DependenciesScope.of(context).codeTimerBloc.add(const CodeTimerEvent.reset());
-            }
+          Expanded(
+            child: SafeArea(
+              top: false,
+              child: BlocConsumer<AuthBloc, AuthState>(
+                bloc: DependenciesScope.of(context).authorizationBloc,
+                listener: (context, state) {
+                  if (state.status == AuthorizationStatus.authorized) {
+                    // Важно: `CodeTimerBloc` живёт дольше экрана (dependency scope),
+                    // поэтому при успешной авторизации нужно явно остановить таймер.
+                    DependenciesScope.of(context).codeTimerBloc.add(const CodeTimerEvent.reset());
+                  }
 
-            state.maybeMap(
-              processing: (_) {
-                LoaderOverlay.of(context).showLoader();
-              },
-              orElse: () {
-                LoaderOverlay.of(context).hideLoader();
-              },
-            );
+                  state.maybeMap(
+                    processing: (_) {
+                      LoaderOverlay.of(context).showLoader();
+                    },
+                    orElse: () {
+                      LoaderOverlay.of(context).hideLoader();
+                    },
+                  );
 
-            state.mapOrNull(
-              error: (_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      context.l10n.tryLater,
-                      style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.white),
-                    ),
-                    backgroundColor: context.uiColors.red,
-                  ),
-                );
-              },
-            );
-          },
-          builder: (context, state) {
-            return Column(
-              children: [
-                const SizedBox(height: 28),
-                const _CallIcon(),
-                const SizedBox(height: 16),
-                Text(
-                  context.l10n.enterCodeTitle,
-                  style: context.uiFonts.header28Semibold.copyWith(fontWeight: FontWeight.w700),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  context.l10n.enterCodeSubtitle,
-                  style: context.uiFonts.text16Medium.copyWith(color: context.uiColors.black60),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  phoneNumber,
-                  style: context.uiFonts.text16Medium.copyWith(fontWeight: FontWeight.w700),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                _EnterCodeField(
-                  onCompleted: (code) {
-                    AuthScope.of(context).login(phoneNumber, code);
-                  },
-                ),
-                const Spacer(),
-                _RetrySection(phoneNumber: phoneNumber),
-              ],
-            );
-          },
-        ),
+                  state.mapOrNull(
+                    error: (_) => showUiSnackBar(context, message: context.l10n.tryLater),
+                  );
+                },
+                builder: (context, state) {
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: UiSpacing.x4),
+                                    const UiIconBadge(icon: Icons.call, size: 64, iconSize: 28),
+                                    const SizedBox(height: UiSpacing.x5),
+                                    Text(
+                                      context.l10n.enterCodeTitle,
+                                      style: fonts.displayS.copyWith(color: palette.ink),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: UiSpacing.x3),
+                                    Text(
+                                      context.l10n.enterCodeSubtitle,
+                                      style: fonts.body.copyWith(color: palette.ink2),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: UiSpacing.x1),
+                                    Text(
+                                      formatPhoneForDisplay(phoneNumber),
+                                      style: fonts.monoDigits.copyWith(color: palette.ink),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: UiSpacing.x6),
+                                    _EnterCodeField(
+                                      onCompleted: (code) {
+                                        AuthScope.of(context).login(phoneNumber, code);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: UiSpacing.x4),
+                                child: _RetrySection(phoneNumber: phoneNumber),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -119,37 +135,10 @@ class _RetrySection extends StatelessWidget {
     return BlocBuilder<CodeTimerBloc, CodeTimerState>(
       bloc: DependenciesScope.of(context).codeTimerBloc,
       builder: (context, timerState) {
-        final isTimerActive = timerState.maybeMap(
-          ticking: (_) => true,
-          orElse: () => false,
-        );
+        final isTimerActive = timerState.maybeMap(ticking: (_) => true, orElse: () => false);
 
         return isTimerActive ? const _RetryTimer() : _RetryButton(phoneNumber: phoneNumber);
       },
-    );
-  }
-}
-
-class _CallIcon extends StatelessWidget {
-  const _CallIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: 64,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: context.uiColors.orangeBg,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: Icon(
-            Icons.call,
-            size: 32,
-            color: context.uiColors.orangePrimary,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -164,8 +153,10 @@ class _EnterCodeField extends StatefulWidget {
 }
 
 class _EnterCodeFieldState extends State<_EnterCodeField> {
-  final _controllers = List.generate(4, (_) => TextEditingController());
-  final _focusNodes = List.generate(4, (_) => FocusNode());
+  static const int _length = 4;
+
+  final _controllers = List.generate(_length, (_) => TextEditingController());
+  final _focusNodes = List.generate(_length, (_) => FocusNode());
 
   @override
   void dispose() {
@@ -183,11 +174,11 @@ class _EnterCodeFieldState extends State<_EnterCodeField> {
   String get _code => _controllers.map((e) => e.text).join();
 
   void _goNext(int i) {
-    if (i < 3) {
+    if (i < _length - 1) {
       _focusNodes[i + 1].requestFocus();
     } else {
       _focusNodes[i].unfocus();
-      if (_code.length == 4) widget.onCompleted?.call(_code);
+      if (_code.length == _length) widget.onCompleted?.call(_code);
     }
   }
 
@@ -231,49 +222,100 @@ class _EnterCodeFieldState extends State<_EnterCodeField> {
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(
-          4,
-          (fieldIndex) {
-            return Container(
-              width: 64,
-              height: 64,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              alignment: Alignment.center,
-              child: TextField(
-                controller: _controllers[fieldIndex],
-                focusNode: _focusNodes[fieldIndex],
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                textInputAction: fieldIndex == 3 ? TextInputAction.done : TextInputAction.next,
-                maxLength: 1,
-                style: context.uiFonts.header20Medium,
-                cursorColor: context.uiColors.orangePrimary,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: context.uiColors.white,
-                  counterText: '',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: context.uiColors.orangePrimary,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                onChanged: (value) => _onChanged(fieldIndex, value),
-                onSubmitted: (_) {
-                  if (fieldIndex == 3) FocusScope.of(context).unfocus();
-                },
-              ),
-            );
-          },
+        children: List.generate(_length, (fieldIndex) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x2),
+            child: _CodeCell(
+              controller: _controllers[fieldIndex],
+              focusNode: _focusNodes[fieldIndex],
+              semanticLabel: context.l10n.enterCodeDigitLabel(fieldIndex + 1, _length),
+              textInputAction: fieldIndex == _length - 1
+                  ? TextInputAction.done
+                  : TextInputAction.next,
+              onChanged: (value) => _onChanged(fieldIndex, value),
+              onSubmitted: (_) {
+                if (fieldIndex == _length - 1) FocusScope.of(context).unfocus();
+              },
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+/// Ячейка ввода одной цифры кода: обводка и кольцо фокуса как у `UiTextField`.
+class _CodeCell extends StatelessWidget {
+  const _CodeCell({
+    required this.controller,
+    required this.focusNode,
+    required this.semanticLabel,
+    required this.textInputAction,
+    required this.onChanged,
+    required this.onSubmitted,
+  });
+
+  static const double _size = 64;
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final String semanticLabel;
+  final TextInputAction textInputAction;
+  final ValueChanged<String> onChanged;
+  final ValueChanged<String> onSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.uiPalette;
+
+    OutlineInputBorder border(Color color, double width) => OutlineInputBorder(
+      borderRadius: UiRadius.mdAll,
+      borderSide: BorderSide(color: color, width: width),
+    );
+
+    return ListenableBuilder(
+      listenable: focusNode,
+      builder: (context, child) {
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: UiRadius.mdAll,
+            boxShadow: focusNode.hasFocus
+                ? [BoxShadow(color: palette.accentTint, spreadRadius: 4)]
+                : null,
+          ),
+          child: child,
+        );
+      },
+      child: SizedBox.square(
+        dimension: _size,
+        child: Semantics(
+          label: semanticLabel,
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+            textInputAction: textInputAction,
+            maxLength: 1,
+            style: context.uiFonts.monoDigits.copyWith(
+              color: palette.ink,
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+            ),
+            cursorColor: palette.accent,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: palette.surface,
+              counterText: '',
+              contentPadding: EdgeInsets.zero,
+              border: border(palette.controlLine, 1),
+              enabledBorder: border(palette.controlLine, 1),
+              focusedBorder: border(palette.accent, 2),
+            ),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onChanged: onChanged,
+            onSubmitted: onSubmitted,
+          ),
         ),
       ),
     );
@@ -313,13 +355,11 @@ class _RetryButtonState extends State<_RetryButton> {
     return BlocBuilder<CodeTimerBloc, CodeTimerState>(
       bloc: _codeTimerBloc,
       builder: (context, timerState) {
-        final isEnabled = timerState.maybeMap(
-          idle: (_) => true,
-          orElse: () => false,
-        );
+        final isEnabled = timerState.maybeMap(idle: (_) => true, orElse: () => false);
 
-        return TextButton(
-          onPressed: isEnabled
+        return UiTextLink(
+          label: context.l10n.callAgain,
+          onTap: isEnabled
               ? () {
                   _sendCodeBloc.add(
                     SendCodeEvent.sendCodeRequested(phoneNumber: widget.phoneNumber),
@@ -327,12 +367,6 @@ class _RetryButtonState extends State<_RetryButton> {
                   _codeTimerBloc.add(const CodeTimerEvent.started());
                 }
               : null,
-          child: Text(
-            context.l10n.callAgain,
-            style: context.uiFonts.text16Medium.copyWith(
-              color: isEnabled ? context.uiColors.orangePrimary : context.uiColors.black40,
-            ),
-          ),
         );
       },
     );
@@ -357,33 +391,28 @@ class _RetryTimerState extends State<_RetryTimer> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.uiPalette;
+
     return BlocBuilder<CodeTimerBloc, CodeTimerState>(
       bloc: _codeTimerBloc,
       builder: (context, state) {
         if (state.secondsRemaining > 0) {
           return DecoratedBox(
             decoration: BoxDecoration(
-              color: context.uiColors.white,
-              borderRadius: BorderRadius.circular(36),
-              border: Border.all(color: context.uiColors.brown),
+              color: palette.surface,
+              borderRadius: UiRadius.fullAll,
+              border: Border.all(color: palette.line),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x4, vertical: UiSpacing.x3),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.timer,
-                    color: context.uiColors.orangePrimary,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 16),
+                  Icon(Icons.timer_outlined, color: palette.accent, size: 24),
+                  const SizedBox(width: UiSpacing.x3),
                   Text(
                     _formatTime(state.secondsRemaining),
-                    style: context.uiFonts.text16Semibold,
+                    style: context.uiFonts.monoDigits.copyWith(color: palette.ink),
                   ),
                 ],
               ),

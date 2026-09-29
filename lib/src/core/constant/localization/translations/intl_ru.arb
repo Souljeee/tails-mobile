@@ -68,5 +68,28 @@
   "navCalendar": "Календарь",
   "navProfile": "Профиль",
   "navAddPet": "Добавить питомца",
-  "navAddEvent": "Добавить событие"
+  "navAddEvent": "Добавить событие",
+  "authSlide1Title": "Профиль любимца",
+  "authSlide1Subtitle": "Имя, порода, дата рождения и заметки — чтобы ничего не терялось.",
+  "authSlide2Title": "Календарь питомца",
+  "authSlide2Subtitle": "Все запланированные события в одном списке и по датам.",
+  "authSlide3Title": "Ничего не забыть",
+  "authSlide3Subtitle": "Создавайте напоминания о важных делах для питомца за пару секунд.",
+  "authPhoneTitle": "Введите ваш номер телефона",
+  "authPhoneSubtitle": "Мы отправим вам безопасный код подтверждения",
+  "authPhoneLabel": "Номер телефона",
+  "authGetCode": "Получить код",
+  "authConsentPrefix": "Нажимая «Получить код», вы соглашаетесь с нашими ",
+  "authTerms": "Условиями использования",
+  "authConsentAnd": " и ",
+  "authPrivacy": "Политикой конфиденциальности",
+  "enterCodeBack": "Назад",
+  "enterCodeDigitLabel": "Цифра {index} из {count}",
+  "@enterCodeDigitLabel": {
+    "description": "Подпись поля ввода одной цифры кода для скринридера",
+    "placeholders": {
+      "index": {"type": "int"},
+      "count": {"type": "int"}
+    }
+  }
 }

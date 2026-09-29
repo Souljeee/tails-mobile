@@ -319,6 +319,102 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Добавить событие'**
   String get navAddEvent;
+
+  /// No description provided for @authSlide1Title.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль любимца'**
+  String get authSlide1Title;
+
+  /// No description provided for @authSlide1Subtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя, порода, дата рождения и заметки — чтобы ничего не терялось.'**
+  String get authSlide1Subtitle;
+
+  /// No description provided for @authSlide2Title.
+  ///
+  /// In ru, this message translates to:
+  /// **'Календарь питомца'**
+  String get authSlide2Title;
+
+  /// No description provided for @authSlide2Subtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все запланированные события в одном списке и по датам.'**
+  String get authSlide2Subtitle;
+
+  /// No description provided for @authSlide3Title.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ничего не забыть'**
+  String get authSlide3Title;
+
+  /// No description provided for @authSlide3Subtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создавайте напоминания о важных делах для питомца за пару секунд.'**
+  String get authSlide3Subtitle;
+
+  /// No description provided for @authPhoneTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите ваш номер телефона'**
+  String get authPhoneTitle;
+
+  /// No description provided for @authPhoneSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мы отправим вам безопасный код подтверждения'**
+  String get authPhoneSubtitle;
+
+  /// No description provided for @authPhoneLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер телефона'**
+  String get authPhoneLabel;
+
+  /// No description provided for @authGetCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получить код'**
+  String get authGetCode;
+
+  /// No description provided for @authConsentPrefix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажимая «Получить код», вы соглашаетесь с нашими '**
+  String get authConsentPrefix;
+
+  /// No description provided for @authTerms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Условиями использования'**
+  String get authTerms;
+
+  /// No description provided for @authConsentAnd.
+  ///
+  /// In ru, this message translates to:
+  /// **' и '**
+  String get authConsentAnd;
+
+  /// No description provided for @authPrivacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Политикой конфиденциальности'**
+  String get authPrivacy;
+
+  /// No description provided for @enterCodeBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назад'**
+  String get enterCodeBack;
+
+  /// Подпись поля ввода одной цифры кода для скринридера
+  ///
+  /// In ru, this message translates to:
+  /// **'Цифра {index} из {count}'**
+  String enterCodeDigitLabel(int index, int count);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
