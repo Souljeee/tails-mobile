@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
-import 'package:tails_mobile/src/core/ui_kit/typos/text_style_tokens.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_sizes.dart';
 
 enum UiButtonType { main, secondary }
 
-enum UiButtonSize { s, m }
+/// Размер кнопки: [l] — 56 pt (основное действие), [m] — 44 pt.
+enum UiButtonSize { m, l }
 
 class UiButton extends StatelessWidget {
   final String label;
 
   final VoidCallback? onPressed;
 
+  /// По умолчанию [UiButtonSize.l].
   final UiButtonSize? size;
 
   final UiButtonType _type;
@@ -67,10 +70,11 @@ class UiButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sizeProps = _getSizeProperties();
+    final colorScheme = _getColorScheme(context);
+    final sizeProps = _getSizeProperties(context);
 
     return ElevatedButton(
-      style: _createButtonStyle(context),
+      style: _createButtonStyle(colorScheme, sizeProps),
       onPressed: isLoading ? null : onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -79,27 +83,20 @@ class UiButton extends StatelessWidget {
             Center(
               child: SizedBox.square(
                 dimension: 24,
-                child: CircularProgressIndicator(
-                  color: context.uiColors.white,
-                ),
+                child: CircularProgressIndicator(color: colorScheme.staticItem, strokeWidth: 3),
               ),
             ),
           ] else ...[
-            Text(
-              label,
-              style: sizeProps.textStyle,
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
+            Flexible(
+              child: Text(
+                label,
+                style: sizeProps.textStyle,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            if (icon != null) ...[
-              const SizedBox(width: 8),
-              Icon(
-                icon,
-                size: 24,
-                color: context.uiColors.white,
-              )
-            ],
+            if (icon != null) ...[const SizedBox(width: 8), Icon(icon, size: 24)],
           ],
         ],
       ),
@@ -107,18 +104,18 @@ class UiButton extends StatelessWidget {
   }
 
   _ButtonColorScheme _getColorScheme(BuildContext context) {
-    final colors = context.uiColors;
+    final palette = context.uiPalette;
     const transparent = Colors.transparent;
 
     switch (_type) {
       case UiButtonType.main:
         return _ButtonColorScheme(
-          staticFill: staticFillColor ?? colors.orangePrimary,
-          staticItem: staticItemColor ?? colors.white,
-          pressedFill: pressedFillColor ?? colors.lightOrange,
-          pressedItem: pressedItemColor ?? colors.white,
-          disabledFill: disabledFillColor ?? colors.orangePrimary.withValues(alpha: 0.3),
-          disabledItem: disabledItemColor ?? colors.white,
+          staticFill: staticFillColor ?? palette.accent,
+          staticItem: staticItemColor ?? palette.surface,
+          pressedFill: pressedFillColor ?? palette.accentPressed,
+          pressedItem: pressedItemColor ?? palette.surface,
+          disabledFill: disabledFillColor ?? palette.sunken,
+          disabledItem: disabledItemColor ?? palette.ink3,
           defaultBorder: defaultBorderColor ?? transparent,
           pressedBorder: pressedBorderColor ?? transparent,
           disabledBorder: disabledBorderColor ?? transparent,
@@ -127,77 +124,77 @@ class UiButton extends StatelessWidget {
       case UiButtonType.secondary:
         return _ButtonColorScheme(
           staticFill: staticFillColor ?? transparent,
-          staticItem: staticItemColor ?? colors.orangePrimary,
-          pressedFill: pressedFillColor ?? transparent,
-          pressedItem: pressedItemColor ?? colors.lightOrange,
+          staticItem: staticItemColor ?? palette.accent,
+          pressedFill: pressedFillColor ?? palette.accentTint,
+          pressedItem: pressedItemColor ?? palette.accentPressed,
           disabledFill: disabledFillColor ?? transparent,
-          disabledItem: disabledItemColor ?? colors.lightOrange,
-          defaultBorder: defaultBorderColor ?? colors.orangePrimary,
-          pressedBorder: pressedBorderColor ?? colors.lightOrange,
-          disabledBorder: disabledBorderColor ?? colors.blue100.withValues(alpha: 0.5),
+          disabledItem: disabledItemColor ?? palette.ink3,
+          defaultBorder: defaultBorderColor ?? palette.accent,
+          pressedBorder: pressedBorderColor ?? palette.accentPressed,
+          disabledBorder: disabledBorderColor ?? palette.line,
         );
     }
   }
 
-  _ButtonSizeProperties _getSizeProperties() {
+  _ButtonSizeProperties _getSizeProperties(BuildContext context) {
     switch (size) {
-      case UiButtonSize.s:
+      case UiButtonSize.m:
         return _ButtonSizeProperties(
-          textStyle: UiDefaultTextStyleTokens().text16Regular,
-          height: 36,
-          borderRadius: 26,
+          textStyle: context.uiFonts.callout,
+          height: UiSizes.buttonM,
+          borderRadius: UiRadius.md,
         );
 
-      default:
+      case UiButtonSize.l:
+      case null:
         return _ButtonSizeProperties(
-          textStyle: UiDefaultTextStyleTokens().text20Semibold,
-          height: 56,
-          borderRadius: 26,
+          textStyle: context.uiFonts.headline,
+          height: UiSizes.buttonL,
+          borderRadius: UiRadius.md,
         );
     }
   }
 
-  ButtonStyle _createButtonStyle(BuildContext context) {
-    final colorScheme = _getColorScheme(context);
-    final sizeProps = _getSizeProperties();
+  ButtonStyle _createButtonStyle(_ButtonColorScheme colorScheme, _ButtonSizeProperties sizeProps) {
+    // Во время загрузки кнопка неактивна, но выглядит как обычная.
+    bool isDisabled(Set<WidgetState> states) => states.contains(WidgetState.disabled) && !isLoading;
+
+    Color resolveItemColor(Set<WidgetState> states) {
+      if (isDisabled(states)) {
+        return colorScheme.disabledItem;
+      }
+      if (states.contains(WidgetState.pressed)) {
+        return colorScheme.pressedItem;
+      }
+      return colorScheme.staticItem;
+    }
 
     return ButtonStyle(
       backgroundColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.disabled)) {
+        if (isDisabled(states)) {
           return colorScheme.disabledFill;
+        }
+        if (states.contains(WidgetState.pressed)) {
+          return colorScheme.pressedFill;
         }
         return colorScheme.staticFill;
       }),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      overlayColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.pressed)) {
-          return colorScheme.pressedFill;
-        }
-        return Colors.transparent;
-      }),
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
       side: WidgetStateProperty.resolveWith((states) {
+        if (isDisabled(states)) {
+          return BorderSide(color: colorScheme.disabledBorder, width: 1.5);
+        }
         if (states.contains(WidgetState.pressed)) {
           return BorderSide(color: colorScheme.pressedBorder, width: 1.5);
         }
-        if (states.contains(WidgetState.disabled)) {
-          return BorderSide(color: colorScheme.disabledBorder, width: 1.5);
-        }
         return BorderSide(color: colorScheme.defaultBorder, width: 1.5);
       }),
-      foregroundColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.pressed)) {
-          return colorScheme.pressedItem;
-        }
-        if (states.contains(WidgetState.disabled)) {
-          return colorScheme.disabledItem;
-        }
-        return colorScheme.staticItem;
-      }),
+      foregroundColor: WidgetStateProperty.resolveWith(resolveItemColor),
+      iconColor: WidgetStateProperty.resolveWith(resolveItemColor),
       fixedSize: WidgetStatePropertyAll(Size.fromHeight(sizeProps.height)),
       shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(sizeProps.borderRadius),
-        ),
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(sizeProps.borderRadius)),
       ),
       elevation: const WidgetStatePropertyAll(0),
       splashFactory: NoSplash.splashFactory,
