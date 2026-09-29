@@ -1,66 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tails_mobile/src/core/navigation/routes.dart';
+import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_nav_bar/ui_fab.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_nav_bar/ui_floating_nav_bar.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 
-/// Builds the "shell" for the app by building a Scaffold with a
-/// BottomNavigationBar, where [navigationShell] is placed in the body of the Scaffold.
-class ScaffoldWithNavBar extends StatelessWidget {
-  /// Constructs an [ScaffoldWithNavBar].
-  const ScaffoldWithNavBar({
-    required this.navigationShell,
-    Key? key,
-  }) : super(key: key ?? const ValueKey<String>('ScaffoldWithNavBar'));
+/// Оболочка приложения: контент ветки и плавающая навигация с кнопкой «+».
+///
+/// На корневых экранах вкладок показаны «пилюля» и «+». На вложенных экранах
+/// (например, карточке питомца) «+» скрывается, а «пилюля» растягивается на всю ширину.
+class ScaffoldWithNavBar extends StatefulWidget {
+  const ScaffoldWithNavBar({required this.navigationShell, Key? key})
+    : super(key: key ?? const ValueKey<String>('ScaffoldWithNavBar'));
 
-  /// The navigation shell and container for the branch Navigators.
+  /// Контейнер навигации веток.
   final StatefulNavigationShell navigationShell;
 
+  /// Корневые маршруты вкладок; на них показывается кнопка «+».
+  static List<String> get rootLocations => [
+    const PetsRoute().location,
+    const ScheduleRoute().location,
+    const ProfileRoute().location,
+  ];
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
-        // Here, the items of BottomNavigationBar are hard coded. In a real
-        // world scenario, the items would most likely be generated from the
-        // branches of the shell route, which can be fetched using
-        // `navigationShell.route.branches`.
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pets_outlined),
-            activeIcon: Icon(Icons.pets),
-            label: 'Питомцы',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month_outlined),
-            activeIcon: Icon(Icons.calendar_month),
-            label: 'Календарь',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined),
-            activeIcon: Icon(Icons.person_2),
-            label: 'Профиль',
-          ),
-        ],
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        currentIndex: navigationShell.currentIndex,
-        onTap: (index) => _onTap(context, index),
-      ),
+  State<ScaffoldWithNavBar> createState() => _ScaffoldWithNavBarState();
+}
+
+class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
+  final ShellActionsController _actions = ShellActionsController();
+
+  static const double _bottomGap = UiSpacing.x4;
+
+  void _onTap(int index) {
+    // При повторном нажатии на активную вкладку возвращаемся на её корневой экран.
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
     );
   }
 
-  /// Navigate to the current location of the branch at the provided index when
-  /// tapping an item in the BottomNavigationBar.
-  void _onTap(BuildContext context, int index) {
-    // When navigating to a new branch, it's recommended to use the goBranch
-    // method, as doing so makes sure the last navigation state of the
-    // Navigator for the branch is restored.
-    navigationShell.goBranch(
-      index,
-      // A common pattern when using bottom navigation bars is to support
-      // navigating to the initial location when tapping the item that is
-      // already active. This example demonstrates how to support this behavior,
-      // using the initialLocation parameter of goBranch.
-      initialLocation: index == navigationShell.currentIndex,
+  void _onActionPressed() {
+    final tab = ShellTab.values[widget.navigationShell.currentIndex];
+
+    _actions.actionFor(tab)?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final safeBottom = MediaQuery.paddingOf(context).bottom;
+    final location = GoRouterState.of(context).uri.path;
+    final isRoot = ScaffoldWithNavBar.rootLocations.contains(location);
+    final currentTab = ShellTab.values[widget.navigationShell.currentIndex];
+    final canAdd = currentTab != ShellTab.profile;
+    final inset = UiFloatingNavBar.height + _bottomGap * 2 + safeBottom;
+
+    return ShellScope(
+      controller: _actions,
+      bottomInset: inset,
+      child: Scaffold(
+        extendBody: true,
+        body: Stack(
+          children: [
+            Positioned.fill(child: widget.navigationShell),
+            Positioned(
+              left: UiSpacing.x4,
+              right: UiSpacing.x4,
+              bottom: _bottomGap + safeBottom,
+              child: UiFloatingNavBar(
+                items: [
+                  UiNavBarItem(
+                    icon: Icons.pets_outlined,
+                    activeIcon: Icons.pets,
+                    label: l10n.navPets,
+                  ),
+                  UiNavBarItem(
+                    icon: Icons.calendar_month_outlined,
+                    activeIcon: Icons.calendar_month,
+                    label: l10n.navCalendar,
+                  ),
+                  UiNavBarItem(
+                    icon: Icons.person_outline,
+                    activeIcon: Icons.person,
+                    label: l10n.navProfile,
+                  ),
+                ],
+                currentIndex: widget.navigationShell.currentIndex,
+                onTap: _onTap,
+                showAction: isRoot && canAdd,
+                action: UiFab(
+                  onPressed: _onActionPressed,
+                  semanticLabel: currentTab == ShellTab.pets ? l10n.navAddPet : l10n.navAddEvent,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

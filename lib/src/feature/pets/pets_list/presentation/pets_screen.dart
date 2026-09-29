@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_app_bar/ui_app_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
@@ -20,9 +21,18 @@ class PetsScreen extends StatefulWidget {
   State<PetsScreen> createState() => _PetsScreenState();
 }
 
-class _PetsScreenState extends State<PetsScreen> {
-  late final PetsListBloc _petsListBloc =
-      PetsListBloc(petRepository: DependenciesScope.of(context).petRepository);
+class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScreen> {
+  @override
+  ShellTab get shellTab => ShellTab.pets;
+
+  @override
+  void onShellAction() {
+    Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const AddPetModal()));
+  }
+
+  late final PetsListBloc _petsListBloc = PetsListBloc(
+    petRepository: DependenciesScope.of(context).petRepository,
+  );
 
   @override
   void initState() {
@@ -44,25 +54,7 @@ class _PetsScreenState extends State<PetsScreen> {
       backgroundColor: context.uiColors.grayMain,
       appBar: UiAppBar.baseToolBar(
         title: 'Мои питомцы',
-        actions: [
-          _NotificationsButton(
-            onPressed: () {},
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'pets_floating_action_button',
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute<void>(builder: (_) => const AddPetModal()),
-          );
-        },
-        backgroundColor: context.uiColors.orangePrimary,
-        child: Icon(
-          Icons.add,
-          color: context.uiColors.white,
-        ),
+        actions: [_NotificationsButton(onPressed: () {})],
       ),
       body: SafeArea(
         child: BlocBuilder<PetsListBloc, PetsListState>(
@@ -94,7 +86,7 @@ class _PetsList extends StatelessWidget {
     return pets.isEmpty
         ? const _PetsEmptyList()
         : ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.fromLTRB(16, 0, 16, ShellScope.bottomInsetOf(context)),
             itemCount: pets.length,
             separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
@@ -135,12 +127,7 @@ class _PetItem extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(100),
-              child: Image.network(
-                pet.image,
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              ),
+              child: Image.network(pet.image, width: 100, height: 100, fit: BoxFit.cover),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -150,12 +137,7 @@ class _PetItem extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Text(
-                          pet.name,
-                          style: context.uiFonts.header24Semibold,
-                        ),
-                      ),
+                      Expanded(child: Text(pet.name, style: context.uiFonts.header24Semibold)),
                       const SizedBox(width: 16),
                       IconButton(
                         onPressed: () {
@@ -195,11 +177,7 @@ class _PetsEmptyList extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 120),
-          SvgPicture.asset(
-            context.uiIcons.emptyDogHouse.keyName,
-            width: 150,
-            height: 150,
-          ),
+          SvgPicture.asset(context.uiIcons.emptyDogHouse.keyName, width: 150, height: 150),
           const SizedBox(height: 16),
           Text(
             'Список ваших питомцев пуст',
@@ -232,10 +210,7 @@ class _PetsShimmer extends StatelessWidget {
             3,
             (index) => Padding(
               padding: const EdgeInsets.only(top: 16),
-              child: UiKitShimmerLoading(
-                height: 100,
-                borderRadius: BorderRadius.circular(32),
-              ),
+              child: UiKitShimmerLoading(height: 100, borderRadius: BorderRadius.circular(32)),
             ),
           ),
         ),
@@ -255,11 +230,7 @@ class _FetchingError extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 120),
-          SvgPicture.asset(
-            context.uiIcons.sadDoc.keyName,
-            width: 150,
-            height: 150,
-          ),
+          SvgPicture.asset(context.uiIcons.sadDoc.keyName, width: 150, height: 150),
           const SizedBox(height: 16),
           Text(
             'Ошибка загрузки',
@@ -273,10 +244,7 @@ class _FetchingError extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          UiButton.main(
-            label: 'Повторить',
-            onPressed: onRetry,
-          ),
+          UiButton.main(label: 'Повторить', onPressed: onRetry),
         ],
       ),
     );
@@ -291,16 +259,10 @@ class _NotificationsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: context.uiColors.white,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: context.uiColors.white, shape: BoxShape.circle),
       child: Padding(
         padding: const EdgeInsetsGeometry.all(12),
-        child: Icon(
-          Icons.notifications,
-          color: context.uiColors.black100,
-        ),
+        child: Icon(Icons.notifications, color: context.uiColors.black100),
       ),
     );
   }

@@ -145,4 +145,19 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get all => 'Все';
+
+  @override
+  String get navPets => 'Питомцы';
+
+  @override
+  String get navCalendar => 'Календарь';
+
+  @override
+  String get navProfile => 'Профиль';
+
+  @override
+  String get navAddPet => 'Добавить питомца';
+
+  @override
+  String get navAddEvent => 'Добавить событие';
 }

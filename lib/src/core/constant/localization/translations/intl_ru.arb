@@ -63,5 +63,10 @@
   "deletePetSubtitle": "Вы уверены, что хотите удалить этого питомца? Это действие нельзя будет отменить.",
   "deletePetCancel": "Отмена",
   "deletePetDelete": "Удалить",
-  "all": "Все"
+  "all": "Все",
+  "navPets": "Питомцы",
+  "navCalendar": "Календарь",
+  "navProfile": "Профиль",
+  "navAddPet": "Добавить питомца",
+  "navAddEvent": "Добавить событие"
 }

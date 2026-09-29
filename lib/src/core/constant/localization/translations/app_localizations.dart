@@ -289,6 +289,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Все'**
   String get all;
+
+  /// No description provided for @navPets.
+  ///
+  /// In ru, this message translates to:
+  /// **'Питомцы'**
+  String get navPets;
+
+  /// No description provided for @navCalendar.
+  ///
+  /// In ru, this message translates to:
+  /// **'Календарь'**
+  String get navCalendar;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль'**
+  String get navProfile;
+
+  /// No description provided for @navAddPet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить питомца'**
+  String get navAddPet;
+
+  /// No description provided for @navAddEvent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить событие'**
+  String get navAddEvent;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

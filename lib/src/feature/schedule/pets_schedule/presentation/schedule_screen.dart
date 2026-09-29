@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_app_bar/ui_app_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_popup/ui_popup.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
@@ -24,7 +25,13 @@ class ScheduleScreen extends StatefulWidget {
   State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
+class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<ScheduleScreen> {
+  @override
+  ShellTab get shellTab => ShellTab.schedule;
+
+  @override
+  void onShellAction() => _openCreateEventBottomSheet();
+
   DateTime _selectedDate = DateTime.now().withoutTime;
   int? _selectedPetId;
 
@@ -107,12 +114,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return Scaffold(
       backgroundColor: context.uiColors.grayMain,
       appBar: const UiAppBar.baseToolBar(title: 'Календарь'),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'schedule_floating_action_button',
-        onPressed: _openCreateEventBottomSheet,
-        backgroundColor: context.uiColors.orangePrimary,
-        child: Icon(Icons.add, color: context.uiColors.white),
-      ),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
