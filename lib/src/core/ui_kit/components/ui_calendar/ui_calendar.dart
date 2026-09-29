@@ -105,8 +105,25 @@ class _DateConstraintsProvider extends InheritedWidget {
   }
 }
 
+/// Управляет отображаемым месяцем [MonthCalendar] снаружи, например из собственного заголовка.
+class MonthCalendarController extends ValueNotifier<DateTime> {
+  MonthCalendarController(DateTime month) : super(month.monthStart);
+
+  void goToMonth(DateTime month) => value = month.monthStart;
+
+  void nextMonth() => value = value.addMonth(1);
+
+  void previousMonth() => value = value.subtractMonth(1);
+}
+
 class MonthCalendar extends StatefulWidget {
   final DateTime? initialMonth;
+
+  /// Внешнее управление месяцем. Если задан, `initialMonth` игнорируется.
+  final MonthCalendarController? controller;
+
+  /// Показывать ли встроенный заголовок с переключателями месяца.
+  final bool showHeader;
   final OnDateTapCallback? onDateTap;
   final CalendarStyle? style;
   final DateConstraints? dateConstraints;
@@ -116,6 +133,8 @@ class MonthCalendar extends StatefulWidget {
 
   const MonthCalendar({
     this.initialMonth,
+    this.controller,
+    this.showHeader = true,
     this.dateConstraints,
     this.onDateTap,
     this.style,
@@ -130,7 +149,61 @@ class MonthCalendar extends StatefulWidget {
 }
 
 class _MonthCalendarState extends State<MonthCalendar> {
-  late DateTime selectedMonth = widget.initialMonth ?? DateTime.now().monthStart;
+  late DateTime selectedMonth =
+      widget.controller?.value ?? widget.initialMonth ?? DateTime.now().monthStart;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller?.addListener(_onControllerChanged);
+  }
+
+  @override
+  void didUpdateWidget(MonthCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_onControllerChanged);
+      widget.controller?.addListener(_onControllerChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_onControllerChanged);
+
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    final month = widget.controller!.value;
+
+    if (month == selectedMonth) {
+      return;
+    }
+
+    setState(() {
+      selectedMonth = month;
+    });
+
+    widget.onChangeMonth?.call(selectedMonth);
+  }
+
+  void _setMonth(DateTime month) {
+    if (widget.controller != null) {
+      // Источник правды — контроллер, состояние обновится в `_onControllerChanged`.
+      widget.controller!.goToMonth(month);
+
+      return;
+    }
+
+    setState(() {
+      selectedMonth = month;
+
+      widget.onChangeMonth?.call(selectedMonth);
+    });
+  }
 
   CalendarStyle get _defaultStyle =>
       CalendarStyle(resolveDateTextColor: (_) => context.uiPalette.ink);
@@ -147,22 +220,24 @@ class _MonthCalendarState extends State<MonthCalendar> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 8),
-            widget.headerBuilder?.call(
-                  selectedMonth,
-                  _onNextMonthButtonHandler,
-                  _onPreviousMonthButtonHandler,
-                  _onNextYearButtonHandler,
-                  _onPreviousYearButtonHandler,
-                ) ??
-                _DefaultCalendarHeader(
-                  month: selectedMonth,
-                  nextYearButtonHandler: _onNextYearButtonHandler,
-                  previousYearButtonHandler: _onPreviousYearButtonHandler,
-                  nextMonthButtonHandler: _onNextMonthButtonHandler,
-                  previousMonthButtonHandler: _onPreviousMonthButtonHandler,
-                ),
-            const SizedBox(height: 12),
+            if (widget.showHeader) ...[
+              const SizedBox(height: 8),
+              widget.headerBuilder?.call(
+                    selectedMonth,
+                    _onNextMonthButtonHandler,
+                    _onPreviousMonthButtonHandler,
+                    _onNextYearButtonHandler,
+                    _onPreviousYearButtonHandler,
+                  ) ??
+                  _DefaultCalendarHeader(
+                    month: selectedMonth,
+                    nextYearButtonHandler: _onNextYearButtonHandler,
+                    previousYearButtonHandler: _onPreviousYearButtonHandler,
+                    nextMonthButtonHandler: _onNextMonthButtonHandler,
+                    previousMonthButtonHandler: _onPreviousMonthButtonHandler,
+                  ),
+              const SizedBox(height: 12),
+            ],
             _CalendarBody(
               selectedMonth: selectedMonth,
               onDateTap: widget.onDateTap,
@@ -174,37 +249,13 @@ class _MonthCalendarState extends State<MonthCalendar> {
     );
   }
 
-  void _onNextYearButtonHandler() {
-    setState(() {
-      selectedMonth = selectedMonth.addYear(1);
+  void _onNextYearButtonHandler() => _setMonth(selectedMonth.addYear(1));
 
-      widget.onChangeMonth?.call(selectedMonth);
-    });
-  }
+  void _onPreviousYearButtonHandler() => _setMonth(selectedMonth.subtractYear(1));
 
-  void _onPreviousYearButtonHandler() {
-    setState(() {
-      selectedMonth = selectedMonth.subtractYear(1);
+  void _onNextMonthButtonHandler() => _setMonth(selectedMonth.addMonth(1));
 
-      widget.onChangeMonth?.call(selectedMonth);
-    });
-  }
-
-  void _onNextMonthButtonHandler() {
-    setState(() {
-      selectedMonth = selectedMonth.addMonth(1);
-
-      widget.onChangeMonth?.call(selectedMonth);
-    });
-  }
-
-  void _onPreviousMonthButtonHandler() {
-    setState(() {
-      selectedMonth = selectedMonth.subtractMonth(1);
-
-      widget.onChangeMonth?.call(selectedMonth);
-    });
-  }
+  void _onPreviousMonthButtonHandler() => _setMonth(selectedMonth.subtractMonth(1));
 }
 
 class _DefaultCalendarHeader extends StatelessWidget {

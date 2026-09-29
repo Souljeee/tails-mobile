@@ -212,4 +212,92 @@ class AppLocalizationsRu extends AppLocalizations {
   String enterCodeDigitLabel(int index, int count) {
     return 'Цифра $index из $count';
   }
+
+  @override
+  String get scheduleToday => 'Сегодня';
+
+  @override
+  String scheduleTodayCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дела на сегодня',
+      many: '$count дел на сегодня',
+      few: '$count дела на сегодня',
+      one: '$count дело на сегодня',
+      zero: 'Нет дел на сегодня',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String scheduleEventsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count события',
+      many: '$count событий',
+      few: '$count события',
+      one: '$count событие',
+      zero: 'Нет событий',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scheduleAllDay => 'Весь день';
+
+  @override
+  String get scheduleEmptyDay => 'На этот день событий нет';
+
+  @override
+  String get schedulePreviousMonth => 'Предыдущий месяц';
+
+  @override
+  String get scheduleNextMonth => 'Следующий месяц';
+
+  @override
+  String get fetchingErrorTitle => 'Ошибка загрузки';
+
+  @override
+  String get fetchingErrorMessage => 'Повторите позднее';
+
+  @override
+  String get fetchingErrorRetry => 'Повторить';
+
+  @override
+  String get eventTypeDeworming => 'Дегельминтизация';
+
+  @override
+  String get eventTypeYearlyVaccination => 'Годовая вакцинация';
+
+  @override
+  String get eventTypeRabiesVaccination => 'Вакцинация от бешенства';
+
+  @override
+  String get eventTypeWeeklyPills => 'Недельные таблетки';
+
+  @override
+  String get eventTypeDailyPills => 'Лекарства';
+
+  @override
+  String get eventTypeGrooming => 'Уход за шерстью';
+
+  @override
+  String get eventTypeBathing => 'Купание';
+
+  @override
+  String get eventTypeWalking => 'Прогулка';
+
+  @override
+  String get eventTypeFeeding => 'Кормление';
+
+  @override
+  String get eventTypeNailTrimming => 'Стрижка когтей';
+
+  @override
+  String get eventTypeFleaTreatment => 'Обработка от блох';
+
+  @override
+  String get eventTypeCustom => 'Другое';
 }

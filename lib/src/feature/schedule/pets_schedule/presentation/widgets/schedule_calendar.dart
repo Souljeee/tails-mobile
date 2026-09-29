@@ -1,83 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_card/ui_card.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
-import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 
+/// Карточка месяца: выбранный день — accent-круг, сегодняшний — accent-обводка,
+/// под днями точки цветов питомцев, у которых есть события.
 class ScheduleCalendar extends StatelessWidget {
   final DateTime selectedDate;
+  final MonthCalendarController controller;
   final void Function(DateTime date) onDateTap;
+  final DateMarkersResolver resolveMarkers;
 
-  const ScheduleCalendar({required this.selectedDate, required this.onDateTap, super.key});
+  const ScheduleCalendar({
+    required this.selectedDate,
+    required this.controller,
+    required this.onDateTap,
+    required this.resolveMarkers,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.uiPalette;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: context.uiColors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
+      child: UiCard(
+        padding: const EdgeInsets.fromLTRB(UiSpacing.x3, UiSpacing.x3, UiSpacing.x3, UiSpacing.x2),
         child: MonthCalendar(
+          controller: controller,
+          showHeader: false,
           onDateTap: onDateTap,
           style: CalendarStyle(
-            resolveDateTextColor: (date) => selectedDate.isSameDate(date)
-                ? context.uiColors.white
-                : context.uiColors.black80,
-            resolveDateBackgroundColor: (date) => selectedDate.isSameDate(date)
-                ? context.uiColors.orangePrimary
+            resolveDateTextColor: (date) =>
+                selectedDate.isSameDate(date) ? palette.surface : palette.ink,
+            resolveDateBackgroundColor: (date) =>
+                selectedDate.isSameDate(date) ? palette.accent : Colors.transparent,
+            resolveDateBorderColor: (date) =>
+                DateTime.now().isSameDate(date) && !selectedDate.isSameDate(date)
+                ? palette.accent
                 : Colors.transparent,
+            resolveDateMarkers: resolveMarkers,
           ),
-          headerBuilder:
-              (
-                month,
-                nextMonthButtonHandler,
-                previousMonthButtonHandler,
-                nextYearButtonHandler,
-                previousYearButtonHandler,
-              ) {
-                final String formattedSelectedMonth = DateFormat.yMMMM()
-                    .format(month)
-                    .replaceAll(' г.', '')
-                    .toFirstLetterUpperCase();
-
-                return Row(
-                  children: [
-                    GestureDetector(
-                      onTap: previousMonthButtonHandler,
-                      child: SizedBox.square(
-                        dimension: 42,
-                        child: Center(
-                          child: UiSvgImage(
-                            svgPath: context.uiIcons.arrowLeft.keyName,
-                            color: context.uiColors.black100,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: Text(formattedSelectedMonth, style: context.uiFonts.text16Semibold),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: nextMonthButtonHandler,
-                      child: SizedBox.square(
-                        dimension: 42,
-                        child: Center(
-                          child: UiSvgImage(
-                            svgPath: context.uiIcons.arrowRight.keyName,
-                            color: context.uiColors.black100,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
         ),
       ),
     );

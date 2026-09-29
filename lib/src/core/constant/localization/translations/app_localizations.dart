@@ -415,6 +415,138 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Цифра {index} из {count}'**
   String enterCodeDigitLabel(int index, int count);
+
+  /// No description provided for @scheduleToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня'**
+  String get scheduleToday;
+
+  /// Подпись под заголовком календаря: число дел на сегодня
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, =0{Нет дел на сегодня} one{{count} дело на сегодня} few{{count} дела на сегодня} many{{count} дел на сегодня} other{{count} дела на сегодня}}'**
+  String scheduleTodayCount(int count);
+
+  /// Число событий выбранного дня
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, =0{Нет событий} one{{count} событие} few{{count} события} many{{count} событий} other{{count} события}}'**
+  String scheduleEventsCount(int count);
+
+  /// No description provided for @scheduleAllDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Весь день'**
+  String get scheduleAllDay;
+
+  /// No description provided for @scheduleEmptyDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'На этот день событий нет'**
+  String get scheduleEmptyDay;
+
+  /// No description provided for @schedulePreviousMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предыдущий месяц'**
+  String get schedulePreviousMonth;
+
+  /// No description provided for @scheduleNextMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следующий месяц'**
+  String get scheduleNextMonth;
+
+  /// No description provided for @fetchingErrorTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ошибка загрузки'**
+  String get fetchingErrorTitle;
+
+  /// No description provided for @fetchingErrorMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторите позднее'**
+  String get fetchingErrorMessage;
+
+  /// No description provided for @fetchingErrorRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить'**
+  String get fetchingErrorRetry;
+
+  /// No description provided for @eventTypeDeworming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дегельминтизация'**
+  String get eventTypeDeworming;
+
+  /// No description provided for @eventTypeYearlyVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Годовая вакцинация'**
+  String get eventTypeYearlyVaccination;
+
+  /// No description provided for @eventTypeRabiesVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вакцинация от бешенства'**
+  String get eventTypeRabiesVaccination;
+
+  /// No description provided for @eventTypeWeeklyPills.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недельные таблетки'**
+  String get eventTypeWeeklyPills;
+
+  /// No description provided for @eventTypeDailyPills.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лекарства'**
+  String get eventTypeDailyPills;
+
+  /// No description provided for @eventTypeGrooming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уход за шерстью'**
+  String get eventTypeGrooming;
+
+  /// No description provided for @eventTypeBathing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Купание'**
+  String get eventTypeBathing;
+
+  /// No description provided for @eventTypeWalking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прогулка'**
+  String get eventTypeWalking;
+
+  /// No description provided for @eventTypeFeeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормление'**
+  String get eventTypeFeeding;
+
+  /// No description provided for @eventTypeNailTrimming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стрижка когтей'**
+  String get eventTypeNailTrimming;
+
+  /// No description provided for @eventTypeFleaTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обработка от блох'**
+  String get eventTypeFleaTreatment;
+
+  /// No description provided for @eventTypeCustom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое'**
+  String get eventTypeCustom;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

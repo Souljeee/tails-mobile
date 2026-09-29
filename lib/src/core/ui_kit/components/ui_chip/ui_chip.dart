@@ -9,6 +9,9 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 class UiChip extends StatelessWidget {
   const UiChip({required this.label, required this.selected, this.onTap, this.leading, super.key});
 
+  /// Высота чипа (с рамкой) — область нажатия 44 pt.
+  static const double height = UiSizes.minTapTarget;
+
   final String label;
   final bool selected;
   final VoidCallback? onTap;

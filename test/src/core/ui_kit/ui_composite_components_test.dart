@@ -160,5 +160,31 @@ void main() {
       await tester.tap(find.text('15'));
       expect(tapped, DateTime(2026, 9, 15));
     });
+
+    testWidgets('контроллер переключает месяц снаружи, заголовок можно скрыть', (tester) async {
+      final controller = MonthCalendarController(DateTime(2026, 9, 17));
+      final changed = <DateTime>[];
+
+      await tester.pumpWidget(
+        uiTestApp(
+          MonthCalendar(controller: controller, showHeader: false, onChangeMonth: changed.add),
+        ),
+      );
+
+      expect(controller.value, DateTime(2026, 9));
+      expect(find.text('30'), findsOneWidget);
+
+      controller.nextMonth();
+      await tester.pump();
+
+      expect(changed, [DateTime(2026, 10)]);
+      expect(find.text('31'), findsOneWidget);
+
+      controller.goToMonth(DateTime(2026, 9, 29));
+      await tester.pump();
+
+      expect(controller.value, DateTime(2026, 9));
+      expect(find.text('30'), findsOneWidget);
+    });
   });
 }
