@@ -16,6 +16,10 @@ class PetDto extends Equatable {
   final DateTime birthday;
   final String color;
   final String image;
+
+  /// Вес в кг. Backend отдаёт поле не для всех версий API, поэтому оно необязательное.
+  @JsonKey(fromJson: _weightFromJson)
+  final double? weight;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -30,23 +34,28 @@ class PetDto extends Equatable {
     required this.image,
     required this.createdAt,
     required this.updatedAt,
+    this.weight,
   });
 
   factory PetDto.fromJson(Map<String, dynamic> json) => _$PetDtoFromJson(json);
-  
+
   Map<String, dynamic> toJson() => _$PetDtoToJson(this);
+
+  static double? _weightFromJson(dynamic weight) =>
+      weight == null ? null : double.tryParse(weight.toString());
 
   @override
   List<Object?> get props => [
-        id,
-        petType,
-        name,
-        breed,
-        gender,
-        birthday,
-        color,
-        image,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    petType,
+    name,
+    breed,
+    gender,
+    birthday,
+    color,
+    image,
+    weight,
+    createdAt,
+    updatedAt,
+  ];
 }

@@ -138,5 +138,36 @@
   "createEventNotesPlaceholder": "Добавьте детали...",
   "createEventSubmit": "Создать событие",
   "eventChipTime": "Время",
-  "timePickerClear": "Очистить"
+  "timePickerClear": "Очистить",
+  "petsOverviewTitle": "Мои питомцы",
+  "petsCount": "{count, plural, one{{count} питомец} few{{count} питомца} many{{count} питомцев} other{{count} питомца}}",
+  "@petsCount": {
+    "description": "Число питомцев в подписи под заголовком",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "petsTodayEvents": "{count, plural, =0{сегодня дел нет} one{сегодня {count} дело} few{сегодня {count} дела} many{сегодня {count} дел} other{сегодня {count} дела}}",
+  "@petsTodayEvents": {
+    "description": "Число дел на сегодня в подписи под заголовком",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "petsEmptyTitle": "Список ваших питомцев пуст",
+  "petsEmptyMessage": "Расскажите нам о ваших любимцах",
+  "notificationsLabel": "Уведомления",
+  "petAgeShortYearsMonths": "{years, plural, one{{years} год} few{{years} года} many{{years} лет} other{{years} лет}} {months} мес.",
+  "@petAgeShortYearsMonths": {
+    "description": "Возраст питомца: годы и месяцы в сокращённом виде",
+    "placeholders": {"years": {"type": "int"}, "months": {"type": "int"}}
+  },
+  "petAgeShortMonths": "{months} мес.",
+  "@petAgeShortMonths": {
+    "description": "Возраст питомца младше года",
+    "placeholders": {"months": {"type": "int"}}
+  },
+  "petWeightKg": "{weight} кг",
+  "@petWeightKg": {
+    "description": "Вес питомца в килограммах",
+    "placeholders": {"weight": {"type": "String"}}
+  },
+  "petNextEventToday": "Сегодня",
+  "petNextEventTomorrow": "Завтра"
 }

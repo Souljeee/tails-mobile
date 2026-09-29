@@ -21,6 +21,7 @@ abstract final class UiRadius {
   static const BorderRadius mdAll = BorderRadius.all(Radius.circular(md));
   static const BorderRadius lgAll = BorderRadius.all(Radius.circular(lg));
   static const BorderRadius xlAll = BorderRadius.all(Radius.circular(xl));
+  static const Radius lgTop = Radius.circular(lg);
   static const Radius xlTop = Radius.circular(xl);
   static const BorderRadius fullAll = BorderRadius.all(Radius.circular(full));
 }

@@ -351,4 +351,72 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get timePickerClear => 'Очистить';
+
+  @override
+  String get petsOverviewTitle => 'Мои питомцы';
+
+  @override
+  String petsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count питомца',
+      many: '$count питомцев',
+      few: '$count питомца',
+      one: '$count питомец',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String petsTodayEvents(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'сегодня $count дела',
+      many: 'сегодня $count дел',
+      few: 'сегодня $count дела',
+      one: 'сегодня $count дело',
+      zero: 'сегодня дел нет',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get petsEmptyTitle => 'Список ваших питомцев пуст';
+
+  @override
+  String get petsEmptyMessage => 'Расскажите нам о ваших любимцах';
+
+  @override
+  String get notificationsLabel => 'Уведомления';
+
+  @override
+  String petAgeShortYearsMonths(int years, int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: '$years лет',
+      many: '$years лет',
+      few: '$years года',
+      one: '$years год',
+    );
+    return '$_temp0 $months мес.';
+  }
+
+  @override
+  String petAgeShortMonths(int months) {
+    return '$months мес.';
+  }
+
+  @override
+  String petWeightKg(String weight) {
+    return '$weight кг';
+  }
+
+  @override
+  String get petNextEventToday => 'Сегодня';
+
+  @override
+  String get petNextEventTomorrow => 'Завтра';
 }

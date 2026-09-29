@@ -649,6 +649,72 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Очистить'**
   String get timePickerClear;
+
+  /// No description provided for @petsOverviewTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои питомцы'**
+  String get petsOverviewTitle;
+
+  /// Число питомцев в подписи под заголовком
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} питомец} few{{count} питомца} many{{count} питомцев} other{{count} питомца}}'**
+  String petsCount(int count);
+
+  /// Число дел на сегодня в подписи под заголовком
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, =0{сегодня дел нет} one{сегодня {count} дело} few{сегодня {count} дела} many{сегодня {count} дел} other{сегодня {count} дела}}'**
+  String petsTodayEvents(int count);
+
+  /// No description provided for @petsEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Список ваших питомцев пуст'**
+  String get petsEmptyTitle;
+
+  /// No description provided for @petsEmptyMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расскажите нам о ваших любимцах'**
+  String get petsEmptyMessage;
+
+  /// No description provided for @notificationsLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления'**
+  String get notificationsLabel;
+
+  /// Возраст питомца: годы и месяцы в сокращённом виде
+  ///
+  /// In ru, this message translates to:
+  /// **'{years, plural, one{{years} год} few{{years} года} many{{years} лет} other{{years} лет}} {months} мес.'**
+  String petAgeShortYearsMonths(int years, int months);
+
+  /// Возраст питомца младше года
+  ///
+  /// In ru, this message translates to:
+  /// **'{months} мес.'**
+  String petAgeShortMonths(int months);
+
+  /// Вес питомца в килограммах
+  ///
+  /// In ru, this message translates to:
+  /// **'{weight} кг'**
+  String petWeightKg(String weight);
+
+  /// No description provided for @petNextEventToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня'**
+  String get petNextEventToday;
+
+  /// No description provided for @petNextEventTomorrow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Завтра'**
+  String get petNextEventTomorrow;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

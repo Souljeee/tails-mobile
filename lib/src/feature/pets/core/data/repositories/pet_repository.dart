@@ -72,6 +72,7 @@ extension on PetDto {
     birthday: birthday,
     color: color,
     image: image,
+    weight: weight,
     createdAt: createdAt,
     updatedAt: updatedAt,
   );
@@ -110,7 +111,6 @@ extension on PetDetailsDto {
     hasCastration: hasCastration,
   );
 }
-
 
 extension on EditPetModel {
   EditPetDto toDto() => EditPetDto(

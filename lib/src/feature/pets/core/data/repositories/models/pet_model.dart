@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
-class PetModel extends Equatable{
+class PetModel extends Equatable {
   final int id;
   final PetTypeEnum petType;
   final String name;
@@ -11,6 +11,9 @@ class PetModel extends Equatable{
   final DateTime birthday;
   final String color;
   final String image;
+
+  /// Вес в кг; `null`, если backend его не вернул.
+  final double? weight;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -25,8 +28,9 @@ class PetModel extends Equatable{
     required this.image,
     required this.createdAt,
     required this.updatedAt,
+    this.weight,
   });
-  
+
   @override
   List<Object?> get props => [
     id,
@@ -37,6 +41,7 @@ class PetModel extends Equatable{
     birthday,
     color,
     image,
+    weight,
     createdAt,
     updatedAt,
   ];
