@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker_plus/flutter_picker_plus.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_shadows.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 
 class TimePickerCarouselPopup extends StatefulWidget {
   const TimePickerCarouselPopup({
@@ -41,8 +44,11 @@ class _TimePickerCarouselPopupState extends State<TimePickerCarouselPopup> {
     itemExtent: 44,
     columnPadding: EdgeInsets.zero,
     selecteds: _selecteds,
-    textStyle: context.uiFonts.text20Semibold.copyWith(color: context.uiColors.black100),
-    selectedTextStyle: context.uiFonts.text20Semibold.copyWith(color: context.uiColors.black100),
+    textStyle: context.uiFonts.monoDigits.copyWith(color: context.uiPalette.ink, fontSize: 20),
+    selectedTextStyle: context.uiFonts.monoDigits.copyWith(
+      color: context.uiPalette.ink,
+      fontSize: 20,
+    ),
     onSelect: _onSelect,
   );
 
@@ -60,10 +66,11 @@ class _TimePickerCarouselPopupState extends State<TimePickerCarouselPopup> {
   @override
   void initState() {
     super.initState();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (widget.initialHour != null && widget.initialMinute != null) {
-        final formatted = '${widget.initialHour?.toString().padLeft(2, '0')}:${widget.initialMinute?.toString().padLeft(2, '0')}';
+        final formatted =
+            '${widget.initialHour?.toString().padLeft(2, '0')}:${widget.initialMinute?.toString().padLeft(2, '0')}';
         widget.onTimeSelected(formatted);
       }
     });
@@ -81,15 +88,10 @@ class _TimePickerCarouselPopupState extends State<TimePickerCarouselPopup> {
       width: 220,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: context.uiColors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: context.uiColors.black100.withValues(alpha: 0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: context.uiPalette.surface,
+          borderRadius: UiRadius.lgAll,
+          border: Border.all(color: context.uiPalette.line),
+          boxShadow: UiShadows.e2,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -102,8 +104,11 @@ class _TimePickerCarouselPopupState extends State<TimePickerCarouselPopup> {
                   widget.onClear();
                 },
                 child: Text(
-                  'Очистить',
-                  style: context.uiFonts.text16Semibold.copyWith(color: context.uiColors.brown),
+                  context.l10n.timePickerClear,
+                  style: context.uiFonts.callout.copyWith(
+                    color: context.uiPalette.accent,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),

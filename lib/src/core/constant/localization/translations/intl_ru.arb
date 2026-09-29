@@ -121,5 +121,22 @@
   "eventTypeFeeding": "Кормление",
   "eventTypeNailTrimming": "Стрижка когтей",
   "eventTypeFleaTreatment": "Обработка от блох",
-  "eventTypeCustom": "Другое"
+  "eventTypeCustom": "Другое",
+  "cancel": "Отмена",
+  "createEventTitle": "Новое событие",
+  "createEventForWhom": "Для кого",
+  "createEventNameLabel": "Название",
+  "createEventNamePlaceholder": "Например, «Покормить кота»",
+  "createEventTypeLabel": "Тип",
+  "createEventDateLabel": "Дата",
+  "createEventDatePlaceholder": "ДД.ММ.ГГГГ",
+  "createEventTimeLabel": "Время",
+  "createEventTimePlaceholder": "чч:мм",
+  "createEventRecurrenceLabel": "Повторение",
+  "createEventNoRecurrence": "Не повторять",
+  "createEventNotesLabel": "Заметки · необязательно",
+  "createEventNotesPlaceholder": "Добавьте детали...",
+  "createEventSubmit": "Создать событие",
+  "eventChipTime": "Время",
+  "timePickerClear": "Очистить"
 }

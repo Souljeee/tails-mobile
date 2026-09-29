@@ -1,14 +1,22 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_flyout/ui_flyout.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_avatar/ui_pet_avatar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_shadows.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
+import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
@@ -16,10 +24,12 @@ import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/domain/create_event_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/uio/create_event_uio.dart';
+import 'package:tails_mobile/src/feature/schedule/create_event/presentation/utils/event_type_options.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/time_picker_carousel_popup.dart';
 
 enum CreateScheduleEventResult { success, error }
 
+/// Содержимое sheet «Новое событие». Показывается через `showUiBottomSheet`.
 class CreateScheduleEventBottomSheet extends StatefulWidget {
   final DateTime date;
   final List<PetModel> pets;
@@ -45,6 +55,9 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     CreateEventUio(date: widget.date, petId: widget.selectedPetId),
   );
 
+  /// Выбранный чип типа; если ничего не выбрано, отправляется `custom`, как и раньше.
+  final ValueNotifier<ScheduleEventTypeEnum?> _selectedType = ValueNotifier(null);
+
   final UiTextFieldController _eventTitleController = UiTextFieldController();
   final UiTextFieldController _dateController = UiTextFieldController();
   final UiTextFieldController _timeController = UiTextFieldController();
@@ -56,7 +69,6 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     super.initState();
 
     _dateController.text = DateFormat('dd.MM.yyyy').format(widget.date);
-    _recurrenceController.text = 'Не повторять';
 
     _eventTitleController.addListener(_onTitleChanged);
     _timeController.addListener(_onTimeChanged);
@@ -64,74 +76,104 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   }
 
   @override
-  Widget build(BuildContext context) {
-    // 84px — отступы из ui_popup (top: 52 + bottom: 32)
-    final maxHeight = MediaQuery.of(context).size.height * 0.85 - 84;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: maxHeight),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Flexible(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text('Новое событие', style: context.uiFonts.header24Semibold),
-                ),
-                const SizedBox(height: 16),
-                ValueListenableBuilder(
-                  valueListenable: _createEventUio,
-                  builder: (context, uio, child) {
-                    return _PetsList(
-                      pets: widget.pets,
-                      selectedPetId: uio.petId,
-                      onPetSelected: _onPetIdSelected,
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                _EventTitle(controller: _eventTitleController),
-                const SizedBox(height: 16),
-                _DateTimeFields(
-                  initialDate: widget.date,
-                  dateController: _dateController,
-                  timeController: _timeController,
-                ),
-                const SizedBox(height: 16),
-                _RecurrenceSelector(controller: _recurrenceController),
-                const SizedBox(height: 16),
-                _NotesField(controller: _notesController),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          BlocConsumer<CreateEventBloc, CreateEventState>(
-            bloc: _createEventBloc,
-            listener: (context, state) {
-              state.mapOrNull(
-                success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
-                error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
-              );
-            },
-            builder: (context, state) {
-              return ValueListenableBuilder(
-                valueListenable: _createEventUio,
-                builder: (context, uio, child) {
-                  return UiButton.main(
-                    label: 'Готово',
-                    onPressed: uio.isValid ? _createEvent : null,
-                    isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
+    if (_recurrenceController.text.isEmpty) {
+      _recurrenceController.text = context.l10n.createEventNoRecurrence;
+    }
+  }
+
+  @override
+  void dispose() {
+    _createEventBloc.close();
+    _createEventUio.dispose();
+    _selectedType.dispose();
+    _eventTitleController.dispose();
+    _dateController.dispose();
+    _timeController.dispose();
+    _recurrenceController.dispose();
+    _notesController.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
+        const SizedBox(height: UiSpacing.x4),
+        _FieldLabel(label: l10n.createEventForWhom),
+        ValueListenableBuilder(
+          valueListenable: _createEventUio,
+          builder: (context, uio, child) {
+            return _PetChips(
+              pets: widget.pets,
+              selectedPetId: uio.petId,
+              onPetSelected: _onPetIdSelected,
+            );
+          },
+        ),
+        const SizedBox(height: UiSpacing.x4),
+        UiTextField(
+          controller: _eventTitleController,
+          labelText: l10n.createEventNameLabel,
+          placeholderText: l10n.createEventNamePlaceholder,
+        ),
+        const SizedBox(height: UiSpacing.x4),
+        _FieldLabel(label: l10n.createEventTypeLabel),
+        ValueListenableBuilder(
+          valueListenable: _selectedType,
+          builder: (context, selected, child) {
+            return _TypeChips(selected: selected, onSelected: (type) => _selectedType.value = type);
+          },
+        ),
+        const SizedBox(height: UiSpacing.x4),
+        _DateTimeFields(
+          initialDate: widget.date,
+          dateController: _dateController,
+          timeController: _timeController,
+        ),
+        const SizedBox(height: UiSpacing.x4),
+        _RecurrenceSelector(controller: _recurrenceController),
+        const SizedBox(height: UiSpacing.x4),
+        UiTextField(
+          controller: _notesController,
+          labelText: l10n.createEventNotesLabel,
+          placeholderText: l10n.createEventNotesPlaceholder,
+          maxLines: 4,
+        ),
+        const SizedBox(height: UiSpacing.x5),
+        BlocConsumer<CreateEventBloc, CreateEventState>(
+          bloc: _createEventBloc,
+          listener: (context, state) {
+            state.mapOrNull(
+              success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
+              error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
+            );
+          },
+          builder: (context, state) {
+            return ListenableBuilder(
+              listenable: Listenable.merge([_createEventUio, _eventTitleController]),
+              builder: (context, child) {
+                final isValid =
+                    _createEventUio.value.isValid && _eventTitleController.text.trim().isNotEmpty;
+
+                return UiButton.main(
+                  label: l10n.createEventSubmit,
+                  onPressed: isValid ? _createEvent : null,
+                  isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
+                );
+              },
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -146,7 +188,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       recurrence: null,
       description: _notesController.text,
       petId: _createEventUio.value.petId!,
-      type: ScheduleEventTypeEnum.custom,
+      type: _selectedType.value ?? ScheduleEventTypeEnum.custom,
       isRecurring: false,
     );
 
@@ -190,22 +232,72 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   }
 }
 
-class _NotesField extends StatelessWidget {
-  const _NotesField({required this.controller});
+/// Подпись над группой чипов (для полей ввода подпись рисует сам `UiTextField`).
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel({required this.label});
 
-  final UiTextFieldController controller;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: UiSpacing.x2),
+      child: Text(label, style: context.uiFonts.callout.copyWith(color: context.uiPalette.ink2)),
+    );
+  }
+}
+
+class _PetChips extends StatelessWidget {
+  const _PetChips({required this.pets, required this.selectedPetId, required this.onPetSelected});
+
+  final List<PetModel> pets;
+  final int? selectedPetId;
+  final void Function(int petId) onPetSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: UiSpacing.x2,
+      runSpacing: UiSpacing.x2,
       children: [
-        Text(
-          'Заметки',
-          style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black60),
-        ),
-        const SizedBox(height: 8),
-        UiTextField(controller: controller, placeholderText: 'Добавьте детали...', maxLines: 5),
+        for (final pet in pets)
+          UiChip(
+            label: pet.name,
+            selected: selectedPetId == pet.id,
+            onTap: () => onPetSelected(pet.id),
+            leading: UiPetAvatar(imageUrl: pet.image, size: 24),
+          ),
+      ],
+    );
+  }
+}
+
+class _TypeChips extends StatelessWidget {
+  const _TypeChips({required this.selected, required this.onSelected});
+
+  final ScheduleEventTypeEnum? selected;
+  final ValueChanged<ScheduleEventTypeEnum> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.uiPalette;
+    final l10n = context.l10n;
+
+    return Wrap(
+      spacing: UiSpacing.x2,
+      runSpacing: UiSpacing.x2,
+      children: [
+        for (final option in eventTypeOptions)
+          UiChip(
+            label: option.labelOf(l10n),
+            selected: selected == option.type,
+            onTap: () => onSelected(option.type),
+            leading: Icon(
+              option.icon,
+              size: 18,
+              color: selected == option.type ? palette.surface : palette.ink2,
+            ),
+          ),
       ],
     );
   }
@@ -218,28 +310,25 @@ class _RecurrenceSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Повторение',
-          style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black60),
-        ),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: () {
-            // TODO: настройка повторения
-          },
-          child: IgnorePointer(
-            child: UiTextField(
-              controller: controller,
-              placeholderText: 'Повторение',
-              suffixIcon: Icons.keyboard_arrow_down_outlined,
-              suffixIconColor: context.uiColors.orangePrimary,
-            ),
+    final l10n = context.l10n;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        // TODO: настройка повторения
+      },
+      child: IgnorePointer(
+        child: UiTextField(
+          controller: controller,
+          labelText: l10n.createEventRecurrenceLabel,
+          placeholderText: l10n.createEventRecurrenceLabel,
+          // TODO: заменить временную иконку повтора на финальную из набора.
+          trailingIcon: UiSvgImage(
+            svgPath: context.uiIcons.placeholderRepeat.path,
+            color: context.uiPalette.ink2,
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -265,158 +354,123 @@ class _DateTimeFieldsState extends State<_DateTimeFields> {
   final ValueNotifier<bool> _isDatePickerOpen = ValueNotifier(false);
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Дата',
-                style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black60),
-              ),
-              const SizedBox(height: 8),
-              ValueListenableBuilder(
-                valueListenable: _isDatePickerOpen,
-                builder: (context, isOpen, child) {
-                  return UiFlyout(
-                    isOpen: isOpen,
-                    anchor: const UiFlyoutAnchor(
-                      offset: Offset(16, 0),
-                      anchorAlignment: Alignment.centerLeft,
-                      flyoutAlignment: Alignment.centerLeft,
-                    ),
-                    flyoutBuilder: (context) {
-                      return TapRegion(
-                        onTapOutside: (_) {
-                          _isDatePickerOpen.value = false;
-                        },
-                        child: _DatePickerCalendarPopup(
-                          initialDate: widget.initialDate,
-                          onDateSelected: (date) {
-                            widget.dateController.text = DateFormat('dd.MM.yyyy').format(date);
-                            _isDatePickerOpen.value = false;
-                          },
-                        ),
-                      );
-                    },
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        _isDatePickerOpen.value = true;
-                      },
-                      child: IgnorePointer(
-                        child: UiTextField(
-                          controller: widget.dateController,
-                          placeholderText: 'ДД.ММ.ГГГГ',
-                          trailingIcon: Icon(
-                            Icons.calendar_today,
-                            size: 24,
-                            color: context.uiColors.orangePrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Время',
-                style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black60),
-              ),
-              const SizedBox(height: 8),
-              ValueListenableBuilder(
-                valueListenable: _isTimePickerOpen,
-                builder: (context, isOpen, child) {
-                  return UiFlyout(
-                    isOpen: isOpen,
-                    anchor: const UiFlyoutAnchor(offset: Offset(0, 16)),
-                    flyoutBuilder: (context) {
-                      String hour = DateTime.now().hour.toString();
-                      String minute = DateTime.now().minute.toString();
+  void dispose() {
+    _isTimePickerOpen.dispose();
+    _isDatePickerOpen.dispose();
 
-                      if (widget.timeController.text.isNotEmpty) {
-                        hour = widget.timeController.text.split(':')[0];
-                        minute = widget.timeController.text.split(':')[1];
-                      }
-
-                      return TapRegion(
-                        onTapOutside: (_) {
-                          _isTimePickerOpen.value = false;
-                        },
-                        child: TimePickerCarouselPopup(
-                          initialHour: int.tryParse(hour),
-                          initialMinute: int.tryParse(minute),
-                          onClear: () {
-                            widget.timeController.clear();
-                            _isTimePickerOpen.value = false;
-                          },
-                          onTimeSelected: (time) {
-                            widget.timeController.text = time;
-                          },
-                        ),
-                      );
-                    },
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        _isTimePickerOpen.value = true;
-                      },
-                      child: IgnorePointer(
-                        child: ValueListenableBuilder(
-                          valueListenable: widget.timeController,
-                          builder: (context, value, child) {
-                            return UiTextField(
-                              controller: widget.timeController,
-                              placeholderText: 'чч:мм',
-                              inputMask: _timeInputMask,
-                              inputFilter: {'#': RegExp('[0-9]')},
-                              trailingIcon: Icon(
-                                Icons.access_time,
-                                size: 24,
-                                color: context.uiColors.orangePrimary,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+    super.dispose();
   }
-}
-
-class _EventTitle extends StatelessWidget {
-  final UiTextFieldController controller;
-
-  const _EventTitle({required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final l10n = context.l10n;
+    final iconColor = context.uiPalette.ink2;
+
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Название события',
-          style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black60),
+        Expanded(
+          child: ValueListenableBuilder(
+            valueListenable: _isDatePickerOpen,
+            builder: (context, isOpen, child) {
+              return UiFlyout(
+                isOpen: isOpen,
+                anchor: const UiFlyoutAnchor(
+                  offset: Offset(16, 0),
+                  anchorAlignment: Alignment.centerLeft,
+                  flyoutAlignment: Alignment.centerLeft,
+                ),
+                flyoutBuilder: (context) {
+                  return TapRegion(
+                    onTapOutside: (_) {
+                      _isDatePickerOpen.value = false;
+                    },
+                    child: _DatePickerCalendarPopup(
+                      initialDate: widget.initialDate,
+                      onDateSelected: (date) {
+                        widget.dateController.text = DateFormat('dd.MM.yyyy').format(date);
+                        _isDatePickerOpen.value = false;
+                      },
+                    ),
+                  );
+                },
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    _isDatePickerOpen.value = true;
+                  },
+                  child: IgnorePointer(
+                    child: UiTextField(
+                      controller: widget.dateController,
+                      labelText: l10n.createEventDateLabel,
+                      placeholderText: l10n.createEventDatePlaceholder,
+                      trailingIcon: Icon(Icons.calendar_today_outlined, size: 24, color: iconColor),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
-        const SizedBox(height: 8),
-        UiTextField(controller: controller, placeholderText: 'Например, "Покормить кота"'),
+        const SizedBox(width: UiSpacing.x4),
+        Expanded(
+          child: ValueListenableBuilder(
+            valueListenable: _isTimePickerOpen,
+            builder: (context, isOpen, child) {
+              return UiFlyout(
+                isOpen: isOpen,
+                anchor: const UiFlyoutAnchor(offset: Offset(0, 16)),
+                flyoutBuilder: (context) {
+                  String hour = DateTime.now().hour.toString();
+                  String minute = DateTime.now().minute.toString();
+
+                  if (widget.timeController.text.isNotEmpty) {
+                    hour = widget.timeController.text.split(':')[0];
+                    minute = widget.timeController.text.split(':')[1];
+                  }
+
+                  return TapRegion(
+                    onTapOutside: (_) {
+                      _isTimePickerOpen.value = false;
+                    },
+                    child: TimePickerCarouselPopup(
+                      initialHour: int.tryParse(hour),
+                      initialMinute: int.tryParse(minute),
+                      onClear: () {
+                        widget.timeController.clear();
+                        _isTimePickerOpen.value = false;
+                      },
+                      onTimeSelected: (time) {
+                        widget.timeController.text = time;
+                      },
+                    ),
+                  );
+                },
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    _isTimePickerOpen.value = true;
+                  },
+                  child: IgnorePointer(
+                    child: ValueListenableBuilder(
+                      valueListenable: widget.timeController,
+                      builder: (context, value, child) {
+                        return UiTextField(
+                          controller: widget.timeController,
+                          labelText: l10n.createEventTimeLabel,
+                          placeholderText: l10n.createEventTimePlaceholder,
+                          inputMask: _timeInputMask,
+                          inputFilter: {'#': RegExp('[0-9]')},
+                          trailingIcon: Icon(Icons.schedule, size: 24, color: iconColor),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ],
     );
   }
@@ -430,30 +484,26 @@ class _DatePickerCalendarPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.uiPalette;
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: context.uiColors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: context.uiColors.black100.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: palette.surface,
+        borderRadius: UiRadius.lgAll,
+        border: Border.all(color: palette.line),
+        boxShadow: UiShadows.e2,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x3, vertical: UiSpacing.x2),
         child: SizedBox(
           width: 320,
           child: MonthCalendar(
             initialMonth: initialDate,
             onDateTap: onDateSelected,
             headerBuilder: (month, nextMonthButtonHandler, previousMonthButtonHandler, _, _) {
-              final formattedMonth = DateFormat.yMMMM()
-                  .format(month)
-                  .replaceAll(' г.', '')
-                  .toFirstLetterUpperCase();
+              final formattedMonth = DateFormat.yMMMM(
+                Localizations.localeOf(context).toString(),
+              ).format(month).replaceAll(' г.', '').toFirstLetterUpperCase();
 
               return Row(
                 children: [
@@ -462,125 +512,31 @@ class _DatePickerCalendarPopup extends StatelessWidget {
                       formattedMonth,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: context.uiFonts.text20Semibold,
+                      style: context.uiFonts.headline.copyWith(color: palette.ink),
                     ),
                   ),
                   IconButton(
                     onPressed: previousMonthButtonHandler,
                     icon: const Icon(Icons.chevron_left),
-                    color: context.uiColors.orangePrimary,
+                    color: palette.accent,
                   ),
                   IconButton(
                     onPressed: nextMonthButtonHandler,
                     icon: const Icon(Icons.chevron_right),
-                    color: context.uiColors.orangePrimary,
+                    color: palette.accent,
                   ),
                 ],
               );
             },
             style: CalendarStyle(
-              resolveDateTextColor: (date) {
-                if (date.year == initialDate.year &&
-                    date.month == initialDate.month &&
-                    date.day == initialDate.day) {
-                  return context.uiColors.white;
-                }
-                return context.uiColors.black100;
-              },
-              resolveDateBackgroundColor: (date) {
-                if (date.year == initialDate.year &&
-                    date.month == initialDate.month &&
-                    date.day == initialDate.day) {
-                  return context.uiColors.orangePrimary;
-                }
-                return Colors.transparent;
-              },
+              resolveDateTextColor: (date) =>
+                  initialDate.isSameDate(date) ? palette.surface : palette.ink,
+              resolveDateBackgroundColor: (date) =>
+                  initialDate.isSameDate(date) ? palette.accent : Colors.transparent,
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _PetsList extends StatelessWidget {
-  final List<PetModel> pets;
-  final int? selectedPetId;
-  final void Function(int petId) onPetSelected;
-
-  const _PetsList({required this.pets, required this.selectedPetId, required this.onPetSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 110),
-      child: ListView.separated(
-        physics: const BouncingScrollPhysics(),
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: pets.length,
-        itemBuilder: (context, index) {
-          return _PetItem(
-            pet: pets[index],
-            isSelected: selectedPetId == pets[index].id,
-            onSelected: () => onPetSelected(pets[index].id),
-          );
-        },
-        separatorBuilder: (context, index) => const SizedBox(width: 12),
-      ),
-    );
-  }
-}
-
-class _PetItem extends StatelessWidget {
-  final PetModel pet;
-  final bool isSelected;
-  final void Function() onSelected;
-
-  const _PetItem({required this.pet, required this.isSelected, required this.onSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox.square(
-          dimension: 80,
-          child: GestureDetector(
-            onTap: onSelected,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: context.uiColors.white,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? context.uiColors.orangePrimary : Colors.transparent,
-                  width: 2,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(2),
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: CachedNetworkImage(
-                      imageUrl: pet.image,
-                      width: 72,
-                      height: 72,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          pet.name,
-          style: context.uiFonts.text14Regular.copyWith(
-            color: isSelected ? context.uiColors.orangePrimary : context.uiColors.black100,
-          ),
-        ),
-      ],
     );
   }
 }

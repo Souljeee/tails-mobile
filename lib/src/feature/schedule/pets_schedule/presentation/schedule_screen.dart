@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_errors/ui_fetching_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_button/ui_icon_button.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_popup/ui_popup.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_top_bar/ui_top_bar.dart';
@@ -85,9 +85,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
   }
 
   Future<void> _openCreateEventBottomSheet() async {
-    final result = await showUiPopup<CreateScheduleEventResult>(
+    final result = await showUiBottomSheet<CreateScheduleEventResult>(
       context: context,
-      child: CreateScheduleEventBottomSheet(
+      builder: (_) => CreateScheduleEventBottomSheet(
         date: _selectedDate,
         pets: _petsBloc.state.mapOrNull<List<PetModel>?>(success: (state) => state.pets) ?? [],
         selectedPetId: _selectedPetId,

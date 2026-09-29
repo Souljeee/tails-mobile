@@ -547,6 +547,108 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Другое'**
   String get eventTypeCustom;
+
+  /// No description provided for @cancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get cancel;
+
+  /// No description provided for @createEventTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое событие'**
+  String get createEventTitle;
+
+  /// No description provided for @createEventForWhom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для кого'**
+  String get createEventForWhom;
+
+  /// No description provided for @createEventNameLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название'**
+  String get createEventNameLabel;
+
+  /// No description provided for @createEventNamePlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, «Покормить кота»'**
+  String get createEventNamePlaceholder;
+
+  /// No description provided for @createEventTypeLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип'**
+  String get createEventTypeLabel;
+
+  /// No description provided for @createEventDateLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата'**
+  String get createEventDateLabel;
+
+  /// No description provided for @createEventDatePlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'ДД.ММ.ГГГГ'**
+  String get createEventDatePlaceholder;
+
+  /// No description provided for @createEventTimeLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Время'**
+  String get createEventTimeLabel;
+
+  /// No description provided for @createEventTimePlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'чч:мм'**
+  String get createEventTimePlaceholder;
+
+  /// No description provided for @createEventRecurrenceLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторение'**
+  String get createEventRecurrenceLabel;
+
+  /// No description provided for @createEventNoRecurrence.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не повторять'**
+  String get createEventNoRecurrence;
+
+  /// No description provided for @createEventNotesLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заметки · необязательно'**
+  String get createEventNotesLabel;
+
+  /// No description provided for @createEventNotesPlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте детали...'**
+  String get createEventNotesPlaceholder;
+
+  /// No description provided for @createEventSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Создать событие'**
+  String get createEventSubmit;
+
+  /// No description provided for @eventChipTime.
+  ///
+  /// In ru, this message translates to:
+  /// **'Время'**
+  String get eventChipTime;
+
+  /// No description provided for @timePickerClear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Очистить'**
+  String get timePickerClear;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

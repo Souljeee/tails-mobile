@@ -300,4 +300,55 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get eventTypeCustom => 'Другое';
+
+  @override
+  String get cancel => 'Отмена';
+
+  @override
+  String get createEventTitle => 'Новое событие';
+
+  @override
+  String get createEventForWhom => 'Для кого';
+
+  @override
+  String get createEventNameLabel => 'Название';
+
+  @override
+  String get createEventNamePlaceholder => 'Например, «Покормить кота»';
+
+  @override
+  String get createEventTypeLabel => 'Тип';
+
+  @override
+  String get createEventDateLabel => 'Дата';
+
+  @override
+  String get createEventDatePlaceholder => 'ДД.ММ.ГГГГ';
+
+  @override
+  String get createEventTimeLabel => 'Время';
+
+  @override
+  String get createEventTimePlaceholder => 'чч:мм';
+
+  @override
+  String get createEventRecurrenceLabel => 'Повторение';
+
+  @override
+  String get createEventNoRecurrence => 'Не повторять';
+
+  @override
+  String get createEventNotesLabel => 'Заметки · необязательно';
+
+  @override
+  String get createEventNotesPlaceholder => 'Добавьте детали...';
+
+  @override
+  String get createEventSubmit => 'Создать событие';
+
+  @override
+  String get eventChipTime => 'Время';
+
+  @override
+  String get timePickerClear => 'Очистить';
 }
