@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:tails_mobile/src/core/ui_kit/colors/ui_color_scheme.dart';
+import 'package:tails_mobile/src/core/ui_kit/colors/ui_palette.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_form_field/ui_form_field.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_validators.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_motion.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 
 class UiTextField extends StatefulWidget {
   const UiTextField({
@@ -20,6 +24,7 @@ class UiTextField extends StatefulWidget {
     this.inputMaskLazy = true,
     this.errorTextColor,
     this.labelText,
+    this.helperText,
     this.labelMaxLines,
     this.placeholderText,
     this.focusNode,
@@ -65,7 +70,12 @@ class UiTextField extends StatefulWidget {
   final Map<String, RegExp>? inputFilter;
   final bool inputMaskLazy;
   final Color? errorTextColor;
+
+  /// Подпись над полем.
   final String? labelText;
+
+  /// Подсказка под полем.
+  final String? helperText;
   final int? labelMaxLines;
   final String? placeholderText;
   final TextInputType? keyboardType;
@@ -101,67 +111,32 @@ class UiTextField extends StatefulWidget {
 }
 
 class _UiTextFieldState extends State<UiTextField> {
-  bool _pressed = false;
   FocusNode? _focusNode;
   late UiTextFieldController _controller = widget.controller;
   VoidCallback? _controllerListener;
 
   bool get _hasFocus => _focusNode?.hasFocus ?? false;
 
-  bool get _scaleLabel => _hasFocus || (_controller.text.isNotEmpty);
+  bool get _isEnabled => widget.enabled ?? true;
 
-  EdgeInsets get _labelPadding => EdgeInsets.only(top: _scaleLabel ? 11 : 23, left: 16);
+  // Показываем ошибку только если поле было «тронуто».
+  bool get _hasError =>
+      _controller.touched && _controller.validators.hasValidationMessage(_controller.text);
 
-  TextStyle get _labelStyle {
-    final enabled = widget.enabled ?? true;
-    final baseStyle = _scaleLabel ? context.uiFonts.text12Regular : context.uiFonts.text16Regular;
-    final color = enabled
-        ? context.uiColors.black40
-        : context.uiColors.black40.withValues(alpha: 0.5);
-
-    return baseStyle.copyWith(color: color);
-  }
-
-  Set<_InputState> get _currentStates {
-    final states = <_InputState>{};
-
-    if (_hasFocus) {
-      states.add(_InputState.focused);
+  BorderSide _borderSide(UiPalette palette) {
+    if (_hasError) {
+      return BorderSide(color: palette.danger, width: 2);
     }
 
-    if (!(widget.enabled ?? true)) {
-      states.add(_InputState.disabled);
+    if (_hasFocus || widget.alwaysShowBorder) {
+      return BorderSide(color: palette.accent, width: 2);
     }
 
-    // Показываем ошибку только если поле было "тронуто"
-    if (_controller.touched &&
-        widget.controller.validators.hasValidationMessage(_controller.text)) {
-      states.add(_InputState.error);
+    if (!_isEnabled) {
+      return BorderSide(color: palette.line);
     }
 
-    if (widget.enabled ?? true) {
-      states.add(_pressed ? _InputState.pressed : _InputState.static);
-    }
-
-    return states;
-  }
-
-  BorderSide get _borderSide {
-    if (widget.alwaysShowBorder) {
-      if (_currentStates.contains(_InputState.error)) {
-        return BorderSide(color: context.uiColors.red);
-      } else {
-        return BorderSide(color: context.uiColors.brown);
-      }
-    }
-
-    if (_currentStates.contains(_InputState.error)) {
-      return BorderSide(color: context.uiColors.red);
-    } else if (_currentStates.contains(_InputState.focused)) {
-      return BorderSide(color: context.uiColors.brown);
-    }
-
-    return BorderSide.none;
+    return BorderSide(color: palette.controlLine);
   }
 
   @override
@@ -180,7 +155,7 @@ class _UiTextFieldState extends State<UiTextField> {
       if (!_hasFocus && _controller.text.isNotEmpty) {
         _controller.markAsTouched();
       }
-      setState(() {}); // Rebuild when focus changes, to reset position of label
+      setState(() {}); // Rebuild when focus changes, to update the border
     });
   }
 
@@ -210,150 +185,103 @@ class _UiTextFieldState extends State<UiTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.uiColorScheme;
-    final themeTypography = context.uiFonts;
-    final enabled = widget.enabled ?? true;
+    final palette = context.uiPalette;
+    final fonts = context.uiFonts;
+    final enabled = _isEnabled;
+    final borderSide = _borderSide(palette);
+    final border = OutlineInputBorder(borderRadius: UiRadius.mdAll, borderSide: borderSide);
 
-    // Показываем ошибки только если поле было "тронуто"
-    final bool hasValidationErrors =
-        _controller.touched && _controller.validators.hasValidationMessage(_controller.text);
+    // Ошибку под полем показываем только когда нет ограничения длины (счётчик занимает место).
+    final errorText = _hasError && widget.maxLength == null ? _getErrorText() : null;
+    final showFocusRing = _hasFocus && !_hasError;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        GestureDetector(
-          onTapDown: (_) => setState(() => _pressed = true),
-          onTapUp: (_) => setState(() => _pressed = false),
-          onTapCancel: () => setState(() => _pressed = false),
-          behavior: HitTestBehavior.translucent,
-          child: Stack(
-            children: [
-              TextField(
-                textCapitalization: widget.capitalization,
-                onTap: widget.onTap,
-                onChanged: (value) {
-                  // Помечаем поле как "тронутое" при начале ввода
-                  if (!_controller.touched) {
-                    _controller.markAsTouched();
-                  }
-                  widget.onChanged?.call(value);
-                },
-                onSubmitted: widget.onSubmitted,
-                onEditingComplete: widget.onEditingComplete,
-                textInputAction: widget.textInputAction,
-                enabled: widget.enabled,
-                autofocus: widget.autofocus,
-                readOnly: widget.readOnly,
-                enableSuggestions: widget.enableSuggestions,
-                autocorrect: widget.autocorrect,
-                obscureText: widget.obscureText,
-                controller: _controller,
-                focusNode: _focusNode,
-                keyboardType: widget.keyboardType,
-                maxLengthEnforcement: widget.maxLengthEnforcement,
-                maxLines: widget.maxLines,
-                minLines: widget.minLines,
-                cursorColor: colors.black100,
-                style:
-                    widget.inputTextStyle ??
-                    themeTypography.text16Regular.copyWith(
-                      color: enabled ? colors.black100 : colors.black100.withValues(alpha: 0.5),
-                    ),
-                textAlignVertical: TextAlignVertical.bottom,
-                decoration: InputDecoration(
-                  isDense: true,
-                  hintText: widget.labelText == null ? widget.placeholderText : null,
-                  hintMaxLines: widget.labelMaxLines,
-                  hintStyle:
-                      widget.placeholderStyle ??
-                      themeTypography.text16Regular.copyWith(
-                        color: colors.black50,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  prefixIcon: widget.trailingIcon == null
-                      ? null
-                      : GestureDetector(onTap: widget.onTrailingTap, child: widget.trailingIcon),
-                  prefixIconConstraints: widget.trailingIcon == null
-                      ? null
-                      : widget.trailingConstraints,
-                  // prefix: GestureDetector(
-                  //   onTap: widget.onTrailingTap,
-                  //   child: widget.trailingIcon,
-                  // ),
-                  //prefixText: '+7',
-                  //prefixIconConstraints: const BoxConstraints(minWidth: 44, maxWidth: 44, minHeight: 44, maxHeight: 44),
-                  suffixIcon: widget.secondaryText == null && widget.suffixIcon == null
-                      ? null
-                      : _SuffixWidget(
-                          secondaryText: widget.secondaryText,
-                          suffixIcon: widget.suffixIcon,
-                          hasFocus: _hasFocus,
-                          suffixIconColor: widget.suffixIconColor,
-                          onSuffixTap: widget.onSuffixTap,
-                          alwaysShowTrailing: widget.alwaysShowTrailing,
-                        ),
-                  filled: true,
-                  fillColor:
-                      widget.fillColor ??
-                      (enabled ? colors.black5 : colors.black5.withValues(alpha: 0.5)),
-                  contentPadding: widget.labelText != null
-                      ? const EdgeInsets.fromLTRB(16, 31, 16, 11)
-                      : const EdgeInsets.fromLTRB(16, 21, 16, 21),
-                  disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(48),
-                    borderSide: _borderSide,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(48),
-                    borderSide: _borderSide,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(48),
-                    borderSide: _borderSide,
-                  ),
-                ),
-                inputFormatters: [
-                  if (widget.maxLength != null) LengthLimitingTextInputFormatter(widget.maxLength),
-                  MaskTextInputFormatter(
-                    initialText: _controller.text,
-                    mask: widget.inputMask,
-                    filter: widget.inputFilter,
-                    type: widget.inputMaskLazy
-                        ? MaskAutoCompletionType.lazy
-                        : MaskAutoCompletionType.eager,
-                  ),
-                  ...widget.trailingFormatters,
-                ],
-              ),
-              if (widget.labelText != null)
-                IgnorePointer(
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: _labelPadding,
-                    child: AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 200),
-                      style: _labelStyle,
-                      child: Text(
-                        widget.labelText ?? '',
-                        maxLines: widget.labelMaxLines,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+    return UiFormField(
+      label: widget.labelText,
+      helperText: widget.helperText,
+      errorText: errorText,
+      child: AnimatedContainer(
+        duration: UiMotion.base,
+        curve: UiMotion.curve,
+        decoration: BoxDecoration(
+          borderRadius: UiRadius.mdAll,
+          boxShadow: [
+            if (showFocusRing) BoxShadow(color: palette.accentTint, spreadRadius: UiSpacing.x1),
+          ],
         ),
-        if (hasValidationErrors && widget.maxLength == null)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              _getErrorText(),
-              style: themeTypography.text14Medium.copyWith(color: colors.red),
+        child: TextField(
+          textCapitalization: widget.capitalization,
+          onTap: widget.onTap,
+          onChanged: (value) {
+            // Помечаем поле как "тронутое" при начале ввода
+            if (!_controller.touched) {
+              _controller.markAsTouched();
+            }
+            widget.onChanged?.call(value);
+          },
+          onSubmitted: widget.onSubmitted,
+          onEditingComplete: widget.onEditingComplete,
+          textInputAction: widget.textInputAction,
+          enabled: widget.enabled,
+          autofocus: widget.autofocus,
+          readOnly: widget.readOnly,
+          enableSuggestions: widget.enableSuggestions,
+          autocorrect: widget.autocorrect,
+          obscureText: widget.obscureText,
+          controller: _controller,
+          focusNode: _focusNode,
+          keyboardType: widget.keyboardType,
+          maxLengthEnforcement: widget.maxLengthEnforcement,
+          maxLines: widget.maxLines,
+          minLines: widget.minLines,
+          cursorColor: palette.accent,
+          style:
+              widget.inputTextStyle ??
+              fonts.body.copyWith(color: enabled ? palette.ink : palette.ink3),
+          decoration: InputDecoration(
+            isDense: true,
+            hintText: widget.placeholderText,
+            hintMaxLines: widget.labelMaxLines,
+            hintStyle:
+                widget.placeholderStyle ??
+                fonts.body.copyWith(color: palette.ink3, overflow: TextOverflow.ellipsis),
+            prefixIcon: widget.trailingIcon == null
+                ? null
+                : GestureDetector(onTap: widget.onTrailingTap, child: widget.trailingIcon),
+            prefixIconConstraints: widget.trailingIcon == null ? null : widget.trailingConstraints,
+            suffixIcon: widget.secondaryText == null && widget.suffixIcon == null
+                ? null
+                : _SuffixWidget(
+                    secondaryText: widget.secondaryText,
+                    suffixIcon: widget.suffixIcon,
+                    hasFocus: _hasFocus,
+                    suffixIconColor: widget.suffixIconColor,
+                    onSuffixTap: widget.onSuffixTap,
+                    alwaysShowTrailing: widget.alwaysShowTrailing,
+                  ),
+            filled: true,
+            fillColor: widget.fillColor ?? (enabled ? palette.surface : palette.sunken),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: UiSpacing.x4,
+              vertical: UiSpacing.x4,
             ),
+            disabledBorder: border,
+            enabledBorder: border,
+            focusedBorder: border,
           ),
-      ],
+          inputFormatters: [
+            if (widget.maxLength != null) LengthLimitingTextInputFormatter(widget.maxLength),
+            MaskTextInputFormatter(
+              initialText: _controller.text,
+              mask: widget.inputMask,
+              filter: widget.inputFilter,
+              type: widget.inputMaskLazy
+                  ? MaskAutoCompletionType.lazy
+                  : MaskAutoCompletionType.eager,
+            ),
+            ...widget.trailingFormatters,
+          ],
+        ),
+      ),
     );
   }
 
@@ -396,7 +324,7 @@ class _SuffixWidget extends StatelessWidget {
               child: Text(
                 secondaryText!,
                 overflow: TextOverflow.ellipsis,
-                style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.black40),
+                style: context.uiFonts.bodyBold.copyWith(color: context.uiPalette.ink),
               ),
             ),
           if (suffixIcon == null) const SizedBox(width: 12),
@@ -404,7 +332,7 @@ class _SuffixWidget extends StatelessWidget {
             IconButton(
               padding: EdgeInsets.zero,
               onPressed: onSuffixTap,
-              icon: Icon(suffixIcon, size: 28, color: suffixIconColor ?? context.uiColors.black100),
+              icon: Icon(suffixIcon, size: 24, color: suffixIconColor ?? context.uiPalette.ink2),
             ),
         ],
       );
@@ -413,5 +341,3 @@ class _SuffixWidget extends StatelessWidget {
     return const SizedBox.shrink();
   }
 }
-
-enum _InputState { focused, disabled, pressed, error, static }

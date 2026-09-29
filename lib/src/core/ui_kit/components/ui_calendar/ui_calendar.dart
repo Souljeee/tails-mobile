@@ -11,6 +11,9 @@ typedef OnDateTapCallback = void Function(DateTime date);
 typedef OnMonthChangeCallback = void Function(DateTime date);
 typedef DateColorResolver = Color Function(DateTime date);
 typedef ShowBadgeResolver = bool Function(DateTime date);
+
+/// Возвращает цвета маркеров событий под числом (обычно цвета питомцев).
+typedef DateMarkersResolver = List<Color> Function(DateTime date);
 typedef CalendarHeaderBuilder =
     Widget Function(
       DateTime month,
@@ -34,6 +37,7 @@ class CalendarStyle extends Equatable {
   final DateColorResolver? resolveDateTextColor;
   final DateColorResolver? resolveDateBackgroundColor;
   final DateColorResolver? resolveDateBorderColor;
+  final DateMarkersResolver? resolveDateMarkers;
   final Color? iconBackgroundColor;
   final Color? iconColor;
   final Color? backgroundColor;
@@ -42,6 +46,7 @@ class CalendarStyle extends Equatable {
     this.resolveDateTextColor,
     this.resolveDateBackgroundColor,
     this.resolveDateBorderColor,
+    this.resolveDateMarkers,
     this.iconBackgroundColor,
     this.iconColor,
     this.backgroundColor,
@@ -52,6 +57,7 @@ class CalendarStyle extends Equatable {
     resolveDateTextColor,
     resolveDateBackgroundColor,
     resolveDateBorderColor,
+    resolveDateMarkers,
     iconBackgroundColor,
     iconColor,
     backgroundColor,
@@ -127,7 +133,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
   late DateTime selectedMonth = widget.initialMonth ?? DateTime.now().monthStart;
 
   CalendarStyle get _defaultStyle =>
-      CalendarStyle(resolveDateTextColor: (_) => context.uiColors.black50);
+      CalendarStyle(resolveDateTextColor: (_) => context.uiPalette.ink);
 
   DateConstraints get _defaultConstraints => const DateConstraints();
 
@@ -225,7 +231,10 @@ class _DefaultCalendarHeader extends StatelessWidget {
 
     return Row(
       children: [
-        Text(formattedSelectedMonth, style: context.uiFonts.text20Semibold),
+        Text(
+          formattedSelectedMonth,
+          style: context.uiFonts.headline.copyWith(color: context.uiPalette.ink),
+        ),
         const Spacer(),
         _CalendarHeaderButton(
           iconPath: context.uiIcons.doubleArrowLeft.keyName,
@@ -262,9 +271,9 @@ class _CalendarHeaderButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox.square(
-        dimension: 42,
+        dimension: 44,
         child: Center(
-          child: UiSvgImage(svgPath: iconPath, color: context.uiColors.orangePrimary),
+          child: UiSvgImage(svgPath: iconPath, color: context.uiPalette.accent),
         ),
       ),
     );
@@ -315,9 +324,11 @@ class _CalendarBodyState extends State<_CalendarBody> {
               children: daysOfWeek
                   .map(
                     (day) => Text(
-                      day,
-                      style: context.uiFonts.text14Regular.copyWith(
-                        color: context.uiColors.black50,
+                      day.toUpperCase(),
+                      style: context.uiFonts.monoEyebrow.copyWith(
+                        color: context.uiPalette.ink3,
+                        fontSize: 12,
+                        letterSpacing: 0.6,
                       ),
                     ),
                   )
@@ -396,7 +407,15 @@ class _DateItemState extends State<_DateItem> {
     }
 
     return _CalendarStyleProvider.of(context).resolveDateTextColor?.call(widget.date) ??
-        context.uiColors.black50;
+        context.uiPalette.ink;
+  }
+
+  List<Color> get _markers {
+    if (!widget.isActiveMonth) {
+      return const [];
+    }
+
+    return _CalendarStyleProvider.of(context).resolveDateMarkers?.call(widget.date) ?? const [];
   }
 
   @override
@@ -404,26 +423,64 @@ class _DateItemState extends State<_DateItem> {
     return GestureDetector(
       onTap: widget.isActiveMonth && widget.onTap != null ? () => widget.onTap!(widget.date) : null,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        height: 36,
-        margin: const EdgeInsets.all(4),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: _dateBackgroundColor,
-          shape: BoxShape.circle,
-          border: Border.all(color: _dateBorderColor, width: 2),
-        ),
-        duration: const Duration(milliseconds: 100),
-        child: Stack(
-          fit: StackFit.expand,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            AnimatedDefaultTextStyle(
+            AnimatedContainer(
+              height: 36,
+              width: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: _dateBackgroundColor,
+                shape: BoxShape.circle,
+                border: Border.all(color: _dateBorderColor, width: 2),
+              ),
               duration: const Duration(milliseconds: 100),
-              style: context.uiFonts.text16Semibold.copyWith(color: _dateTextColor),
-              child: Center(child: Text(widget.date.day.toString())),
+              child: AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 100),
+                style: context.uiFonts.monoDigits.copyWith(
+                  color: _dateTextColor,
+                  fontWeight: FontWeight.w600,
+                ),
+                child: Text(widget.date.day.toString()),
+              ),
             ),
+            const SizedBox(height: 2),
+            _DateMarkers(colors: _markers),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Ряд маленьких точек под числом; занимает место и когда маркеров нет.
+class _DateMarkers extends StatelessWidget {
+  final List<Color> colors;
+
+  const _DateMarkers({required this.colors});
+
+  static const int _maxMarkers = 3;
+  static const double _dotSize = 5;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: _dotSize,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (final color in colors.take(_maxMarkers))
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1),
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                child: const SizedBox.square(dimension: _dotSize),
+              ),
+            ),
+        ],
       ),
     );
   }

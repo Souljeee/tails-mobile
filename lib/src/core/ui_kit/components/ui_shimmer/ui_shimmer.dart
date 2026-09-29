@@ -14,8 +14,7 @@ class UiKitShimmer extends StatefulWidget {
   UiKitShimmerState createState() => UiKitShimmerState();
 }
 
-class UiKitShimmerState extends State<UiKitShimmer>
-    with SingleTickerProviderStateMixin {
+class UiKitShimmerState extends State<UiKitShimmer> with SingleTickerProviderStateMixin {
   late AnimationController _shimmerController;
 
   @override
@@ -33,24 +32,18 @@ class UiKitShimmerState extends State<UiKitShimmer>
   }
 
   LinearGradient get gradient => LinearGradient(
-    colors: const [Color(0xFFEBEBF4), Color(0xFFF4F4F4), Color(0xFFEBEBF4)],
+    colors: [context.uiPalette.line, context.uiPalette.sunken, context.uiPalette.line],
     stops: const [0.1, 0.3, 0.4],
     begin: const Alignment(-1.0, -0.3),
     end: const Alignment(1.0, 0.3),
-    transform: _SlidingGradientTransform(
-      slidePercent: _shimmerController.value,
-    ),
+    transform: _SlidingGradientTransform(slidePercent: _shimmerController.value),
   );
 
-  bool get isSized =>
-      (context.findRenderObject() as RenderBox?)?.hasSize ?? false;
+  bool get isSized => (context.findRenderObject() as RenderBox?)?.hasSize ?? false;
 
   Size get size => (context.findRenderObject()! as RenderBox).size;
 
-  Offset getDescendantOffset({
-    required RenderBox descendant,
-    Offset offset = Offset.zero,
-  }) {
+  Offset getDescendantOffset({required RenderBox descendant, Offset offset = Offset.zero}) {
     final shimmerBox = context.findRenderObject() as RenderBox?;
     return descendant.localToGlobal(offset, ancestor: shimmerBox);
   }
@@ -158,7 +151,7 @@ class _UiKitShimmerLoadingState extends State<UiKitShimmerLoading> {
                 width: widget.width,
                 height: widget.height,
                 decoration: BoxDecoration(
-                  color: context.uiColors.black5,
+                  color: context.uiPalette.sunken,
                   borderRadius: widget.borderRadius,
                 ),
               );
