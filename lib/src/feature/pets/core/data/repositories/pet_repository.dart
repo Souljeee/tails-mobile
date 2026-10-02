@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/edit_p
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_details_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/pet_color_store.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/add_pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/edit_pet_model.dart';
@@ -17,24 +18,30 @@ import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
 class PetRepository {
   final PetsRemoteDataSource _petsRemoteDataSource;
+  final PetColorStore? _petColorStore;
 
   final _eventStreamController = StreamController<PetsRepositoryEventsEvent>.broadcast();
 
   Stream<PetsRepositoryEventsEvent> get eventStream => _eventStreamController.stream;
 
-  PetRepository({required PetsRemoteDataSource petsRemoteDataSource})
-    : _petsRemoteDataSource = petsRemoteDataSource;
+  PetRepository({required PetsRemoteDataSource petsRemoteDataSource, PetColorStore? petColorStore})
+    : _petsRemoteDataSource = petsRemoteDataSource,
+      _petColorStore = petColorStore;
 
   Future<List<PetModel>> getPets() async {
     final pets = await _petsRemoteDataSource.getPets();
 
-    return pets.map((pet) => pet.toModel()).toList();
+    final colors = await _petColorStore?.sync(pets.map((pet) => pet.id));
+
+    return pets.map((pet) => pet.toModel(colorIndex: colors?[pet.id] ?? 0)).toList();
   }
 
   Future<PetDetailsModel> getPetDetails({required int id}) async {
     final petDetails = await _petsRemoteDataSource.getPetDetails(id: id);
 
-    return petDetails.toModel();
+    final colorIndex = await _petColorStore?.colorIndexFor(petDetails.id) ?? 0;
+
+    return petDetails.toModel(colorIndex: colorIndex);
   }
 
   Future<void> addPet({required AddPetModel model, required File? image}) async {
@@ -63,7 +70,7 @@ class PetRepository {
 }
 
 extension on PetDto {
-  PetModel toModel() => PetModel(
+  PetModel toModel({int colorIndex = 0}) => PetModel(
     id: id,
     petType: petType,
     name: name,
@@ -75,6 +82,7 @@ extension on PetDto {
     weight: weight,
     createdAt: createdAt,
     updatedAt: updatedAt,
+    colorIndex: colorIndex,
   );
 }
 
@@ -96,7 +104,7 @@ extension on BreedDto {
 }
 
 extension on PetDetailsDto {
-  PetDetailsModel toModel() => PetDetailsModel(
+  PetDetailsModel toModel({int colorIndex = 0}) => PetDetailsModel(
     id: id,
     petType: petType,
     name: name,
@@ -109,6 +117,7 @@ extension on PetDetailsDto {
     createdAt: createdAt,
     updatedAt: updatedAt,
     hasCastration: hasCastration,
+    colorIndex: colorIndex,
   );
 }
 

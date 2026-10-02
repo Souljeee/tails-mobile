@@ -17,6 +17,9 @@ class PetModel extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  /// Индекс цвета питомца в палитре (`UiPalette.petColor`); одинаков на всех экранах.
+  final int colorIndex;
+
   const PetModel({
     required this.id,
     required this.petType,
@@ -29,6 +32,7 @@ class PetModel extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     this.weight,
+    this.colorIndex = 0,
   });
 
   @override
@@ -44,5 +48,6 @@ class PetModel extends Equatable {
     weight,
     createdAt,
     updatedAt,
+    colorIndex,
   ];
 }

@@ -157,7 +157,7 @@ class _PetDetailsSheet extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: UiPetTag(
             label: '${pet.petType.getLocalizedName(l10n)} · ${pet.breed.name}',
-            color: palette.accent,
+            color: palette.petColor(pet.colorIndex),
           ),
         ),
         const SizedBox(height: UiSpacing.x5),
@@ -215,7 +215,7 @@ class _PetDetailsSheet extends StatelessWidget {
               key: ValueKey('${event.id}_${event.date}'),
               event: event,
               petImage: pet.image,
-              petColor: palette.accent,
+              petColor: palette.petColor(pet.colorIndex),
             ),
             const SizedBox(height: UiSpacing.x3),
           ],

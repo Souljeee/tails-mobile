@@ -18,6 +18,7 @@ import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/pet_color_store.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/schedule_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
@@ -35,11 +36,7 @@ import 'package:tails_mobile/src/feature/settings/data/app_settings_repository.d
 /// {@endtemplate}
 final class CompositionRoot {
   /// {@macro composition_root}
-  const CompositionRoot({
-    required this.config,
-    required this.logger,
-    required this.errorReporter,
-  });
+  const CompositionRoot({required this.config, required this.logger, required this.errorReporter});
 
   /// Application configuration
   final ApplicationConfig config;
@@ -79,10 +76,7 @@ final class CompositionRoot {
 /// {@endtemplate}
 final class CompositionResult {
   /// {@macro composition_result}
-  const CompositionResult({
-    required this.dependencies,
-    required this.millisecondsSpent,
-  });
+  const CompositionResult({required this.dependencies, required this.millisecondsSpent});
 
   /// The dependencies container
   final DependenciesContainer dependencies;
@@ -91,7 +85,8 @@ final class CompositionResult {
   final int millisecondsSpent;
 
   @override
-  String toString() => '$CompositionResult('
+  String toString() =>
+      '$CompositionResult('
       'dependencies: $dependencies, '
       'millisecondsSpent: $millisecondsSpent'
       ')';
@@ -186,11 +181,16 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final petsRemoteDataSource = PetsRemoteDataSource(restClient: restClient);
 
-    final petRepository = PetRepository(petsRemoteDataSource: petsRemoteDataSource);
+    final petRepository = PetRepository(
+      petsRemoteDataSource: petsRemoteDataSource,
+      petColorStore: PetColorStore(preferences: sharedPreferences),
+    );
 
     final scheduleRemoteDataSource = ScheduleRemoteDataSource(restClient: restClient);
 
-    final scheduleRepository = ScheduleRepository(scheduleRemoteDataSource: scheduleRemoteDataSource);
+    final scheduleRepository = ScheduleRepository(
+      scheduleRemoteDataSource: scheduleRemoteDataSource,
+    );
 
     return DependenciesContainer(
       logger: logger,
@@ -212,10 +212,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 Future<RestClient> _initNotAuthClient(ApplicationConfig config) async {
   final client = http.Client();
 
-  final restClient = RestClientHttp(
-    baseUrl: config.baseUrl,
-    client: client,
-  );
+  final restClient = RestClientHttp(baseUrl: config.baseUrl, client: client);
 
   return restClient;
 }
@@ -237,19 +234,13 @@ Future<RestClient> _initRestClient(
     ],
   );
 
-  final restClient = RestClientHttp(
-    baseUrl: config.baseUrl,
-    client: client,
-  );
+  final restClient = RestClientHttp(baseUrl: config.baseUrl, client: client);
 
   return restClient;
 }
 
 Future<RestClient> _initRefreshTokenClient(ApplicationConfig config) async {
-  return RestClientHttp(
-    baseUrl: config.baseUrl,
-    client: http.Client(),
-  );
+  return RestClientHttp(baseUrl: config.baseUrl, client: http.Client());
 }
 
 /// {@template app_logger_factory}

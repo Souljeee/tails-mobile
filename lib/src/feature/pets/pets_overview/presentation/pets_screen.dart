@@ -212,7 +212,7 @@ class _PetsSliver extends StatelessWidget {
           return PetOverviewCard(
             key: ValueKey(item.pet.id),
             overview: item,
-            petColor: palette.petColor(index),
+            petColor: palette.petColor(item.pet.colorIndex),
             onTap: () {
               PetDetailsRoute(id: item.pet.id).push<void>(context);
             },

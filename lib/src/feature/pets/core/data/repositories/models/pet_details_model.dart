@@ -3,7 +3,7 @@ import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/bree
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
-class PetDetailsModel extends Equatable{
+class PetDetailsModel extends Equatable {
   final int id;
   final PetTypeEnum petType;
   final String name;
@@ -16,6 +16,9 @@ class PetDetailsModel extends Equatable{
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool hasCastration;
+
+  /// Индекс цвета питомца в палитре (`UiPalette.petColor`); одинаков на всех экранах.
+  final int colorIndex;
 
   const PetDetailsModel({
     required this.id,
@@ -30,8 +33,9 @@ class PetDetailsModel extends Equatable{
     required this.createdAt,
     required this.updatedAt,
     required this.hasCastration,
+    this.colorIndex = 0,
   });
-  
+
   @override
   List<Object?> get props => [
     id,
@@ -46,5 +50,6 @@ class PetDetailsModel extends Equatable{
     createdAt,
     updatedAt,
     hasCastration,
+    colorIndex,
   ];
 }

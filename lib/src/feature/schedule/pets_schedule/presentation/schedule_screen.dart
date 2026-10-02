@@ -230,8 +230,9 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       _petsBloc.state.mapOrNull<List<PetModel>?>(success: (state) => state.pets) ?? [];
 
   Color _petColor(int petId) {
-    final index = _pets.indexWhere((pet) => pet.id == petId);
-    return context.uiPalette.petColor(index < 0 ? 0 : index);
+    final pet = _pets.firstWhereOrNull((pet) => pet.id == petId);
+
+    return context.uiPalette.petColor(pet?.colorIndex ?? 0);
   }
 
   /// Если питомца удалили, сбрасываем фильтр (если выбран именно он) и перезагружаем
