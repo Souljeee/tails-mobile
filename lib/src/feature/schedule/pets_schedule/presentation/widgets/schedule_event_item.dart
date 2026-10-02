@@ -19,7 +19,7 @@ class ScheduleEventItem extends StatefulWidget {
 
   /// Цвет питомца для полосы слева.
   final Color petColor;
-  final void Function(bool value)? onToggle;
+  final ValueChanged<bool>? onToggle;
 
   const ScheduleEventItem({
     required this.event,

@@ -325,15 +325,11 @@ class _EditPetModalState extends State<EditPetModal> {
 
     final initialBirthday = widget.pet.birthday;
     final currentBirthday = formData.birthday;
-    final birthdayChanged = currentBirthday == null
-        ? false
-        : !sameDate(currentBirthday, initialBirthday);
+    final birthdayChanged = currentBirthday != null && !sameDate(currentBirthday, initialBirthday);
 
     final initialWeight = widget.pet.weight;
     final currentWeight = formData.weight;
-    final weightChanged = currentWeight == null
-        ? false
-        : (currentWeight - initialWeight).abs() > 1e-9;
+    final weightChanged = currentWeight != null && (currentWeight - initialWeight).abs() > 1e-9;
 
     return norm(formData.name) != norm(widget.pet.name) ||
         formData.petType != widget.pet.petType ||

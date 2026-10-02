@@ -33,7 +33,7 @@ class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
-  bool get _hasInitialImageUrl => widget.initialImageUrl?.trim().isNotEmpty == true;
+  bool get _hasInitialImageUrl => widget.initialImageUrl?.trim().isNotEmpty ?? false;
 
   bool get _hasImage => _selectedImage != null || _hasInitialImageUrl;
 

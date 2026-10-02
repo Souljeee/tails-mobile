@@ -185,7 +185,6 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       title: _eventTitleController.text,
       date: date,
       time: time.isEmpty ? null : time,
-      recurrence: null,
       description: _notesController.text,
       petId: _createEventUio.value.petId!,
       type: _selectedType.value ?? ScheduleEventTypeEnum.custom,
