@@ -28,15 +28,30 @@ class RecurrenceSummaryBuilder {
   /// [start] — дата события (нужна для вычисления даты последнего повторения при «после N»).
   /// [eventTime] — локальное время события `HH:mm` (`null` — «весь день»); при нескольких
   /// временах в день берутся они.
-  RecurrenceSummary build(RecurrenceModel rule, {required DateTime start, String? eventTime}) =>
-      RecurrenceSummary(
-        title: _title(rule),
+  RecurrenceSummary build(RecurrenceModel rule, {required DateTime start, String? eventTime}) {
+    // «Каждый день» с несколькими временами: заголовок — «3 раза в день», во второй строке времена.
+    if (_isDailyWithSlots(rule) && rule.interval <= 1) {
+      return RecurrenceSummary(
+        title: _l10n.recurrenceTimesPerDay(rule.times.length),
         subtitle: [
-          ..._countParts(rule),
-          ..._timeParts(rule, eventTime),
+          rule.times.map((t) => t.format()).join(' · '),
           ..._endParts(rule, start),
         ].join(' · '),
       );
+    }
+
+    return RecurrenceSummary(
+      title: _title(rule),
+      subtitle: [
+        ..._countParts(rule),
+        ..._timeParts(rule, eventTime),
+        ..._endParts(rule, start),
+      ].join(' · '),
+    );
+  }
+
+  bool _isDailyWithSlots(RecurrenceModel rule) =>
+      rule.period == RecurrencePeriod.day && rule.times.length > 1;
 
   String _title(RecurrenceModel rule) {
     switch (rule.period) {

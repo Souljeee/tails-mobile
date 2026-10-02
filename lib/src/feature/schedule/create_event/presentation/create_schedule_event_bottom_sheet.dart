@@ -5,11 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_card/ui_card.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_discard_guard/ui_discard_guard.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_flyout/ui_flyout.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_avatar/ui_pet_avatar.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
@@ -29,9 +29,11 @@ import 'package:tails_mobile/src/feature/schedule/create_event/domain/create_eve
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/uio/create_event_uio.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/utils/event_type_options.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/time_picker_carousel_popup.dart';
+import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_calculator.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_draft.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_summary.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/recurrence_page.dart';
+import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/utils/recurrence_date_format.dart';
 
 enum CreateScheduleEventResult { success, error }
 
@@ -67,7 +69,6 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   final UiTextFieldController _eventTitleController = UiTextFieldController();
   final UiTextFieldController _dateController = UiTextFieldController();
   final UiTextFieldController _timeController = UiTextFieldController();
-  final UiTextFieldController _recurrenceController = UiTextFieldController();
   final UiTextFieldController _notesController = UiTextFieldController();
 
   /// Повторение: `null` — событие не повторяется. Хранится черновик, чтобы при смене даты
@@ -94,15 +95,6 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (_recurrenceController.text.isEmpty) {
-      _recurrenceController.text = context.l10n.createEventNoRecurrence;
-    }
-  }
-
-  @override
   void dispose() {
     _createEventBloc.close();
     _createEventUio.dispose();
@@ -113,7 +105,6 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     _eventTitleController.dispose();
     _dateController.dispose();
     _timeController.dispose();
-    _recurrenceController.dispose();
     _notesController.dispose();
 
     super.dispose();
@@ -199,7 +190,6 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
             ),
             const SizedBox(height: UiSpacing.x4),
             _RecurrenceSelector(
-              controller: _recurrenceController,
               recurrence: _recurrence,
               onTap: () => _isRecurrenceOpen.value = true,
             ),
@@ -254,29 +244,20 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       return;
     }
 
-    _setRecurrence(draft.rebase(eventDate: _eventDate, eventTime: _eventTime));
+    _recurrence.value = draft.rebase(eventDate: _eventDate, eventTime: _eventTime);
   }
 
   /// `null` — «Не повторять». Время события берётся из первого слота повторения.
   void _applyRecurrence(RecurrenceDraft? draft) {
     _isRecurrenceOpen.value = false;
-    _setRecurrence(draft);
-
-    final times = draft?.toModel().times ?? const <LocalTime>[];
-    if (times.length > 1) {
-      _timeController.text = times.first.format();
-    }
-  }
-
-  void _setRecurrence(RecurrenceDraft? draft) {
-    final l10n = context.l10n;
-
     _recurrence.value = draft;
-    _recurrenceController.text = draft == null
-        ? l10n.createEventNoRecurrence
-        : RecurrenceSummaryBuilder(l10n)
-              .build(draft.toModel(), start: draft.eventDate, eventTime: draft.eventTime?.format())
-              .title;
+
+    // Время события берётся из первого времени «в течение дня» (его можно поменять на экране
+    // повторения), поэтому поле «Время» следует за ним.
+    final time = draft?.resultingEventTime;
+    if (time != null && time != _eventTime) {
+      _timeController.text = time;
+    }
   }
 
   /// Пользователь что-то ввёл или изменил: заранее выбранные питомец и дата не считаются.
@@ -459,13 +440,8 @@ class _TypeChips extends StatelessWidget {
 }
 
 class _RecurrenceSelector extends StatelessWidget {
-  const _RecurrenceSelector({
-    required this.controller,
-    required this.recurrence,
-    required this.onTap,
-  });
+  const _RecurrenceSelector({required this.recurrence, required this.onTap});
 
-  final UiTextFieldController controller;
   final ValueListenable<RecurrenceDraft?> recurrence;
   final VoidCallback onTap;
 
@@ -473,49 +449,63 @@ class _RecurrenceSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final palette = context.uiPalette;
+    final fonts = context.uiFonts;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onTap,
-          child: IgnorePointer(
-            child: UiTextField(
-              controller: controller,
-              labelText: l10n.createEventRecurrenceLabel,
-              placeholderText: l10n.createEventRecurrenceLabel,
-              // TODO: заменить временную иконку повтора на финальную из набора.
-              trailingIcon: UiSvgImage(
-                svgPath: context.uiIcons.placeholderRepeat.path,
-                color: palette.ink2,
+    return ValueListenableBuilder(
+      valueListenable: recurrence,
+      builder: (context, draft, child) {
+        final model = draft?.toModel();
+        final title = draft == null
+            ? l10n.createEventNoRecurrence
+            : RecurrenceSummaryBuilder(
+                l10n,
+              ).build(model!, start: draft.eventDate, eventTime: draft.eventTime?.format()).title;
+        final next = draft == null
+            ? const <DateTime>[]
+            : RecurrenceCalculator.nextOccurrences(model!, draft.eventDate);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _FieldLabel(label: l10n.createEventRecurrenceLabel),
+            UiCard(
+              showShadow: false,
+              showBorder: true,
+              borderRadius: UiRadius.mdAll,
+              onTap: onTap,
+              padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x4, vertical: UiSpacing.x3),
+              child: Row(
+                children: [
+                  Icon(Icons.repeat_rounded, size: 24, color: palette.ink2),
+                  const SizedBox(width: UiSpacing.x3),
+                  Expanded(
+                    child: Text(title, style: fonts.body.copyWith(color: palette.ink)),
+                  ),
+                  Icon(Icons.chevron_right_rounded, color: palette.ink3),
+                ],
               ),
             ),
-          ),
-        ),
-        ValueListenableBuilder(
-          valueListenable: recurrence,
-          builder: (context, draft, child) {
-            if (draft == null) {
-              return const SizedBox.shrink();
-            }
-            final summary = RecurrenceSummaryBuilder(
-              l10n,
-            ).build(draft.toModel(), start: draft.eventDate, eventTime: draft.eventTime?.format());
-            if (summary.subtitle.isEmpty) {
-              return const SizedBox.shrink();
-            }
-
-            return Padding(
-              padding: const EdgeInsets.only(top: UiSpacing.x1),
-              child: Text(
-                summary.subtitle,
-                style: context.uiFonts.footnote.copyWith(color: palette.ink3),
+            if (next.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: UiSpacing.x2),
+                child: Text(
+                  l10n.recurrenceNext(
+                    next
+                        .map(
+                          (date) => RecurrenceDateFormat.pill(
+                            l10n,
+                            date,
+                            withYear: draft!.period == RecurrencePeriod.year,
+                          ),
+                        )
+                        .join(', '),
+                  ),
+                  style: fonts.footnote.copyWith(color: palette.ink3),
+                ),
               ),
-            );
-          },
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

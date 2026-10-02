@@ -475,39 +475,6 @@
   "recurrencePeriodWeek": "Неделя",
   "recurrencePeriodMonth": "Месяц",
   "recurrencePeriodYear": "Год",
-  "recurrenceIntervalTitle": "Повторять каждые",
-  "recurrenceIntervalUnitDays": "{n, plural, one{день} few{дня} many{дней} other{дня}}",
-  "@recurrenceIntervalUnitDays": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
-  "recurrenceIntervalUnitWeeks": "{n, plural, one{неделя} few{недели} many{недель} other{недели}}",
-  "@recurrenceIntervalUnitWeeks": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
-  "recurrenceIntervalUnitMonths": "{n, plural, one{месяц} few{месяца} many{месяцев} other{месяца}}",
-  "@recurrenceIntervalUnitMonths": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
-  "recurrenceIntervalUnitYears": "{n, plural, one{год} few{года} many{лет} other{года}}",
-  "@recurrenceIntervalUnitYears": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
   "recurrenceWeekdayShort": "{weekday, select, 1{Пн} 2{Вт} 3{Ср} 4{Чт} 5{Пт} 6{Сб} 7{Вс} other{}}",
   "@recurrenceWeekdayShort": {
     "placeholders": {
@@ -516,17 +483,19 @@
       }
     }
   },
-  "recurrenceWeekDaysTitle": "Дни недели",
   "recurrencePresetWeekdays": "Будни",
   "recurrencePresetWeekend": "Выходные",
   "recurrencePresetAllDays": "Каждый день",
-  "recurrenceMonthDaysTitle": "Числа месяца",
   "recurrenceLastDay": "Последний день",
-  "recurrenceMonthTransferHint": "В коротких месяцах событие перенесётся на последний день месяца",
-  "recurrenceYearDatesTitle": "Даты",
-  "recurrenceAddDate": "Добавить дату",
+  "recurrenceMonthTransferHint": "В коротких месяцах событие переносится на последний день — например, {examples}",
+  "@recurrenceMonthTransferHint": {
+    "placeholders": {
+      "examples": {
+        "type": "String"
+      }
+    }
+  },
   "recurrenceFeb29Hint": "В невисокосный год событие перенесётся на 28 февраля",
-  "recurrenceTimesTitle": "Раз в день",
   "recurrenceTimeN": "Время {n}",
   "@recurrenceTimeN": {
     "placeholders": {
@@ -535,12 +504,10 @@
       }
     }
   },
-  "recurrenceNoTimeHint": "Укажите время события, чтобы повторять его несколько раз в день",
   "recurrenceEndTitle": "Окончание",
-  "recurrenceEndNever": "Никогда",
-  "recurrenceEndOnDate": "В дату",
-  "recurrenceEndAfterCount": "После N повторений",
-  "recurrenceEndCountTitle": "Число повторений",
+  "recurrenceEndNever": "Без окончания",
+  "recurrenceEndOnDate": "До определённой даты",
+  "recurrenceEndAfterCount": "После нескольких повторений",
   "recurrenceEndErrorBeforeStart": "Дата окончания раньше даты события",
   "recurrenceEndErrorBeforeFirst": "Первое повторение — {date}, дата окончания раньше",
   "@recurrenceEndErrorBeforeFirst": {
@@ -550,15 +517,106 @@
       }
     }
   },
-  "recurrenceEndLast": "Последнее повторение: {date}",
-  "@recurrenceEndLast": {
+  "recurrenceDecrease": "Уменьшить",
+  "recurrenceIncrease": "Увеличить",
+  "recurrenceTooManyEvents": "Слишком много повторений. Сделайте их реже или задайте окончание",
+  "recurrenceWeekdayAbbr": "{weekday, select, 1{пн} 2{вт} 3{ср} 4{чт} 5{пт} 6{сб} 7{вс} other{}}",
+  "@recurrenceWeekdayAbbr": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceMonthAbbr": "{month, select, 1{янв} 2{фев} 3{мар} 4{апр} 5{мая} 6{июн} 7{июл} 8{авг} 9{сен} 10{окт} 11{ноя} 12{дек} other{}}",
+  "@recurrenceMonthAbbr": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceIntervalRowDay": "{n, plural, one{Каждый {n} день} few{Каждые {n} дня} many{Каждые {n} дней} other{Каждые {n} дня}}",
+  "@recurrenceIntervalRowDay": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalRowWeek": "{n, plural, one{Каждую {n} неделю} few{Каждые {n} недели} many{Каждые {n} недель} other{Каждые {n} недели}}",
+  "@recurrenceIntervalRowWeek": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalRowMonth": "{n, plural, one{Каждый {n} месяц} few{Каждые {n} месяца} many{Каждые {n} месяцев} other{Каждые {n} месяца}}",
+  "@recurrenceIntervalRowMonth": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalRowYear": "{n, plural, one{Каждый {n} год} few{Каждые {n} года} many{Каждые {n} лет} other{Каждые {n} года}}",
+  "@recurrenceIntervalRowYear": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalSubtitle": "Интервал",
+  "recurrenceDuringDay": "В течение дня",
+  "recurrenceTimesSubtitle": "Сколько раз за день",
+  "recurrenceAsInEvent": "Как в событии",
+  "recurrenceEventTimeHint": "Это время события — если поменять его здесь, оно поменяется и там",
+  "recurrenceTimeFromEvent": "В {time} — время из события",
+  "@recurrenceTimeFromEvent": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceWeekDaysLabel": "Дни недели",
+  "recurrenceMonthDaysLabel": "Числа месяца",
+  "recurrenceYearDatesLabel": "Даты в году",
+  "recurrenceMonthPickHint": "Выберите одно или несколько чисел",
+  "recurrenceCollapse": "Свернуть",
+  "recurrenceEdit": "Изменить",
+  "recurrenceMonthExamplesFeb": "28 февраля",
+  "recurrenceMonthExamplesNovFeb": "30 ноября и 28 февраля",
+  "recurrenceAddDateRow": "Добавить дату",
+  "recurrenceNewDate": "Новая дата",
+  "recurrenceDateTitle": "Дата",
+  "recurrenceEndDateTitle": "Дата окончания",
+  "recurrenceEndValueUntil": "До {date}",
+  "@recurrenceEndValueUntil": {
     "placeholders": {
       "date": {
         "type": "String"
       }
     }
   },
-  "recurrenceDecrease": "Уменьшить",
-  "recurrenceIncrease": "Увеличить",
-  "recurrenceTooManyEvents": "Слишком много повторений. Сделайте их реже или задайте окончание"
+  "recurrenceEndValueAfter": "{n, plural, one{После {n} повторения} other{После {n} повторений}}",
+  "@recurrenceEndValueAfter": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceEndCountLabel": "Число повторений",
+  "recurrenceDelete": "Удалить",
+  "recurrenceApply": "Применить",
+  "recurrenceAdd": "Добавить",
+  "recurrenceSave": "Сохранить",
+  "recurrenceBack": "Назад",
+  "recurrenceIntervalRowDayOne": "Каждый день",
+  "recurrenceIntervalRowWeekOne": "Каждую неделю",
+  "recurrenceIntervalRowMonthOne": "Каждый месяц",
+  "recurrenceIntervalRowYearOne": "Каждый год"
 }

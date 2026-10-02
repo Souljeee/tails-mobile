@@ -10,6 +10,7 @@ class UiDayToggle extends StatelessWidget {
     required this.selected,
     this.onTap,
     this.semanticsLabel,
+    this.size = UiSizes.minTapTarget,
     super.key,
   });
 
@@ -19,6 +20,9 @@ class UiDayToggle extends StatelessWidget {
 
   /// Полное название для скринридера, например «понедельник».
   final String? semanticsLabel;
+
+  /// Диаметр кнопки; на узких экранах сетка из 7 кнопок может быть чуть меньше 44.
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +35,7 @@ class UiDayToggle extends StatelessWidget {
       excludeSemantics: true,
       onTap: onTap,
       child: SizedBox.square(
-        dimension: UiSizes.minTapTarget,
+        dimension: size,
         child: AnimatedContainer(
           duration: UiMotion.base,
           curve: UiMotion.curve,

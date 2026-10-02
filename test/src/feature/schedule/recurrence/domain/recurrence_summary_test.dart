@@ -52,8 +52,20 @@ void main() {
           period: RecurrencePeriod.day,
           times: [LocalTime(8, 0), LocalTime(14, 0), LocalTime(20, 0)],
         ),
-        'Каждый день',
-        '3 раза в день · в 08:00, 14:00 и 20:00',
+        '3 раза в день',
+        '08:00 · 14:00 · 20:00',
+      );
+    });
+
+    test('несколько времён в день при интервале 2', () {
+      expectSummary(
+        const RecurrenceModel(
+          period: RecurrencePeriod.day,
+          interval: 2,
+          times: [LocalTime(9, 0), LocalTime(21, 0)],
+        ),
+        'Через день',
+        '2 раза в день · в 09:00 и 21:00',
       );
     });
 

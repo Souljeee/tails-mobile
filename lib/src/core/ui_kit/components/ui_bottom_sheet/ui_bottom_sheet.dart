@@ -77,14 +77,30 @@ class _DragHandle extends StatelessWidget {
   }
 }
 
-/// Шапка sheet: слева «Отмена», по центру заголовок.
+/// Шапка sheet: слева «Отмена» (или стрелка «назад»), по центру заголовок.
 class UiSheetHeader extends StatelessWidget {
-  const UiSheetHeader({required this.title, required this.cancelLabel, this.onCancel, super.key});
+  const UiSheetHeader({
+    required this.title,
+    required String this.cancelLabel,
+    this.onCancel,
+    super.key,
+  }) : backLabel = null;
+
+  /// Шапка второй страницы шторки: слева стрелка «назад».
+  const UiSheetHeader.back({
+    required this.title,
+    required String this.backLabel,
+    required VoidCallback this.onCancel,
+    super.key,
+  }) : cancelLabel = null;
 
   final String title;
 
-  /// Подпись кнопки отмены (локализованная).
-  final String cancelLabel;
+  /// Подпись кнопки отмены (локализованная); `null` у варианта со стрелкой.
+  final String? cancelLabel;
+
+  /// Подпись стрелки «назад» для скринридера; `null` у варианта с «Отмена».
+  final String? backLabel;
 
   /// По умолчанию закрывает текущий маршрут.
   final VoidCallback? onCancel;
@@ -93,6 +109,7 @@ class UiSheetHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.uiPalette;
     final fonts = context.uiFonts;
+    final onTap = onCancel ?? () => Navigator.of(context).maybePop();
 
     return SizedBox(
       height: UiSizes.minTapTarget,
@@ -101,14 +118,21 @@ class UiSheetHeader extends StatelessWidget {
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: InkWell(
-                onTap: onCancel ?? () => Navigator.of(context).maybePop(),
-                splashFactory: NoSplash.splashFactory,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: UiSizes.minTapTarget),
-                  child: Align(
-                    widthFactor: 1,
-                    child: Text(cancelLabel, style: fonts.body.copyWith(color: palette.accent)),
+              child: Semantics(
+                button: true,
+                label: backLabel ?? cancelLabel,
+                excludeSemantics: true,
+                child: InkWell(
+                  onTap: onTap,
+                  splashFactory: NoSplash.splashFactory,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: UiSizes.minTapTarget),
+                    child: Align(
+                      widthFactor: 1,
+                      child: backLabel != null
+                          ? Icon(Icons.chevron_left_rounded, size: 28, color: palette.ink)
+                          : Text(cancelLabel!, style: fonts.body.copyWith(color: palette.accent)),
+                    ),
                   ),
                 ),
               ),

@@ -872,61 +872,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get recurrencePeriodYear => 'Год';
 
   @override
-  String get recurrenceIntervalTitle => 'Повторять каждые';
-
-  @override
-  String recurrenceIntervalUnitDays(int n) {
-    String _temp0 = intl.Intl.pluralLogic(
-      n,
-      locale: localeName,
-      other: 'дня',
-      many: 'дней',
-      few: 'дня',
-      one: 'день',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String recurrenceIntervalUnitWeeks(int n) {
-    String _temp0 = intl.Intl.pluralLogic(
-      n,
-      locale: localeName,
-      other: 'недели',
-      many: 'недель',
-      few: 'недели',
-      one: 'неделя',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String recurrenceIntervalUnitMonths(int n) {
-    String _temp0 = intl.Intl.pluralLogic(
-      n,
-      locale: localeName,
-      other: 'месяца',
-      many: 'месяцев',
-      few: 'месяца',
-      one: 'месяц',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String recurrenceIntervalUnitYears(int n) {
-    String _temp0 = intl.Intl.pluralLogic(
-      n,
-      locale: localeName,
-      other: 'года',
-      many: 'лет',
-      few: 'года',
-      one: 'год',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String recurrenceWeekdayShort(String weekday) {
     String _temp0 = intl.Intl.selectLogic(weekday, {
       '1': 'Пн',
@@ -942,9 +887,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get recurrenceWeekDaysTitle => 'Дни недели';
-
-  @override
   String get recurrencePresetWeekdays => 'Будни';
 
   @override
@@ -954,26 +896,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get recurrencePresetAllDays => 'Каждый день';
 
   @override
-  String get recurrenceMonthDaysTitle => 'Числа месяца';
-
-  @override
   String get recurrenceLastDay => 'Последний день';
 
   @override
-  String get recurrenceMonthTransferHint =>
-      'В коротких месяцах событие перенесётся на последний день месяца';
-
-  @override
-  String get recurrenceYearDatesTitle => 'Даты';
-
-  @override
-  String get recurrenceAddDate => 'Добавить дату';
+  String recurrenceMonthTransferHint(String examples) {
+    return 'В коротких месяцах событие переносится на последний день — например, $examples';
+  }
 
   @override
   String get recurrenceFeb29Hint => 'В невисокосный год событие перенесётся на 28 февраля';
-
-  @override
-  String get recurrenceTimesTitle => 'Раз в день';
 
   @override
   String recurrenceTimeN(int n) {
@@ -981,23 +912,16 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get recurrenceNoTimeHint =>
-      'Укажите время события, чтобы повторять его несколько раз в день';
-
-  @override
   String get recurrenceEndTitle => 'Окончание';
 
   @override
-  String get recurrenceEndNever => 'Никогда';
+  String get recurrenceEndNever => 'Без окончания';
 
   @override
-  String get recurrenceEndOnDate => 'В дату';
+  String get recurrenceEndOnDate => 'До определённой даты';
 
   @override
-  String get recurrenceEndAfterCount => 'После N повторений';
-
-  @override
-  String get recurrenceEndCountTitle => 'Число повторений';
+  String get recurrenceEndAfterCount => 'После нескольких повторений';
 
   @override
   String get recurrenceEndErrorBeforeStart => 'Дата окончания раньше даты события';
@@ -1005,11 +929,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String recurrenceEndErrorBeforeFirst(String date) {
     return 'Первое повторение — $date, дата окончания раньше';
-  }
-
-  @override
-  String recurrenceEndLast(String date) {
-    return 'Последнее повторение: $date';
   }
 
   @override
@@ -1021,4 +940,194 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get recurrenceTooManyEvents =>
       'Слишком много повторений. Сделайте их реже или задайте окончание';
+
+  @override
+  String recurrenceWeekdayAbbr(String weekday) {
+    String _temp0 = intl.Intl.selectLogic(weekday, {
+      '1': 'пн',
+      '2': 'вт',
+      '3': 'ср',
+      '4': 'чт',
+      '5': 'пт',
+      '6': 'сб',
+      '7': 'вс',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceMonthAbbr(String month) {
+    String _temp0 = intl.Intl.selectLogic(month, {
+      '1': 'янв',
+      '2': 'фев',
+      '3': 'мар',
+      '4': 'апр',
+      '5': 'мая',
+      '6': 'июн',
+      '7': 'июл',
+      '8': 'авг',
+      '9': 'сен',
+      '10': 'окт',
+      '11': 'ноя',
+      '12': 'дек',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceIntervalRowDay(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n дня',
+      many: 'Каждые $n дней',
+      few: 'Каждые $n дня',
+      one: 'Каждый $n день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceIntervalRowWeek(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n недели',
+      many: 'Каждые $n недель',
+      few: 'Каждые $n недели',
+      one: 'Каждую $n неделю',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceIntervalRowMonth(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n месяца',
+      many: 'Каждые $n месяцев',
+      few: 'Каждые $n месяца',
+      one: 'Каждый $n месяц',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceIntervalRowYear(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n года',
+      many: 'Каждые $n лет',
+      few: 'Каждые $n года',
+      one: 'Каждый $n год',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recurrenceIntervalSubtitle => 'Интервал';
+
+  @override
+  String get recurrenceDuringDay => 'В течение дня';
+
+  @override
+  String get recurrenceTimesSubtitle => 'Сколько раз за день';
+
+  @override
+  String get recurrenceAsInEvent => 'Как в событии';
+
+  @override
+  String get recurrenceEventTimeHint =>
+      'Это время события — если поменять его здесь, оно поменяется и там';
+
+  @override
+  String recurrenceTimeFromEvent(String time) {
+    return 'В $time — время из события';
+  }
+
+  @override
+  String get recurrenceWeekDaysLabel => 'Дни недели';
+
+  @override
+  String get recurrenceMonthDaysLabel => 'Числа месяца';
+
+  @override
+  String get recurrenceYearDatesLabel => 'Даты в году';
+
+  @override
+  String get recurrenceMonthPickHint => 'Выберите одно или несколько чисел';
+
+  @override
+  String get recurrenceCollapse => 'Свернуть';
+
+  @override
+  String get recurrenceEdit => 'Изменить';
+
+  @override
+  String get recurrenceMonthExamplesFeb => '28 февраля';
+
+  @override
+  String get recurrenceMonthExamplesNovFeb => '30 ноября и 28 февраля';
+
+  @override
+  String get recurrenceAddDateRow => 'Добавить дату';
+
+  @override
+  String get recurrenceNewDate => 'Новая дата';
+
+  @override
+  String get recurrenceDateTitle => 'Дата';
+
+  @override
+  String get recurrenceEndDateTitle => 'Дата окончания';
+
+  @override
+  String recurrenceEndValueUntil(String date) {
+    return 'До $date';
+  }
+
+  @override
+  String recurrenceEndValueAfter(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'После $n повторений',
+      one: 'После $n повторения',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recurrenceEndCountLabel => 'Число повторений';
+
+  @override
+  String get recurrenceDelete => 'Удалить';
+
+  @override
+  String get recurrenceApply => 'Применить';
+
+  @override
+  String get recurrenceAdd => 'Добавить';
+
+  @override
+  String get recurrenceSave => 'Сохранить';
+
+  @override
+  String get recurrenceBack => 'Назад';
+
+  @override
+  String get recurrenceIntervalRowDayOne => 'Каждый день';
+
+  @override
+  String get recurrenceIntervalRowWeekOne => 'Каждую неделю';
+
+  @override
+  String get recurrenceIntervalRowMonthOne => 'Каждый месяц';
+
+  @override
+  String get recurrenceIntervalRowYearOne => 'Каждый год';
 }

@@ -7,6 +7,8 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_sizes.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 
 /// Раскрывающаяся карточка: заголовок, значение справа и содержимое под ним.
+///
+/// Содержимое занимает всю ширину карточки и само отвечает за отступы и разделители.
 class UiExpandableCard extends StatelessWidget {
   const UiExpandableCard({
     required this.title,
@@ -14,10 +16,14 @@ class UiExpandableCard extends StatelessWidget {
     required this.onToggle,
     required this.child,
     this.value,
+    this.leading,
     super.key,
   });
 
   final String title;
+
+  /// Виджет слева от заголовка, например `UiIconBadge`.
+  final Widget? leading;
 
   /// Краткое значение справа в свёрнутом виде, например «Никогда».
   final String? value;
@@ -32,8 +38,6 @@ class UiExpandableCard extends StatelessWidget {
 
     return UiCard(
       borderRadius: UiRadius.mdAll,
-      showBorder: true,
-      showShadow: false,
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,6 +55,7 @@ class UiExpandableCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x4),
                   child: Row(
                     children: [
+                      if (leading != null) ...[leading!, const SizedBox(width: UiSpacing.x3)],
                       Expanded(
                         child: Text(title, style: fonts.callout.copyWith(color: palette.ink)),
                       ),
@@ -80,12 +85,7 @@ class UiExpandableCard extends StatelessWidget {
             duration: UiMotion.base,
             curve: UiMotion.curve,
             alignment: Alignment.topCenter,
-            child: expanded
-                ? Padding(
-                    padding: const EdgeInsets.fromLTRB(UiSpacing.x4, 0, UiSpacing.x4, UiSpacing.x4),
-                    child: child,
-                  )
-                : const SizedBox(width: double.infinity),
+            child: expanded ? child : const SizedBox(width: double.infinity),
           ),
         ],
       ),

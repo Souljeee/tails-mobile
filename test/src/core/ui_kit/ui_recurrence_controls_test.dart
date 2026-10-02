@@ -103,9 +103,13 @@ void main() {
   group('UiWheelPanel', () {
     testWidgets('сообщает о выборе пункта', (tester) async {
       int? selected;
+      var applied = 0;
       await tester.pumpWidget(
         uiTestApp(
           UiWheelPanel(
+            title: 'Время 1',
+            rightLabel: 'Применить',
+            onRight: () => applied++,
             columns: [
               UiWheelColumn(
                 labels: const ['00', '01', '02', '03'],
@@ -120,6 +124,9 @@ void main() {
       await tester.drag(find.text('00'), const Offset(0, -UiWheelPanel.itemExtent * 2));
       await tester.pumpAndSettle();
       expect(selected, 2);
+
+      await tester.tap(find.text('Применить'));
+      expect(applied, 1);
     });
   });
 }

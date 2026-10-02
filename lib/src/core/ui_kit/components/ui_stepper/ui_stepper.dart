@@ -4,7 +4,7 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_sizes.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 
-/// Счётчик «− значение +» с границами [min]..[max].
+/// Счётчик в таблетке «− значение +» с границами [min]..[max].
 class UiStepper extends StatelessWidget {
   const UiStepper({
     required this.value,
@@ -15,6 +15,9 @@ class UiStepper extends StatelessWidget {
     this.incrementLabel,
     super.key,
   });
+
+  /// Минимальная ширина значения: число не «пляшет» при смене разрядности.
+  static const double valueWidth = 32;
 
   final int value;
   final ValueChanged<int> onChanged;
@@ -29,28 +32,31 @@ class UiStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.uiPalette;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _StepButton(
-          icon: Icons.remove_rounded,
-          label: decrementLabel,
-          onTap: value > min ? () => onChanged(value - 1) : null,
-        ),
-        ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: UiSizes.minTapTarget),
-          child: Text(
-            '$value',
-            textAlign: TextAlign.center,
-            style: context.uiFonts.bodySemibold.copyWith(color: palette.ink),
+    return DecoratedBox(
+      decoration: BoxDecoration(color: palette.sunken, borderRadius: UiRadius.fullAll),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _StepButton(
+            icon: Icons.remove_rounded,
+            label: decrementLabel,
+            onTap: value > min ? () => onChanged(value - 1) : null,
           ),
-        ),
-        _StepButton(
-          icon: Icons.add_rounded,
-          label: incrementLabel,
-          onTap: value < max ? () => onChanged(value + 1) : null,
-        ),
-      ],
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: valueWidth),
+            child: Text(
+              '$value',
+              textAlign: TextAlign.center,
+              style: context.uiFonts.bodyBold.copyWith(color: palette.ink),
+            ),
+          ),
+          _StepButton(
+            icon: Icons.add_rounded,
+            label: incrementLabel,
+            onTap: value < max ? () => onChanged(value + 1) : null,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -73,19 +79,15 @@ class _StepButton extends StatelessWidget {
       label: label,
       excludeSemantics: true,
       onTap: onTap,
-      child: SizedBox.square(
-        dimension: UiSizes.minTapTarget,
-        child: Padding(
-          padding: const EdgeInsets.all(UiSpacing.x1),
-          child: Material(
-            color: palette.sunken,
-            borderRadius: UiRadius.fullAll,
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: UiRadius.fullAll,
-              splashFactory: NoSplash.splashFactory,
-              child: Icon(icon, color: enabled ? palette.ink : palette.ink3),
-            ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: UiRadius.fullAll,
+        splashFactory: NoSplash.splashFactory,
+        child: SizedBox.square(
+          dimension: UiSizes.minTapTarget,
+          child: Padding(
+            padding: const EdgeInsets.all(UiSpacing.x2),
+            child: Icon(icon, color: enabled ? palette.ink : palette.ink3),
           ),
         ),
       ),
