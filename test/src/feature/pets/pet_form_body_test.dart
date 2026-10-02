@@ -3,6 +3,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfiel
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/pet_form_body.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/pets/core/utils/pet_form_validation.dart';
 
 import '../../../helpers/ui_test_app.dart';
 
@@ -53,5 +54,35 @@ void main() {
     expect(breedTaps, 1);
     expect(dateTaps, 1);
     expect(castration, isNull);
+  });
+
+  testWidgets('PetFormBody показывает ошибки у незаполненных полей', (tester) async {
+    await tester.pumpWidget(
+      uiTestApp(
+        PetFormBody(
+          petType: PetTypeEnum.cat,
+          gender: PetSexEnum.male,
+          nameController: UiTextFieldController(),
+          breedController: UiTextFieldController(),
+          birthDateController: UiTextFieldController(),
+          colorController: UiTextFieldController(),
+          invalidFields: const {PetFormField.name, PetFormField.breed, PetFormField.weight},
+          onImageSelected: (_) {},
+          onTypeChanged: (_) {},
+          onSexChanged: (_) {},
+          onBreedTap: () {},
+          onBirthDateTap: () {},
+          onWeightSelected: (_) {},
+          onCastrationSelected: (_) {},
+        ),
+      ),
+    );
+
+    expect(find.text('Введите кличку'), findsOneWidget);
+    // Текст «Выберите породу» совпадает с подсказкой поля: подсказка + ошибка.
+    expect(find.text('Выберите породу'), findsNWidgets(2));
+    expect(find.text('Укажите вес'), findsOneWidget);
+    expect(find.text('Введите окрас'), findsNothing);
+    expect(find.text('Укажите дату рождения'), findsNothing);
   });
 }

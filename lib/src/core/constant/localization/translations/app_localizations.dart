@@ -991,6 +991,48 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'В ближайшие две недели событий нет'**
   String get petDetailsNoEvents;
+
+  /// No description provided for @petFormErrorName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите кличку'**
+  String get petFormErrorName;
+
+  /// No description provided for @petFormErrorBreed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите породу'**
+  String get petFormErrorBreed;
+
+  /// No description provided for @petFormErrorBirthday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите дату рождения'**
+  String get petFormErrorBirthday;
+
+  /// No description provided for @petFormErrorWeight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите вес'**
+  String get petFormErrorWeight;
+
+  /// No description provided for @petFormErrorColor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите окрас'**
+  String get petFormErrorColor;
+
+  /// No description provided for @createEventErrorPet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите питомца'**
+  String get createEventErrorPet;
+
+  /// No description provided for @createEventErrorTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите название'**
+  String get createEventErrorTitle;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

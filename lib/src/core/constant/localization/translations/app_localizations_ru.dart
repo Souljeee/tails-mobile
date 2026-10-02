@@ -557,4 +557,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get petDetailsNoEvents => 'В ближайшие две недели событий нет';
+
+  @override
+  String get petFormErrorName => 'Введите кличку';
+
+  @override
+  String get petFormErrorBreed => 'Выберите породу';
+
+  @override
+  String get petFormErrorBirthday => 'Укажите дату рождения';
+
+  @override
+  String get petFormErrorWeight => 'Укажите вес';
+
+  @override
+  String get petFormErrorColor => 'Введите окрас';
+
+  @override
+  String get createEventErrorPet => 'Выберите питомца';
+
+  @override
+  String get createEventErrorTitle => 'Введите название';
 }

@@ -11,7 +11,15 @@ class WeightPicker extends StatefulWidget {
   final void Function(double) onWeightSelected;
   final double? initialWeight;
 
-  const WeightPicker({required this.onWeightSelected, this.initialWeight, super.key});
+  /// Текст ошибки под полем (например, «Укажите вес»).
+  final String? errorText;
+
+  const WeightPicker({
+    required this.onWeightSelected,
+    this.initialWeight,
+    this.errorText,
+    super.key,
+  });
 
   @override
   State<WeightPicker> createState() => _WeightPickerState();
@@ -67,6 +75,7 @@ class _WeightPickerState extends State<WeightPicker> {
           labelText: l10n.petFormWeight,
           placeholderText: l10n.petFormWeightPlaceholder,
           secondaryText: l10n.weightKgUnit,
+          errorText: widget.errorText,
         ),
       ),
     );

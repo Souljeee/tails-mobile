@@ -10,6 +10,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart
 import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_motion.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
@@ -21,6 +22,7 @@ import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/edit
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_details_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/pets/core/utils/pet_form_validation.dart';
 import 'package:tails_mobile/src/feature/pets/edit_pet/domain/edit_pet_bloc.dart';
 
 class EditPetFormData extends Equatable {
@@ -187,6 +189,48 @@ class _EditPetModalState extends State<EditPetModal> {
     _formData.value = _formData.value.copyWith(birthday: CopyWithWrapper.value(date));
   }
 
+  final Map<PetFormField, GlobalKey> _fieldKeys = {
+    for (final field in PetFormField.values) field: GlobalKey(),
+  };
+
+  /// Ошибки показываем только после первой попытки отправить форму.
+  bool _showErrors = false;
+
+  List<PetFormField> _missingFields(EditPetFormData formData) => findMissingPetFormFields(
+    name: formData.name,
+    breedId: formData.breedId,
+    birthday: formData.birthday,
+    weight: formData.weight,
+    color: formData.color,
+  );
+
+  /// Возвращает `true`, если форма заполнена. Иначе подсвечивает пустые поля и
+  /// прокручивает форму к первому из них.
+  bool _validate(EditPetFormData formData) {
+    final missing = _missingFields(formData);
+
+    if (missing.isEmpty) {
+      return true;
+    }
+
+    setState(() => _showErrors = true);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final fieldContext = _fieldKeys[missing.first]?.currentContext;
+
+      if (fieldContext != null && fieldContext.mounted) {
+        Scrollable.ensureVisible(
+          fieldContext,
+          duration: UiMotion.base,
+          curve: UiMotion.curve,
+          alignment: 0.1,
+        );
+      }
+    });
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -229,6 +273,8 @@ class _EditPetModalState extends State<EditPetModal> {
                       onCastrationSelected: _onCastrationSelected,
                       onBreedTap: _selectBreed,
                       onBirthDateTap: _selectBirthDate,
+                      invalidFields: _showErrors ? _missingFields(formData).toSet() : const {},
+                      fieldKeys: _fieldKeys,
                     );
                   },
                 ),
@@ -253,14 +299,18 @@ class _EditPetModalState extends State<EditPetModal> {
                   return ValueListenableBuilder<EditPetFormData>(
                     valueListenable: _formData,
                     builder: (context, formData, _) {
-                      final isFormValid = formData.isValid && _hasChanges(formData);
+                      final hasChanges = _hasChanges(formData);
 
                       return UiButton.main(
                         isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
                         label: l10n.savePet,
-                        onPressed: isFormValid
+                        onPressed: hasChanges
                             ? state.mapOrNull(
                                 initial: (_) => () {
+                                  if (!_validate(formData)) {
+                                    return;
+                                  }
+
                                   _editPetBloc.add(
                                     EditPetEvent.editingRequested(
                                       petId: widget.pet.id,

@@ -23,6 +23,7 @@ class UiTextField extends StatefulWidget {
     this.inputFilter,
     this.inputMaskLazy = true,
     this.errorTextColor,
+    this.errorText,
     this.labelText,
     this.helperText,
     this.labelMaxLines,
@@ -70,6 +71,10 @@ class UiTextField extends StatefulWidget {
   final Map<String, RegExp>? inputFilter;
   final bool inputMaskLazy;
   final Color? errorTextColor;
+
+  /// Принудительная ошибка (например, «Заполните поле» после нажатия на кнопку отправки).
+  /// Если задана, показывается вместо ошибок валидаторов.
+  final String? errorText;
 
   /// Подпись над полем.
   final String? labelText;
@@ -121,7 +126,8 @@ class _UiTextFieldState extends State<UiTextField> {
 
   // Показываем ошибку только если поле было «тронуто».
   bool get _hasError =>
-      _controller.touched && _controller.validators.hasValidationMessage(_controller.text);
+      widget.errorText != null ||
+      (_controller.touched && _controller.validators.hasValidationMessage(_controller.text));
 
   BorderSide _borderSide(UiPalette palette) {
     if (_hasError) {
@@ -286,6 +292,10 @@ class _UiTextFieldState extends State<UiTextField> {
   }
 
   String _getErrorText() {
+    if (widget.errorText != null) {
+      return widget.errorText!;
+    }
+
     final errorText = _controller.validators.getFirstValidationMessage(_controller.text) ?? '';
 
     return errorText;

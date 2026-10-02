@@ -215,5 +215,12 @@
   "petDetailsAge": "Возраст",
   "petDetailsEdit": "Изменить",
   "petDetailsUpcoming": "Ближайшие события",
-  "petDetailsNoEvents": "В ближайшие две недели событий нет"
+  "petDetailsNoEvents": "В ближайшие две недели событий нет",
+  "petFormErrorName": "Введите кличку",
+  "petFormErrorBreed": "Выберите породу",
+  "petFormErrorBirthday": "Укажите дату рождения",
+  "petFormErrorWeight": "Укажите вес",
+  "petFormErrorColor": "Введите окрас",
+  "createEventErrorPet": "Выберите питомца",
+  "createEventErrorTitle": "Введите название"
 }

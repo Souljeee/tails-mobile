@@ -64,6 +64,9 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   final UiTextFieldController _recurrenceController = UiTextFieldController();
   final UiTextFieldController _notesController = UiTextFieldController();
 
+  /// Ошибки показываем только после первой попытки создать событие.
+  final ValueNotifier<bool> _showErrors = ValueNotifier(false);
+
   @override
   void initState() {
     super.initState();
@@ -89,6 +92,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     _createEventBloc.close();
     _createEventUio.dispose();
     _selectedType.dispose();
+    _showErrors.dispose();
     _eventTitleController.dispose();
     _dateController.dispose();
     _timeController.dispose();
@@ -109,21 +113,32 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
         UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
         const SizedBox(height: UiSpacing.x4),
         _FieldLabel(label: l10n.createEventForWhom),
-        ValueListenableBuilder(
-          valueListenable: _createEventUio,
-          builder: (context, uio, child) {
+        ListenableBuilder(
+          listenable: Listenable.merge([_createEventUio, _showErrors]),
+          builder: (context, child) {
+            final uio = _createEventUio.value;
+
             return _PetChips(
               pets: widget.pets,
               selectedPetId: uio.petId,
               onPetSelected: _onPetIdSelected,
+              errorText: _showErrors.value && uio.petId == null ? l10n.createEventErrorPet : null,
             );
           },
         ),
         const SizedBox(height: UiSpacing.x4),
-        UiTextField(
-          controller: _eventTitleController,
-          labelText: l10n.createEventNameLabel,
-          placeholderText: l10n.createEventNamePlaceholder,
+        ListenableBuilder(
+          listenable: Listenable.merge([_eventTitleController, _showErrors]),
+          builder: (context, child) {
+            final isTitleMissing = _eventTitleController.text.trim().isEmpty;
+
+            return UiTextField(
+              controller: _eventTitleController,
+              labelText: l10n.createEventNameLabel,
+              placeholderText: l10n.createEventNamePlaceholder,
+              errorText: _showErrors.value && isTitleMissing ? l10n.createEventErrorTitle : null,
+            );
+          },
         ),
         const SizedBox(height: UiSpacing.x4),
         _FieldLabel(label: l10n.createEventTypeLabel),
@@ -158,23 +173,28 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
             );
           },
           builder: (context, state) {
-            return ListenableBuilder(
-              listenable: Listenable.merge([_createEventUio, _eventTitleController]),
-              builder: (context, child) {
-                final isValid =
-                    _createEventUio.value.isValid && _eventTitleController.text.trim().isNotEmpty;
-
-                return UiButton.main(
-                  label: l10n.createEventSubmit,
-                  onPressed: isValid ? _createEvent : null,
-                  isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-                );
-              },
+            return UiButton.main(
+              label: l10n.createEventSubmit,
+              onPressed: _submit,
+              isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
             );
           },
         ),
       ],
     );
+  }
+
+  /// Создаёт событие, если обязательные поля заполнены; иначе подсвечивает пустые.
+  void _submit() {
+    final isValid = _createEventUio.value.isValid && _eventTitleController.text.trim().isNotEmpty;
+
+    if (!isValid) {
+      _showErrors.value = true;
+
+      return;
+    }
+
+    _createEvent();
   }
 
   void _createEvent() {
@@ -247,25 +267,44 @@ class _FieldLabel extends StatelessWidget {
 }
 
 class _PetChips extends StatelessWidget {
-  const _PetChips({required this.pets, required this.selectedPetId, required this.onPetSelected});
+  const _PetChips({
+    required this.pets,
+    required this.selectedPetId,
+    required this.onPetSelected,
+    this.errorText,
+  });
 
   final List<PetModel> pets;
   final int? selectedPetId;
   final void Function(int petId) onPetSelected;
 
+  /// Подсказка под чипами, если питомец не выбран после попытки создать событие.
+  final String? errorText;
+
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: UiSpacing.x2,
-      runSpacing: UiSpacing.x2,
+    final error = errorText;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final pet in pets)
-          UiChip(
-            label: pet.name,
-            selected: selectedPetId == pet.id,
-            onTap: () => onPetSelected(pet.id),
-            leading: UiPetAvatar(imageUrl: pet.image, size: 24),
-          ),
+        Wrap(
+          spacing: UiSpacing.x2,
+          runSpacing: UiSpacing.x2,
+          children: [
+            for (final pet in pets)
+              UiChip(
+                label: pet.name,
+                selected: selectedPetId == pet.id,
+                onTap: () => onPetSelected(pet.id),
+                leading: UiPetAvatar(imageUrl: pet.image, size: 24),
+              ),
+          ],
+        ),
+        if (error != null) ...[
+          const SizedBox(height: UiSpacing.x2),
+          Text(error, style: context.uiFonts.footnote.copyWith(color: context.uiPalette.danger)),
+        ],
       ],
     );
   }
