@@ -419,4 +419,19 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get petNextEventTomorrow => 'Завтра';
+
+  @override
+  String get breedPageTitleCat => 'Порода · кошки';
+
+  @override
+  String get breedPageTitleDog => 'Порода · собаки';
+
+  @override
+  String get breedSearchPlaceholder => 'Найти породу';
+
+  @override
+  String get breedNothingFound => 'Ничего не найдено';
+
+  @override
+  String get breedMixedLabel => 'Метис или не знаю';
 }

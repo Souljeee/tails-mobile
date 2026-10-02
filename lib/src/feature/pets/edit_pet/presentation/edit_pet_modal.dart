@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
@@ -22,7 +22,6 @@ import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/edit_pet/domain/edit_pet_bloc.dart';
-import 'package:tails_mobile/src/feature/pets/select_breed/presentation/select_breed_modal.dart';
 
 class EditPetFormData extends Equatable {
   final String? name;
@@ -229,12 +228,9 @@ class _EditPetModalState extends State<EditPetModal> {
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () async {
-                  final BreedModel? breed = await Navigator.of(context).push<BreedModel>(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          SelectBreedModal(petType: _formData.value.petType ?? PetTypeEnum.cat),
-                    ),
-                  );
+                  final BreedModel? breed = await SelectBreedRoute(
+                    petType: _formData.value.petType ?? PetTypeEnum.cat,
+                  ).push<BreedModel>(context);
 
                   if (breed != null) {
                     _breedController.text = breed.name;
@@ -338,7 +334,6 @@ class _EditPetModalState extends State<EditPetModal> {
                   return ValueListenableBuilder<EditPetFormData>(
                     valueListenable: _formData,
                     builder: (context, formData, _) {
-
                       final isFormValid = formData.isValid && _hasChanges(formData);
 
                       return UiButton.main(
@@ -385,11 +380,15 @@ class _EditPetModalState extends State<EditPetModal> {
 
     final initialBirthday = widget.pet.birthday;
     final currentBirthday = formData.birthday;
-    final birthdayChanged = currentBirthday == null ? false : !sameDate(currentBirthday, initialBirthday);
+    final birthdayChanged = currentBirthday == null
+        ? false
+        : !sameDate(currentBirthday, initialBirthday);
 
     final initialWeight = widget.pet.weight;
     final currentWeight = formData.weight;
-    final weightChanged = currentWeight == null ? false : (currentWeight - initialWeight).abs() > 1e-9;
+    final weightChanged = currentWeight == null
+        ? false
+        : (currentWeight - initialWeight).abs() > 1e-9;
 
     return norm(formData.name) != norm(widget.pet.name) ||
         formData.petType != widget.pet.petType ||

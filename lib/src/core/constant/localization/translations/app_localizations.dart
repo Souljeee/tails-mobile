@@ -715,6 +715,36 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Завтра'**
   String get petNextEventTomorrow;
+
+  /// No description provided for @breedPageTitleCat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода · кошки'**
+  String get breedPageTitleCat;
+
+  /// No description provided for @breedPageTitleDog.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода · собаки'**
+  String get breedPageTitleDog;
+
+  /// No description provided for @breedSearchPlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найти породу'**
+  String get breedSearchPlaceholder;
+
+  /// No description provided for @breedNothingFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ничего не найдено'**
+  String get breedNothingFound;
+
+  /// No description provided for @breedMixedLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Метис или не знаю'**
+  String get breedMixedLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

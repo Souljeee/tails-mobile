@@ -169,5 +169,10 @@
     "placeholders": {"weight": {"type": "String"}}
   },
   "petNextEventToday": "Сегодня",
-  "petNextEventTomorrow": "Завтра"
+  "petNextEventTomorrow": "Завтра",
+  "breedPageTitleCat": "Порода · кошки",
+  "breedPageTitleDog": "Порода · собаки",
+  "breedSearchPlaceholder": "Найти породу",
+  "breedNothingFound": "Ничего не найдено",
+  "breedMixedLabel": "Метис или не знаю"
 }

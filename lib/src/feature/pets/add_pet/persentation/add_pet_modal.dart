@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
@@ -20,7 +20,6 @@ import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/weigh
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
-import 'package:tails_mobile/src/feature/pets/select_breed/presentation/select_breed_modal.dart';
 
 class AddPetFormData extends Equatable {
   final String? name;
@@ -64,31 +63,30 @@ class AddPetFormData extends Equatable {
     CopyWithWrapper<DateTime?>? birthday,
     CopyWithWrapper<bool?>? castration,
     CopyWithWrapper<File?>? image,
-  }) =>
-      AddPetFormData(
-        name: name?.value ?? this.name,
-        petType: petType?.value ?? this.petType,
-        breedId: breedId?.value ?? this.breedId,
-        color: color?.value ?? this.color,
-        weight: weight?.value ?? this.weight,
-        gender: gender?.value ?? this.gender,
-        birthday: birthday?.value ?? this.birthday,
-        castration: castration?.value ?? this.castration,
-        image: image?.value ?? this.image,
-      );
+  }) => AddPetFormData(
+    name: name?.value ?? this.name,
+    petType: petType?.value ?? this.petType,
+    breedId: breedId?.value ?? this.breedId,
+    color: color?.value ?? this.color,
+    weight: weight?.value ?? this.weight,
+    gender: gender?.value ?? this.gender,
+    birthday: birthday?.value ?? this.birthday,
+    castration: castration?.value ?? this.castration,
+    image: image?.value ?? this.image,
+  );
 
   @override
   List<Object?> get props => [
-        name,
-        petType,
-        breedId,
-        color,
-        weight,
-        gender,
-        birthday,
-        castration,
-        image,
-      ];
+    name,
+    petType,
+    breedId,
+    color,
+    weight,
+    gender,
+    birthday,
+    castration,
+    image,
+  ];
 }
 
 class AddPetModal extends StatefulWidget {
@@ -100,15 +98,12 @@ class AddPetModal extends StatefulWidget {
 
 class _AddPetModalState extends State<AddPetModal> {
   final ValueNotifier<AddPetFormData> _formData = ValueNotifier(
-    const AddPetFormData(
-      castration: false,
-      petType: PetTypeEnum.cat,
-      gender: PetSexEnum.male,
-    ),
+    const AddPetFormData(castration: false, petType: PetTypeEnum.cat, gender: PetSexEnum.male),
   );
 
-  late final AddPetBloc _addPetBloc =
-      AddPetBloc(petRepository: DependenciesScope.of(context).petRepository);
+  late final AddPetBloc _addPetBloc = AddPetBloc(
+    petRepository: DependenciesScope.of(context).petRepository,
+  );
 
   final UiTextFieldController _nameController = UiTextFieldController();
   final UiTextFieldController _birthDateController = UiTextFieldController();
@@ -176,10 +171,7 @@ class _AddPetModalState extends State<AddPetModal> {
     return Scaffold(
       backgroundColor: context.uiColors.white,
       appBar: AppBar(
-        title: Text(
-          'Добавить питомца',
-          style: context.uiFonts.header24Semibold,
-        ),
+        title: Text('Добавить питомца', style: context.uiFonts.header24Semibold),
         backgroundColor: context.uiColors.white,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -191,16 +183,11 @@ class _AddPetModalState extends State<AddPetModal> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              PhotoUploadWidget(
-                onImageSelected: _onImageSelected,
-              ),
+              PhotoUploadWidget(onImageSelected: _onImageSelected),
               const SizedBox(height: 40),
               PetTypeSelection(onTypeChanged: _onTypeChanged),
               const SizedBox(height: 16),
-              Text(
-                'Кличка',
-                style: context.uiFonts.header20Medium,
-              ),
+              Text('Кличка', style: context.uiFonts.header20Medium),
               const SizedBox(height: 8),
               UiTextField(
                 controller: _nameController,
@@ -208,27 +195,18 @@ class _AddPetModalState extends State<AddPetModal> {
                 placeholderStyle: context.uiFonts.text16Regular.copyWith(
                   color: context.uiColors.brown,
                 ),
-                trailingIcon: Icon(
-                  Icons.edit_outlined,
-                  size: 28,
-                  color: context.uiColors.brown,
-                ),
+                trailingIcon: Icon(Icons.edit_outlined, size: 28, color: context.uiColors.brown),
               ),
               const SizedBox(height: 16),
               SexSection(onSexChanged: _onSexChanged),
               const SizedBox(height: 16),
-              Text(
-                'Порода',
-                style: context.uiFonts.header20Medium,
-              ),
+              Text('Порода', style: context.uiFonts.header20Medium),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () async {
-                  final BreedModel? breed = await Navigator.of(context).push<BreedModel>(
-                    MaterialPageRoute(
-                      builder: (context) => SelectBreedModal(petType: _formData.value.petType ?? PetTypeEnum.cat),
-                    ),
-                  );
+                  final BreedModel? breed = await SelectBreedRoute(
+                    petType: _formData.value.petType ?? PetTypeEnum.cat,
+                  ).push<BreedModel>(context);
 
                   if (breed != null) {
                     _breedController.text = breed.name;
@@ -242,21 +220,14 @@ class _AddPetModalState extends State<AddPetModal> {
                     placeholderStyle: context.uiFonts.text16Regular.copyWith(
                       color: context.uiColors.brown,
                     ),
-                    trailingIcon: Icon(
-                      Icons.search,
-                      size: 28,
-                      color: context.uiColors.brown,
-                    ),
+                    trailingIcon: Icon(Icons.search, size: 28, color: context.uiColors.brown),
                     suffixIcon: Icons.keyboard_arrow_down_outlined,
                     suffixIconColor: context.uiColors.brown,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Дата рождения',
-                style: context.uiFonts.header20Medium,
-              ),
+              Text('Дата рождения', style: context.uiFonts.header20Medium),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () async {
@@ -286,14 +257,9 @@ class _AddPetModalState extends State<AddPetModal> {
                 ),
               ),
               const SizedBox(height: 16),
-              WeightPicker(
-                onWeightSelected: _onWeightSelected,
-              ),
+              WeightPicker(onWeightSelected: _onWeightSelected),
               const SizedBox(height: 16),
-              Text(
-                'Окрас',
-                style: context.uiFonts.header20Medium,
-              ),
+              Text('Окрас', style: context.uiFonts.header20Medium),
               const SizedBox(height: 8),
               UiTextField(
                 controller: _colorController,
@@ -309,13 +275,14 @@ class _AddPetModalState extends State<AddPetModal> {
               ),
               const SizedBox(height: 16),
               ValueListenableBuilder(
-                  valueListenable: _formData,
-                  builder: (context, formData, _) {
-                    return CastrationSection(
-                      gender: formData.gender ?? PetSexEnum.male,
-                      onSelected: _onCastrationSelected,
-                    );
-                  }),
+                valueListenable: _formData,
+                builder: (context, formData, _) {
+                  return CastrationSection(
+                    gender: formData.gender ?? PetSexEnum.male,
+                    onSelected: _onCastrationSelected,
+                  );
+                },
+              ),
               const SizedBox(height: 32),
               BlocConsumer<AddPetBloc, AddPetState>(
                 bloc: _addPetBloc,
@@ -340,10 +307,7 @@ class _AddPetModalState extends State<AddPetModal> {
                     valueListenable: _formData,
                     builder: (context, formData, _) {
                       return UiButton.main(
-                        isLoading: state.maybeMap(
-                          loading: (_) => true,
-                          orElse: () => false,
-                        ),
+                        isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
                         label: 'Сохранить',
                         onPressed: formData.isValid
                             ? state.mapOrNull(
