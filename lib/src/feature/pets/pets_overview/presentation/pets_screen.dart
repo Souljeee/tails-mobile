@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_empty_state/ui_empty_state.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_errors/ui_fetching_error.dart';
@@ -12,8 +13,6 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
-import 'package:tails_mobile/src/feature/pets/add_pet/persentation/add_pet_modal.dart';
-import 'package:tails_mobile/src/feature/pets/pet_details/presentation/pet_details_screen.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/domain/models/pets_overview.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/domain/pets_overview_bloc.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/presentation/widgets/pet_overview_card.dart';
@@ -38,7 +37,7 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
 
   @override
   void onShellAction() {
-    Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const AddPetModal()));
+    const AddPetRoute().push<void>(context);
   }
 
   @override
@@ -152,10 +151,7 @@ class _PetsSliver extends StatelessWidget {
             overview: item,
             petColor: palette.petColor(index),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(builder: (_) => PetDetailsScreen(id: item.pet.id)),
-              );
+              PetDetailsRoute(id: item.pet.id).push<void>(context);
             },
           );
         },

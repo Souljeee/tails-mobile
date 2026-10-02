@@ -209,5 +209,11 @@
   "weightGramsUnit": "г",
   "done": "Готово",
   "selectAction": "Выбрать",
-  "pickBirthDateTitle": "Дата рождения"
+  "pickBirthDateTitle": "Дата рождения",
+  "navBack": "Назад",
+  "petDetailsMenu": "Меню",
+  "petDetailsAge": "Возраст",
+  "petDetailsEdit": "Изменить",
+  "petDetailsUpcoming": "Ближайшие события",
+  "petDetailsNoEvents": "В ближайшие две недели событий нет"
 }

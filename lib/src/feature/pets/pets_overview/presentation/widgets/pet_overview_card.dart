@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_card/ui_card.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_badge/ui_icon_badge.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_tag/ui_pet_tag.dart';
@@ -10,6 +9,7 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/enums_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/pets/core/utils/event_day_label.dart';
 import 'package:tails_mobile/src/feature/pets/core/utils/pet_age.dart';
 import 'package:tails_mobile/src/feature/pets/core/utils/pet_labels.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/domain/models/pets_overview.dart';
@@ -115,24 +115,13 @@ class _NextEventRow extends StatelessWidget {
 
   final PetNextEvent nextEvent;
 
-  String _eyebrow(BuildContext context) {
-    final l10n = context.l10n;
-    final locale = Localizations.localeOf(context).toString();
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final difference = nextEvent.date.difference(today).inDays;
-    final isAllDay = nextEvent.event.time == null;
-
-    if (difference == 0) {
-      return isAllDay ? l10n.scheduleAllDay : l10n.petNextEventToday;
-    }
-
-    final day = difference == 1
-        ? l10n.petNextEventTomorrow
-        : DateFormat('d MMMM', locale).format(nextEvent.date);
-
-    return isAllDay ? '$day · ${l10n.scheduleAllDay}' : day;
-  }
+  String _eyebrow(BuildContext context) => formatEventDayLabel(
+    l10n: context.l10n,
+    locale: Localizations.localeOf(context).toString(),
+    date: nextEvent.date,
+    now: DateTime.now(),
+    isAllDay: nextEvent.event.time == null,
+  );
 
   @override
   Widget build(BuildContext context) {

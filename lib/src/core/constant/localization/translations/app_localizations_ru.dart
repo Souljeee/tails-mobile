@@ -539,4 +539,22 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pickBirthDateTitle => 'Дата рождения';
+
+  @override
+  String get navBack => 'Назад';
+
+  @override
+  String get petDetailsMenu => 'Меню';
+
+  @override
+  String get petDetailsAge => 'Возраст';
+
+  @override
+  String get petDetailsEdit => 'Изменить';
+
+  @override
+  String get petDetailsUpcoming => 'Ближайшие события';
+
+  @override
+  String get petDetailsNoEvents => 'В ближайшие две недели событий нет';
 }

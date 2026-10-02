@@ -30,6 +30,23 @@ class ScheduleRepository {
     return Map<DateTime, List<ScheduleEventModel>>.fromEntries(eventEntries);
   }
 
+  /// Ближайшие события питомца, сгруппированные по датам.
+  Future<ScheduleEventModelList> getPetUpcomingEvents({
+    required int petId,
+    required DateTime dateFrom,
+    int days = 14,
+  }) async {
+    final events = await _scheduleRemoteDataSource.getPetUpcomingEvents(
+      petId: petId,
+      dateFrom: dateFrom,
+      days: days,
+    );
+
+    return events.map(
+      (date, list) => MapEntry(date, list.map((event) => event.toModel()).toList()),
+    );
+  }
+
   Future<void> createEvent({required CreateEventModel model}) async {
     await _scheduleRemoteDataSource.createEvent(dto: model.toDto());
   }

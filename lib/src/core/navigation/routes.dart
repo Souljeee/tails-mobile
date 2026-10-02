@@ -3,7 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:tails_mobile/src/core/navigation/scaffold_with_navbar.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_screen.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/enter_code_screen.dart';
+import 'package:tails_mobile/src/feature/pets/add_pet/persentation/add_pet_modal.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_details_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/pets/edit_pet/presentation/edit_pet_modal.dart';
+import 'package:tails_mobile/src/feature/pets/pet_details/presentation/pet_details_screen.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/presentation/pets_screen.dart';
 import 'package:tails_mobile/src/feature/pets/select_breed/presentation/select_breed_modal.dart';
 import 'package:tails_mobile/src/feature/profile/presentation/profile_screen.dart';
@@ -18,10 +22,18 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
     TypedGoRoute<AuthRoute>(path: '/auth', name: 'auth'),
     TypedGoRoute<EnterCodeRoute>(path: '/enter-code', name: 'enter-code'),
     TypedGoRoute<SelectBreedRoute>(path: '/select-breed', name: 'select-breed'),
+    TypedGoRoute<AddPetRoute>(path: '/add-pet', name: 'add-pet'),
+    TypedGoRoute<EditPetRoute>(path: '/edit-pet', name: 'edit-pet'),
     TypedStatefulShellRoute<HomeShellRoute>(
       branches: [
         TypedStatefulShellBranch<PetsBranch>(
-          routes: [TypedGoRoute<PetsRoute>(path: '/pets', name: 'pets')],
+          routes: [
+            TypedGoRoute<PetsRoute>(
+              path: '/pets',
+              name: 'pets',
+              routes: [TypedGoRoute<PetDetailsRoute>(path: ':id', name: 'pet-details')],
+            ),
+          ],
         ),
         TypedStatefulShellBranch<ScheduleBranch>(
           routes: [TypedGoRoute<ScheduleRoute>(path: '/schedule', name: 'schedule')],
@@ -97,6 +109,32 @@ class SelectBreedRoute extends GoRouteData with $SelectBreedRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       SelectBreedModal(petType: petType, selectedBreedId: selectedBreedId);
+}
+
+class AddPetRoute extends GoRouteData with $AddPetRoute {
+  const AddPetRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const AddPetModal();
+}
+
+class EditPetRoute extends GoRouteData with $EditPetRoute {
+  /// Редактируемый питомец; передаётся объектом, чтобы не перезагружать данные.
+  final PetDetailsModel $extra;
+
+  const EditPetRoute({required this.$extra});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => EditPetModal(pet: $extra);
+}
+
+class PetDetailsRoute extends GoRouteData with $PetDetailsRoute {
+  final int id;
+
+  const PetDetailsRoute({required this.id});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => PetDetailsScreen(id: id);
 }
 
 class PetsRoute extends GoRouteData with $PetsRoute {

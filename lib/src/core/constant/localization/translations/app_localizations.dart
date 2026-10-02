@@ -955,6 +955,42 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Дата рождения'**
   String get pickBirthDateTitle;
+
+  /// No description provided for @navBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назад'**
+  String get navBack;
+
+  /// No description provided for @petDetailsMenu.
+  ///
+  /// In ru, this message translates to:
+  /// **'Меню'**
+  String get petDetailsMenu;
+
+  /// No description provided for @petDetailsAge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Возраст'**
+  String get petDetailsAge;
+
+  /// No description provided for @petDetailsEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить'**
+  String get petDetailsEdit;
+
+  /// No description provided for @petDetailsUpcoming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ближайшие события'**
+  String get petDetailsUpcoming;
+
+  /// No description provided for @petDetailsNoEvents.
+  ///
+  /// In ru, this message translates to:
+  /// **'В ближайшие две недели событий нет'**
+  String get petDetailsNoEvents;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

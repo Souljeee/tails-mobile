@@ -22,52 +22,58 @@ class ScheduleRemoteDataSource {
       },
     );
 
+    return _parseEventsByDate(response);
+  }
+
+  /// Ближайшие события питомца: `GET /pets/{id}/upcoming/`.
+  Future<ScheduleEventDtoList> getPetUpcomingEvents({
+    required int petId,
+    required DateTime dateFrom,
+    int days = 14,
+  }) async {
+    final response = await restClient.get(
+      '/pets/$petId/upcoming/',
+      queryParams: {
+        'days': days.toString(),
+        'date_from': DateFormat('yyyy-MM-dd').format(dateFrom),
+      },
+    );
+
+    return _parseEventsByDate(response);
+  }
+
+  ScheduleEventDtoList _parseEventsByDate(Object? response) {
     if (response == null || response is! Map<String, dynamic>) {
       throw Exception('Invalid response');
     }
 
-    final responseMap = response;
-    
-    final events = Map<DateTime, List<ScheduleEventDto>>.fromEntries(
-      responseMap.entries.map((MapEntry<String, dynamic> entry) => MapEntry(
-            DateTime.parse(entry.key),
-            (entry.value as List<dynamic>)
-                .map((value) => ScheduleEventDto.fromJson(value as Map<String, dynamic>))
-                .toList(),
-          )),
+    return Map<DateTime, List<ScheduleEventDto>>.fromEntries(
+      response.entries.map(
+        (MapEntry<String, dynamic> entry) => MapEntry(
+          DateTime.parse(entry.key),
+          (entry.value as List<dynamic>)
+              .map((value) => ScheduleEventDto.fromJson(value as Map<String, dynamic>))
+              .toList(),
+        ),
+      ),
     );
-
-    return events;
   }
 
   Future<void> createEvent({required CreateEventDto dto}) async {
-    await restClient.post(
-      '/event_schedule/',
-      body: dto.toJson(),
-    );
+    await restClient.post('/event_schedule/', body: dto.toJson());
   }
 
-  Future<void> markEventAsDone({
-    required String eventId,
-    required DateTime date,
-  }) async {
+  Future<void> markEventAsDone({required String eventId, required DateTime date}) async {
     await restClient.post(
       '/event_schedule/$eventId/mark_done/',
-      body: {
-        'date': DateFormat('yyyy-MM-dd').format(date),
-      },
+      body: {'date': DateFormat('yyyy-MM-dd').format(date)},
     );
   }
 
-  Future<void> markEventAsUndone({
-    required String eventId,
-    required DateTime date,
-  }) async {
+  Future<void> markEventAsUndone({required String eventId, required DateTime date}) async {
     await restClient.post(
       '/event_schedule/$eventId/mark_undone/',
-      body: {
-        'date': DateFormat('yyyy-MM-dd').format(date),
-      },
+      body: {'date': DateFormat('yyyy-MM-dd').format(date)},
     );
   }
 }
