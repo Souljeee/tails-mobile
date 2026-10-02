@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_popup/ui_popup.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 
+/// Sheet выбора даты рождения. Возвращает выбранную дату или `null`.
 class CalendarPopup extends StatefulWidget {
   final DateTime? initialDate;
 
   static Future<DateTime?> show({required BuildContext context, DateTime? initialDate}) =>
-      showUiPopup(
+      showUiBottomSheet<DateTime>(
         context: context,
-        child: CalendarPopup._(initialDate: initialDate),
+        builder: (_) => CalendarPopup._(initialDate: initialDate),
       );
 
   const CalendarPopup._({this.initialDate});
@@ -25,11 +28,14 @@ class _CalendarPopupState extends State<CalendarPopup> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final palette = context.uiPalette;
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Выберите дату рождения', style: context.uiFonts.header28Semibold),
-        const SizedBox(height: 16), 
+        UiSheetHeader(title: l10n.pickBirthDateTitle, cancelLabel: l10n.cancel),
+        const SizedBox(height: UiSpacing.x2),
         MonthCalendar(
           initialMonth: widget.initialDate?.monthStart,
           onDateTap: (date) {
@@ -38,22 +44,16 @@ class _CalendarPopupState extends State<CalendarPopup> {
             });
           },
           style: CalendarStyle(
-            resolveDateTextColor: (date) => _seletedDate?.isSameDate(date) ?? false
-                ? context.uiColors.white
-                : context.uiColors.black80,
-            resolveDateBackgroundColor: (date) => _seletedDate?.isSameDate(date) ?? false
-                ? context.uiColors.orangePrimary
-                : Colors.transparent,
+            resolveDateTextColor: (date) =>
+                _seletedDate?.isSameDate(date) ?? false ? palette.surface : palette.ink,
+            resolveDateBackgroundColor: (date) =>
+                _seletedDate?.isSameDate(date) ?? false ? palette.accent : Colors.transparent,
           ),
         ),
-        SizedBox(
-          width: double.infinity,
-          child: UiButton.main(
-            label: 'Выбрать',
-            onPressed: () {
-              Navigator.pop(context, _seletedDate);
-            },
-          ),
+        const SizedBox(height: UiSpacing.x4),
+        UiButton.main(
+          label: l10n.selectAction,
+          onPressed: _seletedDate == null ? null : () => Navigator.pop(context, _seletedDate),
         ),
       ],
     );

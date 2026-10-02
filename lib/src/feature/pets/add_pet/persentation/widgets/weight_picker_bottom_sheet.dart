@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker_plus/flutter_picker_plus.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 
+/// Содержимое sheet выбора веса: килограммы и граммы с шагом 100 г.
+/// Закрывается, возвращая `[кг, г]`.
 class WeightPickerBottomSheet extends StatefulWidget {
   const WeightPickerBottomSheet({
     required this.initialKilograms,
@@ -18,10 +24,7 @@ class WeightPickerBottomSheet extends StatefulWidget {
 
 class _WeightPickerBottomSheetState extends State<WeightPickerBottomSheet> {
   late final NumberPickerAdapter _adapter = NumberPickerAdapter(
-    data: const [
-      NumberPickerColumn(end: 100),
-      NumberPickerColumn(end: 900, jump: 100),
-    ],
+    data: const [NumberPickerColumn(end: 100), NumberPickerColumn(end: 900, jump: 100)],
   );
 
   late final List<int> _initialSelecteds;
@@ -31,8 +34,12 @@ class _WeightPickerBottomSheetState extends State<WeightPickerBottomSheet> {
     hideHeader: true,
     itemExtent: 44,
     selecteds: _initialSelecteds,
-    textStyle: context.uiFonts.text20Semibold.copyWith(color: context.uiColors.black100),
-    selectedTextStyle: context.uiFonts.text20Semibold.copyWith(color: context.uiColors.black100),
+    backgroundColor: Colors.transparent,
+    textStyle: context.uiFonts.monoDigits.copyWith(color: context.uiPalette.ink, fontSize: 20),
+    selectedTextStyle: context.uiFonts.monoDigits.copyWith(
+      color: context.uiPalette.ink,
+      fontSize: 20,
+    ),
   );
 
   @override
@@ -42,8 +49,6 @@ class _WeightPickerBottomSheetState extends State<WeightPickerBottomSheet> {
     final initialGrams = (widget.initialGrams.clamp(0, 900) ~/ 100) * 100;
     _initialSelecteds = [initialKg, initialGrams ~/ 100];
   }
-
-  void _onCancel() => Navigator.of(context).pop();
 
   void _onConfirm() {
     final values = _picker.getSelectedValues();
@@ -57,75 +62,30 @@ class _WeightPickerBottomSheetState extends State<WeightPickerBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        decoration: BoxDecoration(
-          color: context.uiColors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: const EdgeInsets.only(top: 12, bottom: 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    final l10n = context.l10n;
+    final unitStyle = context.uiFonts.footnote.copyWith(color: context.uiPalette.ink3);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        UiSheetHeader(title: l10n.petFormWeight, cancelLabel: l10n.cancel),
+        const SizedBox(height: UiSpacing.x2),
+        Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  TextButton(
-                    onPressed: _onCancel,
-                    child: Text(
-                      'Отмена',
-                      style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.brown),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Вес',
-                      textAlign: TextAlign.center,
-                      style: context.uiFonts.text16Semibold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: _onConfirm,
-                    child: Text(
-                      'Готово',
-                      style: context.uiFonts.text16Regular.copyWith(color: context.uiColors.brown),
-                    ),
-                  ),
-                ],
-              ),
+            Expanded(
+              child: Text(l10n.weightKgUnit, textAlign: TextAlign.center, style: unitStyle),
             ),
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 44),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'кг',
-                      textAlign: TextAlign.center,
-                      style: context.uiFonts.text12Medium.copyWith(color: context.uiColors.black40),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'г',
-                      textAlign: TextAlign.center,
-                      style: context.uiFonts.text12Medium.copyWith(color: context.uiColors.black40),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 216,
-              child: _picker.makePicker(),
+            Expanded(
+              child: Text(l10n.weightGramsUnit, textAlign: TextAlign.center, style: unitStyle),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: UiSpacing.x2),
+        SizedBox(height: 216, child: _picker.makePicker()),
+        const SizedBox(height: UiSpacing.x4),
+        UiButton.main(label: l10n.done, onPressed: _onConfirm),
+      ],
     );
   }
 }

@@ -13,6 +13,7 @@ class UiSelectableCard extends StatelessWidget {
     required this.selected,
     required this.onTap,
     this.icon,
+    this.leading,
     super.key,
   });
 
@@ -20,6 +21,9 @@ class UiSelectableCard extends StatelessWidget {
   final bool selected;
   final VoidCallback? onTap;
   final IconData? icon;
+
+  /// Произвольный виджет вместо [icon], например SVG.
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +53,8 @@ class UiSelectableCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x4),
                 child: Row(
                   children: [
-                    if (icon != null) ...[
-                      Icon(icon, size: 22, color: palette.ink),
+                    if (leading != null || icon != null) ...[
+                      leading ?? Icon(icon, size: 22, color: palette.ink),
                       const SizedBox(width: UiSpacing.x3),
                     ],
                     Expanded(

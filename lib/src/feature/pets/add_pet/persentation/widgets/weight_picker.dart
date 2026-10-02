@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/weight_picker_bottom_sheet.dart';
+import 'package:tails_mobile/src/feature/pets/core/utils/pet_weight_format.dart';
 
+/// Поле веса: показывает число с суффиксом «кг», по нажатию открывает пикер.
 class WeightPicker extends StatefulWidget {
   final void Function(double) onWeightSelected;
   final double? initialWeight;
 
-  const WeightPicker({
-    required this.onWeightSelected,
-    this.initialWeight,
-    super.key,
-  });
+  const WeightPicker({required this.onWeightSelected, this.initialWeight, super.key});
 
   @override
   State<WeightPicker> createState() => _WeightPickerState();
@@ -18,17 +19,15 @@ class WeightPicker extends StatefulWidget {
 
 class _WeightPickerState extends State<WeightPicker> {
   late double? _weight = widget.initialWeight;
+  late final UiTextFieldController _controller = UiTextFieldController(
+    text: _weight == null ? '' : formatPetWeight(_weight!),
+  );
 
-  String _formatWeight(double weightKg) {
-    final kg = weightKg.floor().clamp(0, 100);
-    final grams = ((weightKg - kg) * 1000).round().clamp(0, 900);
-    final normalizedGrams = (grams ~/ 100) * 100;
+  @override
+  void dispose() {
+    _controller.dispose();
 
-    if (normalizedGrams == 0) return '$kg кг';
-
-    // Так как граммы выбираются шагом 100, отображаем как одну десятичную: 2,3 кг
-    final tenths = (normalizedGrams ~/ 100).clamp(0, 9);
-    return '$kg,$tenths кг';
+    super.dispose();
   }
 
   Future<void> _openWeightPicker() async {
@@ -36,13 +35,9 @@ class _WeightPickerState extends State<WeightPicker> {
     final kg = current.floor().clamp(0, 100);
     final grams = (((current - kg) * 1000).round() ~/ 100) * 100;
 
-    final selected = await showModalBottomSheet<List<int>>(
+    final selected = await showUiBottomSheet<List<int>>(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => WeightPickerBottomSheet(
-        initialKilograms: kg,
-        initialGrams: grams,
-      ),
+      builder: (_) => WeightPickerBottomSheet(initialKilograms: kg, initialGrams: grams),
     );
 
     if (selected == null) return;
@@ -51,12 +46,9 @@ class _WeightPickerState extends State<WeightPicker> {
     final selectedGrams = (selected[1].clamp(0, 900) ~/ 100) * 100;
     final weight = selectedKg + (selectedGrams / 1000.0);
 
-    _onWeightSelected(weight);
-  }
-
-  void _onWeightSelected(double weight) {
     setState(() {
       _weight = weight;
+      _controller.text = formatPetWeight(weight);
     });
 
     widget.onWeightSelected(weight);
@@ -64,46 +56,17 @@ class _WeightPickerState extends State<WeightPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: _openWeightPicker,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: context.uiColors.black5,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Вес',
-                      style: context.uiFonts.header20Medium,
-                    ),
-                    if(_weight != null)...[
-                      const SizedBox(height: 8),
-                      Text(
-                        _formatWeight(_weight!),
-                        style: context.uiFonts.text16Semibold.copyWith(color: context.uiColors.brown),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: context.uiColors.brown,
-              ),
-            ],
-          ),
+      child: AbsorbPointer(
+        child: UiTextField(
+          controller: _controller,
+          labelText: l10n.petFormWeight,
+          placeholderText: l10n.petFormWeightPlaceholder,
+          secondaryText: l10n.weightKgUnit,
         ),
       ),
     );

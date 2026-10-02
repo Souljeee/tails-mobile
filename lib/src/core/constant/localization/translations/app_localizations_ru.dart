@@ -434,4 +434,109 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get breedMixedLabel => 'Метис или не знаю';
+
+  @override
+  String get addPetTitle => 'Новый питомец';
+
+  @override
+  String get editPetTitle => 'Изменить питомца';
+
+  @override
+  String get addPetSubmit => 'Добавить питомца';
+
+  @override
+  String get savePet => 'Сохранить';
+
+  @override
+  String get petFormMain => 'Основное';
+
+  @override
+  String get petFormDetails => 'Детали';
+
+  @override
+  String get petFormKind => 'Вид';
+
+  @override
+  String get petFormName => 'Кличка';
+
+  @override
+  String get petFormNamePlaceholder => 'Например, Барсик';
+
+  @override
+  String get petFormSex => 'Пол';
+
+  @override
+  String get petSexMale => 'Мужской';
+
+  @override
+  String get petSexFemale => 'Женский';
+
+  @override
+  String get petFormBreed => 'Порода';
+
+  @override
+  String get petFormBreedPlaceholder => 'Выберите породу';
+
+  @override
+  String get petFormBirthday => 'Дата рождения';
+
+  @override
+  String get petFormBirthdayHint => 'Если не знаете точно — укажите примерную дату';
+
+  @override
+  String get petFormWeight => 'Вес';
+
+  @override
+  String get petFormWeightPlaceholder => 'Выберите';
+
+  @override
+  String get petFormColor => 'Окрас';
+
+  @override
+  String get petFormColorPlaceholder => 'Например, рыжий';
+
+  @override
+  String get petCastratedMale => 'Кастрирован';
+
+  @override
+  String get petCastratedFemale => 'Стерилизована';
+
+  @override
+  String get petCastratedHint => 'Можно изменить позже в профиле';
+
+  @override
+  String get petPhotoAdd => 'Добавить фото';
+
+  @override
+  String get petPhotoChange => 'Изменить фото';
+
+  @override
+  String get petPhotoHint => 'Фото поможет быстрее находить питомца';
+
+  @override
+  String get photoSourceTitle => 'Загрузить фото';
+
+  @override
+  String get photoSourceGallery => 'Галерея';
+
+  @override
+  String get photoSourceCamera => 'Камера';
+
+  @override
+  String get photoPickError => 'Не удалось выбрать фото';
+
+  @override
+  String get weightKgUnit => 'кг';
+
+  @override
+  String get weightGramsUnit => 'г';
+
+  @override
+  String get done => 'Готово';
+
+  @override
+  String get selectAction => 'Выбрать';
+
+  @override
+  String get pickBirthDateTitle => 'Дата рождения';
 }

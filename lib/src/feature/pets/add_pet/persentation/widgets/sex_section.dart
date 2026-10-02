@@ -1,32 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_switcher/ui_switcher.dart';
-import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_selectable_card/ui_selectable_card.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 
+/// Выбор пола питомца: две карточки-радио.
 class SexSection extends StatelessWidget {
+  final PetSexEnum? value;
   final void Function(PetSexEnum sex) onSexChanged;
 
-  const SexSection({
-    required this.onSexChanged,
-    super.key,
-  });
+  const SexSection({required this.value, required this.onSexChanged, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final l10n = context.l10n;
+
+    return Row(
       children: [
-        Text(
-          'Пол',
-          style: context.uiFonts.header20Medium,
+        Expanded(
+          child: UiSelectableCard(
+            label: l10n.petSexMale,
+            selected: value == PetSexEnum.male,
+            icon: Icons.male,
+            onTap: () => onSexChanged(PetSexEnum.male),
+          ),
         ),
-        const SizedBox(height: 8),
-        UiSwitcher<PetSexEnum>(
-          options: const [
-            UiSwitcherOption(value: PetSexEnum.male, label: 'Мужской', icon: Icons.male),
-            UiSwitcherOption(value: PetSexEnum.female, label: 'Женский', icon: Icons.female),
-          ],
-          onTypeChanged: onSexChanged,
+        const SizedBox(width: UiSpacing.x3),
+        Expanded(
+          child: UiSelectableCard(
+            label: l10n.petSexFemale,
+            selected: value == PetSexEnum.female,
+            icon: Icons.female,
+            onTap: () => onSexChanged(PetSexEnum.female),
+          ),
         ),
       ],
     );

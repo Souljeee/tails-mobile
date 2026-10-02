@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_radio/ui_radio.dart';
-import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_switch_row/ui_switch_row.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 
 class CastrationSection extends StatefulWidget {
@@ -24,37 +24,18 @@ class _CastrationSectionState extends State<CastrationSection> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
+    final l10n = context.l10n;
+
+    return UiSwitchRow(
+      title: widget.gender == PetSexEnum.male ? l10n.petCastratedMale : l10n.petCastratedFemale,
+      subtitle: l10n.petCastratedHint,
+      value: _isSelected,
+      onChanged: (value) {
         setState(() {
-          _isSelected = !_isSelected;
+          _isSelected = value;
         });
-        widget.onSelected(_isSelected);
+        widget.onSelected(value);
       },
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: context.uiColors.black5,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
-          child: Row(
-            children: [
-              UiRadio(isSelected: _isSelected),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  widget.gender == PetSexEnum.male ? 'Кастрирован' : 'Стерилизована',
-                  style: context.uiFonts.header20Medium,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

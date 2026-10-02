@@ -1,21 +1,21 @@
 import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
+import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/calendar_popup.dart';
-import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/castration_section.dart';
-import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/pet_type_selection.dart';
-import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/photo_upload_widget.dart';
-import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/sex_section.dart';
-import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/weight_picker.dart';
+import 'package:tails_mobile/src/feature/pets/add_pet/persentation/widgets/pet_form_body.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/edit_pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_details_model.dart';
@@ -189,145 +189,64 @@ class _EditPetModalState extends State<EditPetModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
-      backgroundColor: context.uiColors.white,
-      appBar: AppBar(
-        title: Text('Изменить', style: context.uiFonts.header24Semibold),
-        backgroundColor: context.uiColors.white,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-      ),
+      backgroundColor: context.uiPalette.canvas,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              PhotoUploadWidget(
-                onImageSelected: _onImageSelected,
-                initialImageUrl: widget.pet.image,
-              ),
-              const SizedBox(height: 40),
-              PetTypeSelection(onTypeChanged: _onTypeChanged),
-              const SizedBox(height: 16),
-              Text('Кличка', style: context.uiFonts.header20Medium),
-              const SizedBox(height: 8),
-              UiTextField(
-                controller: _nameController,
-                placeholderText: 'Наприме, Барсик',
-                placeholderStyle: context.uiFonts.text16Regular.copyWith(
-                  color: context.uiColors.brown,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
+              child: UiSheetHeader(title: l10n.editPetTitle, cancelLabel: l10n.cancel),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.fromLTRB(
+                  UiSpacing.x5,
+                  UiSpacing.x4,
+                  UiSpacing.x5,
+                  UiSpacing.x4,
                 ),
-                trailingIcon: Icon(Icons.edit_outlined, size: 28, color: context.uiColors.brown),
-              ),
-              const SizedBox(height: 16),
-              SexSection(onSexChanged: _onSexChanged),
-              const SizedBox(height: 16),
-              Text('Порода', style: context.uiFonts.header20Medium),
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: () async {
-                  final BreedModel? breed = await SelectBreedRoute(
-                    petType: _formData.value.petType ?? PetTypeEnum.cat,
-                  ).push<BreedModel>(context);
-
-                  if (breed != null) {
-                    _breedController.text = breed.name;
-                    _onBreedSelected(breed);
-                  }
-                },
-                child: AbsorbPointer(
-                  child: UiTextField(
-                    controller: _breedController,
-                    placeholderText: 'Выберите породу',
-                    placeholderStyle: context.uiFonts.text16Regular.copyWith(
-                      color: context.uiColors.brown,
-                    ),
-                    trailingIcon: Icon(Icons.search, size: 28, color: context.uiColors.brown),
-                    suffixIcon: Icons.keyboard_arrow_down_outlined,
-                    suffixIconColor: context.uiColors.brown,
-                  ),
+                child: ValueListenableBuilder<EditPetFormData>(
+                  valueListenable: _formData,
+                  builder: (context, formData, _) {
+                    return PetFormBody(
+                      petType: formData.petType,
+                      gender: formData.gender,
+                      nameController: _nameController,
+                      breedController: _breedController,
+                      birthDateController: _birthDateController,
+                      colorController: _colorController,
+                      initialImageUrl: widget.pet.image,
+                      initialWeight: widget.pet.weight,
+                      initialCastration: widget.pet.hasCastration,
+                      onImageSelected: _onImageSelected,
+                      onTypeChanged: _onTypeChanged,
+                      onSexChanged: _onSexChanged,
+                      onWeightSelected: _onWeightSelected,
+                      onCastrationSelected: _onCastrationSelected,
+                      onBreedTap: _selectBreed,
+                      onBirthDateTap: _selectBirthDate,
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 16),
-              Text('Дата рождения', style: context.uiFonts.header20Medium),
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: () async {
-                  final DateTime? selectedDate = await CalendarPopup.show(
-                    context: context,
-                    initialDate: _formData.value.birthday ?? widget.pet.birthday,
-                  );
-
-                  if (selectedDate != null) {
-                    _birthDateController.text = DateFormat('dd.MM.yyyy').format(selectedDate);
-
-                    _onBirthDateSelected(selectedDate);
-                  }
-                },
-                child: AbsorbPointer(
-                  child: UiTextField(
-                    controller: _birthDateController,
-                    placeholderText: 'ДД.ММ.ГГГГ',
-                    placeholderStyle: context.uiFonts.text16Regular.copyWith(
-                      color: context.uiColors.brown,
-                    ),
-                    trailingIcon: Icon(
-                      Icons.calendar_month_outlined,
-                      size: 28,
-                      color: context.uiColors.brown,
-                    ),
-                    suffixIcon: Icons.keyboard_arrow_down_outlined,
-                    suffixIconColor: context.uiColors.brown,
-                  ),
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                UiSpacing.x5,
+                UiSpacing.x2,
+                UiSpacing.x5,
+                UiSpacing.x4,
               ),
-              const SizedBox(height: 16),
-              WeightPicker(onWeightSelected: _onWeightSelected, initialWeight: widget.pet.weight),
-              const SizedBox(height: 16),
-              Text('Окрас', style: context.uiFonts.header20Medium),
-              const SizedBox(height: 8),
-              UiTextField(
-                controller: _colorController,
-                placeholderText: 'Например, рыжий',
-                placeholderStyle: context.uiFonts.text16Regular.copyWith(
-                  color: context.uiColors.brown,
-                ),
-                trailingIcon: Icon(
-                  Icons.color_lens_outlined,
-                  size: 28,
-                  color: context.uiColors.brown,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ValueListenableBuilder(
-                valueListenable: _formData,
-                builder: (context, formData, _) {
-                  return CastrationSection(
-                    initialSelection: widget.pet.hasCastration,
-                    gender: formData.gender ?? PetSexEnum.male,
-                    onSelected: _onCastrationSelected,
-                  );
-                },
-              ),
-              const SizedBox(height: 32),
-              BlocConsumer<EditPetBloc, EditPetState>(
+              child: BlocConsumer<EditPetBloc, EditPetState>(
                 bloc: _editPetBloc,
                 listener: (context, state) {
                   state.mapOrNull(
                     success: (_) => Navigator.of(context).pop(),
-                    error: (e) => ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Произошла ошибка. Повторите позднее.',
-                          style: context.uiFonts.text16Regular.copyWith(
-                            color: context.uiColors.white,
-                          ),
-                        ),
-                        backgroundColor: context.uiColors.red,
-                      ),
-                    ),
+                    error: (_) => showUiSnackBar(context, message: l10n.tryLater),
                   );
                 },
                 builder: (context, state) {
@@ -338,7 +257,7 @@ class _EditPetModalState extends State<EditPetModal> {
 
                       return UiButton.main(
                         isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-                        label: 'Сохранить',
+                        label: l10n.savePet,
                         onPressed: isFormValid
                             ? state.mapOrNull(
                                 initial: (_) => () {
@@ -353,6 +272,7 @@ class _EditPetModalState extends State<EditPetModal> {
                                         weight: formData.weight,
                                         gender: formData.gender,
                                         birthday: formData.birthday,
+                                        hasCastration: formData.castration,
                                       ),
                                       image: _formData.value.image,
                                     ),
@@ -365,11 +285,36 @@ class _EditPetModalState extends State<EditPetModal> {
                   );
                 },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Future<void> _selectBreed() async {
+    final BreedModel? breed = await SelectBreedRoute(
+      petType: _formData.value.petType ?? PetTypeEnum.cat,
+      selectedBreedId: _formData.value.breedId,
+    ).push<BreedModel>(context);
+
+    if (breed != null) {
+      _breedController.text = breed.name;
+      _onBreedSelected(breed);
+    }
+  }
+
+  Future<void> _selectBirthDate() async {
+    final DateTime? selectedDate = await CalendarPopup.show(
+      context: context,
+      initialDate: _formData.value.birthday ?? widget.pet.birthday,
+    );
+
+    if (selectedDate != null) {
+      _birthDateController.text = DateFormat('dd.MM.yyyy').format(selectedDate);
+
+      _onBirthDateSelected(selectedDate);
+    }
   }
 
   bool _hasChanges(EditPetFormData formData) {

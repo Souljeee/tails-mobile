@@ -745,6 +745,216 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Метис или не знаю'**
   String get breedMixedLabel;
+
+  /// No description provided for @addPetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый питомец'**
+  String get addPetTitle;
+
+  /// No description provided for @editPetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить питомца'**
+  String get editPetTitle;
+
+  /// No description provided for @addPetSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить питомца'**
+  String get addPetSubmit;
+
+  /// No description provided for @savePet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить'**
+  String get savePet;
+
+  /// No description provided for @petFormMain.
+  ///
+  /// In ru, this message translates to:
+  /// **'Основное'**
+  String get petFormMain;
+
+  /// No description provided for @petFormDetails.
+  ///
+  /// In ru, this message translates to:
+  /// **'Детали'**
+  String get petFormDetails;
+
+  /// No description provided for @petFormKind.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вид'**
+  String get petFormKind;
+
+  /// No description provided for @petFormName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кличка'**
+  String get petFormName;
+
+  /// No description provided for @petFormNamePlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, Барсик'**
+  String get petFormNamePlaceholder;
+
+  /// No description provided for @petFormSex.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пол'**
+  String get petFormSex;
+
+  /// No description provided for @petSexMale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мужской'**
+  String get petSexMale;
+
+  /// No description provided for @petSexFemale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Женский'**
+  String get petSexFemale;
+
+  /// No description provided for @petFormBreed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порода'**
+  String get petFormBreed;
+
+  /// No description provided for @petFormBreedPlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите породу'**
+  String get petFormBreedPlaceholder;
+
+  /// No description provided for @petFormBirthday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата рождения'**
+  String get petFormBirthday;
+
+  /// No description provided for @petFormBirthdayHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если не знаете точно — укажите примерную дату'**
+  String get petFormBirthdayHint;
+
+  /// No description provided for @petFormWeight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вес'**
+  String get petFormWeight;
+
+  /// No description provided for @petFormWeightPlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите'**
+  String get petFormWeightPlaceholder;
+
+  /// No description provided for @petFormColor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окрас'**
+  String get petFormColor;
+
+  /// No description provided for @petFormColorPlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, рыжий'**
+  String get petFormColorPlaceholder;
+
+  /// No description provided for @petCastratedMale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кастрирован'**
+  String get petCastratedMale;
+
+  /// No description provided for @petCastratedFemale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стерилизована'**
+  String get petCastratedFemale;
+
+  /// No description provided for @petCastratedHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Можно изменить позже в профиле'**
+  String get petCastratedHint;
+
+  /// No description provided for @petPhotoAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить фото'**
+  String get petPhotoAdd;
+
+  /// No description provided for @petPhotoChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить фото'**
+  String get petPhotoChange;
+
+  /// No description provided for @petPhotoHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фото поможет быстрее находить питомца'**
+  String get petPhotoHint;
+
+  /// No description provided for @photoSourceTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузить фото'**
+  String get photoSourceTitle;
+
+  /// No description provided for @photoSourceGallery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Галерея'**
+  String get photoSourceGallery;
+
+  /// No description provided for @photoSourceCamera.
+  ///
+  /// In ru, this message translates to:
+  /// **'Камера'**
+  String get photoSourceCamera;
+
+  /// No description provided for @photoPickError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось выбрать фото'**
+  String get photoPickError;
+
+  /// No description provided for @weightKgUnit.
+  ///
+  /// In ru, this message translates to:
+  /// **'кг'**
+  String get weightKgUnit;
+
+  /// No description provided for @weightGramsUnit.
+  ///
+  /// In ru, this message translates to:
+  /// **'г'**
+  String get weightGramsUnit;
+
+  /// No description provided for @done.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово'**
+  String get done;
+
+  /// No description provided for @selectAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрать'**
+  String get selectAction;
+
+  /// No description provided for @pickBirthDateTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата рождения'**
+  String get pickBirthDateTitle;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
