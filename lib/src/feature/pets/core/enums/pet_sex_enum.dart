@@ -7,15 +7,3 @@ enum PetSexEnum {
   @JsonValue('F')
   female,
 }
-
-extension PetSexEnumExtension on PetSexEnum {
-  String get shortName => switch (this) {
-        PetSexEnum.male => 'Муж.',
-        PetSexEnum.female => 'Жен.',
-      };
-
-  String get fullName => switch (this) {
-        PetSexEnum.male => 'Мужcкой',
-        PetSexEnum.female => 'Женский',
-      };
-}

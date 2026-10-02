@@ -27,7 +27,7 @@ class UiFormField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (label != null) ...[
-          Text(label!, style: fonts.text14Semibold.copyWith(color: palette.ink2)),
+          Text(label!, style: fonts.callout.copyWith(color: palette.ink2)),
           const SizedBox(height: UiSpacing.x2),
         ],
         child,

@@ -8,15 +8,11 @@ class _BaseLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: ColoredBox(
-            color: context.uiColors.white.withValues(alpha: 0.5),
-          ),
-        ),
+        Positioned.fill(child: ColoredBox(color: context.uiPalette.canvas.withValues(alpha: 0.5))),
         Center(
           child: SizedBox.square(
             dimension: 80,
-            child: CircularProgressIndicator(color: context.uiColors.orangePrimary),
+            child: CircularProgressIndicator(color: context.uiPalette.accent),
           ),
         ),
       ],
@@ -32,10 +28,7 @@ abstract class LoaderController {
 class LoaderOverlay extends StatefulWidget {
   final Widget child;
 
-  const LoaderOverlay({
-    required this.child,
-    super.key,
-  });
+  const LoaderOverlay({required this.child, super.key});
 
   static LoaderController of(BuildContext context) {
     final loaderOverlay = context.dependOnInheritedWidgetOfExactType<_InheritedLoaderOverlay>();

@@ -157,7 +157,10 @@ class _NavItem extends StatelessWidget {
                   item.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: context.uiFonts.text12Semibold.copyWith(color: color),
+                  style: context.uiFonts.footnote.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),

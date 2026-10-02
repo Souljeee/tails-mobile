@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Семантическая палитра Design 2.0.
 ///
-/// Написана вручную, а не через `theme_tailor`, чтобы не требовать перегенерации
-/// `UiColorScheme`, пока экраны переходят на новый дизайн. Старые цвета
-/// (`context.uiColors`) остаются до завершения миграции.
+/// Написана вручную, без кодогенерации. Доступна через `context.uiPalette`.
 @immutable
 class UiPalette extends ThemeExtension<UiPalette> {
   const UiPalette({
