@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/schedule_remote_data_source.dart';
@@ -93,5 +95,22 @@ void main() {
     await pumpEventQueue();
 
     expect(bloc.state, isA<ScheduleState$Error>());
+  });
+
+  test('completer завершается после загрузки, в том числе неудачной', () async {
+    final ok = Completer<void>();
+
+    bloc.add(ScheduleEvent.fetchRequested(startDate: start, endDate: end, completer: ok));
+    await ok.future.timeout(const Duration(seconds: 1));
+
+    dataSource.fail = true;
+    final failed = Completer<void>();
+
+    bloc.add(
+      ScheduleEvent.fetchRequested(startDate: start, endDate: end, silent: true, completer: failed),
+    );
+    await failed.future.timeout(const Duration(seconds: 1));
+
+    expect(bloc.state, isA<ScheduleState$Success>());
   });
 }

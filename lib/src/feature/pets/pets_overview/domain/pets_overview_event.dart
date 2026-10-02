@@ -6,7 +6,9 @@ sealed class PetsOverviewEvent extends Equatable {
   const PetsOverviewEvent();
 
   /// [silent] — обновить данные, не показывая загрузку, если они уже есть.
-  const factory PetsOverviewEvent.fetchRequested({bool silent}) = PetsOverviewEvent$FetchRequested;
+  /// [completer] завершается, когда обработка закончена (для pull-to-refresh).
+  const factory PetsOverviewEvent.fetchRequested({bool silent, Completer<void>? completer}) =
+      PetsOverviewEvent$FetchRequested;
 
   T map<T>({required PetsOverviewEventMatch<T, PetsOverviewEvent$FetchRequested> fetchRequested}) =>
       switch (this) {
@@ -15,9 +17,10 @@ sealed class PetsOverviewEvent extends Equatable {
 }
 
 final class PetsOverviewEvent$FetchRequested extends PetsOverviewEvent {
-  const PetsOverviewEvent$FetchRequested({this.silent = false});
+  const PetsOverviewEvent$FetchRequested({this.silent = false, this.completer});
 
   final bool silent;
+  final Completer<void>? completer;
 
   @override
   List<Object?> get props => [silent];

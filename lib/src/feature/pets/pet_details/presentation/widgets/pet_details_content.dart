@@ -9,6 +9,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_section_header/ui_sec
 import 'package:tails_mobile/src/core/ui_kit/components/ui_stat_strip/ui_stat_strip.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_sizes.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/enums_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
@@ -26,7 +27,12 @@ import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/
 /// Фото закреплено за экраном: при прокрутке уезжает вверх вместе с листом, а при
 /// оттягивании вниз (overscroll) растягивается, не открывая фон над собой.
 class PetDetailsContent extends StatefulWidget {
-  const PetDetailsContent({required this.pet, required this.upcomingEvents, super.key});
+  const PetDetailsContent({
+    required this.pet,
+    required this.upcomingEvents,
+    required this.onRefresh,
+    super.key,
+  });
 
   /// Доля ширины экрана, которую занимает высота фото.
   static const double _photoHeightFactor = 0.95;
@@ -39,6 +45,9 @@ class PetDetailsContent extends StatefulWidget {
 
   final PetDetailsModel pet;
   final List<ScheduleEventModel> upcomingEvents;
+
+  /// Pull-to-refresh; индикатор показывается ниже кнопок поверх фото.
+  final Future<void> Function() onRefresh;
 
   @override
   State<PetDetailsContent> createState() => _PetDetailsContentState();
@@ -85,34 +94,39 @@ class _PetDetailsContentState extends State<PetDetailsContent> {
             ),
           ),
         ),
-        SingleChildScrollView(
-          controller: _controller,
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: photoHeight - PetDetailsContent._sheetOverlap),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: palette.canvas,
-                  borderRadius: const BorderRadius.vertical(top: UiRadius.xlTop),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    UiSpacing.x5,
-                    UiSpacing.x6,
-                    UiSpacing.x5,
-                    ShellScope.bottomInsetOf(context),
+        RefreshIndicator.adaptive(
+          onRefresh: widget.onRefresh,
+          color: palette.accent,
+          edgeOffset: MediaQuery.paddingOf(context).top + UiSizes.minTapTarget + UiSpacing.x4,
+          child: SingleChildScrollView(
+            controller: _controller,
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: photoHeight - PetDetailsContent._sheetOverlap),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: palette.canvas,
+                    borderRadius: const BorderRadius.vertical(top: UiRadius.xlTop),
                   ),
-                  child: _PetDetailsSheet(
-                    pet: widget.pet,
-                    upcomingEvents: widget.upcomingEvents
-                        .take(PetDetailsContent._maxEvents)
-                        .toList(),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      UiSpacing.x5,
+                      UiSpacing.x6,
+                      UiSpacing.x5,
+                      ShellScope.bottomInsetOf(context),
+                    ),
+                    child: _PetDetailsSheet(
+                      pet: widget.pet,
+                      upcomingEvents: widget.upcomingEvents
+                          .take(PetDetailsContent._maxEvents)
+                          .toList(),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

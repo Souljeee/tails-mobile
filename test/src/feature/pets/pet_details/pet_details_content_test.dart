@@ -33,7 +33,9 @@ Widget _app(Widget child) => MaterialApp(
 
 void main() {
   testWidgets('PetDetailsContent shows real pet data and empty events hint', (tester) async {
-    await tester.pumpWidget(_app(PetDetailsContent(pet: _pet(), upcomingEvents: const [])));
+    await tester.pumpWidget(
+      _app(PetDetailsContent(pet: _pet(), upcomingEvents: const [], onRefresh: () async {})),
+    );
 
     expect(find.text('Рекс'), findsOneWidget);
     expect(find.text('Собака · Корги'), findsOneWidget);
@@ -45,9 +47,38 @@ void main() {
 
   testWidgets('PetDetailsContent hides castration row when not castrated', (tester) async {
     await tester.pumpWidget(
-      _app(PetDetailsContent(pet: _pet(castrated: false), upcomingEvents: const [])),
+      _app(
+        PetDetailsContent(
+          pet: _pet(castrated: false),
+          upcomingEvents: const [],
+          onRefresh: () async {},
+        ),
+      ),
     );
 
     expect(find.text('Кастрирован'), findsNothing);
+  });
+
+  testWidgets('PetDetailsContent вызывает onRefresh при протягивании вниз', (tester) async {
+    tester.view.physicalSize = const Size(360, 740);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    var refreshes = 0;
+
+    await tester.pumpWidget(
+      _app(
+        PetDetailsContent(
+          pet: _pet(),
+          upcomingEvents: const [],
+          onRefresh: () async => refreshes++,
+        ),
+      ),
+    );
+
+    await tester.drag(find.text('Рекс'), const Offset(0, 500));
+    await tester.pumpAndSettle();
+
+    expect(refreshes, 1);
   });
 }

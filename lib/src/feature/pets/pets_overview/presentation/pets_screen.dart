@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -71,6 +73,15 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
 
   void _reload() => _petsOverviewBloc.add(const PetsOverviewEvent.fetchRequested());
 
+  /// Pull-to-refresh: тихо обновляет данные и завершается, когда загрузка закончилась.
+  Future<void> _refresh() {
+    final completer = Completer<void>();
+
+    _petsOverviewBloc.add(PetsOverviewEvent.fetchRequested(silent: true, completer: completer));
+
+    return completer.future;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,34 +91,38 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
         child: BlocBuilder<PetsOverviewBloc, PetsOverviewState>(
           bloc: _petsOverviewBloc,
           builder: (context, state) {
-            return CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(
-                  child: UiLargeTitleHeader(
-                    title: context.l10n.petsOverviewTitle,
-                    subtitle: state.mapOrNull(
-                      success: (state) => _subtitle(context, state.overview),
-                    ),
-                    trailing: UiIconButton(
-                      icon: Icons.notifications_none,
-                      semanticLabel: context.l10n.notificationsLabel,
-                      // TODO: открыть страницу уведомлений, когда она появится.
-                      onPressed: () {},
+            return RefreshIndicator.adaptive(
+              onRefresh: _refresh,
+              color: context.uiPalette.accent,
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: UiLargeTitleHeader(
+                      title: context.l10n.petsOverviewTitle,
+                      subtitle: state.mapOrNull(
+                        success: (state) => _subtitle(context, state.overview),
+                      ),
+                      trailing: UiIconButton(
+                        icon: Icons.notifications_none,
+                        semanticLabel: context.l10n.notificationsLabel,
+                        // TODO: открыть страницу уведомлений, когда она появится.
+                        onPressed: () {},
+                      ),
                     ),
                   ),
-                ),
-                state.map(
-                  loading: (_) => const SliverToBoxAdapter(child: _PetsShimmer()),
-                  error: (_) => SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: UiFetchingError(onRetry: _reload),
+                  state.map(
+                    loading: (_) => const SliverToBoxAdapter(child: _PetsShimmer()),
+                    error: (_) => SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: UiFetchingError(onRetry: _reload),
+                    ),
+                    success: (state) => state.overview.pets.isEmpty
+                        ? const SliverFillRemaining(hasScrollBody: false, child: _PetsEmpty())
+                        : _PetsSliver(overview: state.overview),
                   ),
-                  success: (state) => state.overview.pets.isEmpty
-                      ? const SliverFillRemaining(hasScrollBody: false, child: _PetsEmpty())
-                      : _PetsSliver(overview: state.overview),
-                ),
-              ],
+                ],
+              ),
             );
           },
         ),

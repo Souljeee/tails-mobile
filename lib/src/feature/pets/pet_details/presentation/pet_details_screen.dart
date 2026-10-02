@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -44,6 +46,17 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
     super.dispose();
   }
 
+  /// Pull-to-refresh: тихо обновляет карточку и завершается, когда загрузка закончилась.
+  Future<void> _refresh() {
+    final completer = Completer<void>();
+
+    _petDetailsBloc.add(
+      PetDetailsEvent.fetchRequested(id: widget.id, silent: true, completer: completer),
+    );
+
+    return completer.future;
+  }
+
   void _back() {
     if (context.canPop()) {
       context.pop();
@@ -82,8 +95,11 @@ class _PetDetailsScreenState extends State<PetDetailsScreen> {
             children: [
               state.map(
                 loading: (_) => const _PetDetailsShimmer(),
-                success: (state) =>
-                    PetDetailsContent(pet: state.petData, upcomingEvents: state.upcomingEvents),
+                success: (state) => PetDetailsContent(
+                  pet: state.petData,
+                  upcomingEvents: state.upcomingEvents,
+                  onRefresh: _refresh,
+                ),
                 error: (_) => SafeArea(
                   child: Center(
                     child: UiFetchingError(

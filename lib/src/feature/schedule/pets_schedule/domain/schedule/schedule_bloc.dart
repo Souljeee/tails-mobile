@@ -52,6 +52,8 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
       if (!keepData) {
         emit(const ScheduleState.error());
       }
+    } finally {
+      event.completer?.complete();
     }
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -145,15 +147,25 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     _reloadSchedule(silent: true);
   }
 
-  void _reloadSchedule({bool silent = false}) {
+  void _reloadSchedule({bool silent = false, Completer<void>? completer}) {
     _scheduleBloc.add(
       ScheduleEvent.fetchRequested(
         startDate: _window.start,
         endDate: _window.end,
         petId: _selectedPetId,
         silent: silent,
+        completer: completer,
       ),
     );
+  }
+
+  /// Pull-to-refresh: тихо обновляет расписание и завершается, когда загрузка закончилась.
+  Future<void> _pullToRefresh() {
+    final completer = Completer<void>();
+
+    _reloadSchedule(silent: true, completer: completer);
+
+    return completer.future;
   }
 
   Future<void> _openCreateEventBottomSheet() async {
@@ -279,50 +291,54 @@ class _ScheduleScreenState extends State<ScheduleScreen>
             builder: (context, scheduleState) {
               return SafeArea(
                 bottom: false,
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: UiLargeTitleHeader(
-                        title: context.l10n.navCalendar,
-                        subtitle: _todayCountLabel(scheduleState),
-                        trailing: _TodayButton(onPressed: _goToToday),
+                child: RefreshIndicator.adaptive(
+                  onRefresh: _pullToRefresh,
+                  color: palette.accent,
+                  child: CustomScrollView(
+                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: UiLargeTitleHeader(
+                          title: context.l10n.navCalendar,
+                          subtitle: _todayCountLabel(scheduleState),
+                          trailing: _TodayButton(onPressed: _goToToday),
+                        ),
                       ),
-                    ),
-                    SliverToBoxAdapter(child: _MonthHeader(controller: _monthController)),
-                    SliverToBoxAdapter(
-                      child: _PetChipsSection(
-                        state: petsState,
-                        selectedPetId: _selectedPetId,
-                        onChanged: _onPetChanged,
+                      SliverToBoxAdapter(child: _MonthHeader(controller: _monthController)),
+                      SliverToBoxAdapter(
+                        child: _PetChipsSection(
+                          state: petsState,
+                          selectedPetId: _selectedPetId,
+                          onChanged: _onPetChanged,
+                        ),
                       ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x4)),
-                    SliverToBoxAdapter(
-                      child: ScheduleCalendar(
-                        selectedDate: _selectedDate,
-                        controller: _monthController,
-                        onDateTap: (date) {
-                          setState(() {
-                            _selectedDate = date;
-                          });
-                        },
-                        resolveMarkers: (date) => _markersFor(scheduleState, date),
+                      const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x4)),
+                      SliverToBoxAdapter(
+                        child: ScheduleCalendar(
+                          selectedDate: _selectedDate,
+                          controller: _monthController,
+                          onDateTap: (date) {
+                            setState(() {
+                              _selectedDate = date;
+                            });
+                          },
+                          resolveMarkers: (date) => _markersFor(scheduleState, date),
+                        ),
                       ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x5)),
-                    _EventsSliver(
-                      state: scheduleState,
-                      date: _selectedDate,
-                      pets: _pets,
-                      petColorOf: _petColor,
-                      onToggle: _onEventToggle,
-                      onRetry: _reloadSchedule,
-                    ),
-                    SliverPadding(
-                      padding: EdgeInsets.only(bottom: ShellScope.bottomInsetOf(context)),
-                    ),
-                  ],
+                      const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x5)),
+                      _EventsSliver(
+                        state: scheduleState,
+                        date: _selectedDate,
+                        pets: _pets,
+                        petColorOf: _petColor,
+                        onToggle: _onEventToggle,
+                        onRetry: _reloadSchedule,
+                      ),
+                      SliverPadding(
+                        padding: EdgeInsets.only(bottom: ShellScope.bottomInsetOf(context)),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

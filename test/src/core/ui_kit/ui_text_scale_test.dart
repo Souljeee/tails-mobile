@@ -148,6 +148,7 @@ void main() {
               hasCastration: true,
             ),
             upcomingEvents: const [],
+            onRefresh: () async {},
           ),
         ),
       ),

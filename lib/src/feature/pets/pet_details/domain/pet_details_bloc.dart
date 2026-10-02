@@ -49,8 +49,12 @@ class PetDetailsBloc extends Bloc<PetDetailsEvent, PetDetailsState> {
     PetDetailsEvent$FetchRequested event,
     Emitter<PetDetailsState> emit,
   ) async {
+    final keepData = event.silent && state is PetDetailsState$Success;
+
     try {
-      emit(const PetDetailsState.loading());
+      if (!keepData) {
+        emit(const PetDetailsState.loading());
+      }
 
       final petData = await _petRepository.getPetDetails(id: _petId);
 
@@ -60,7 +64,12 @@ class PetDetailsBloc extends Bloc<PetDetailsEvent, PetDetailsState> {
     } catch (e, s) {
       addError(e, s);
 
-      emit(const PetDetailsState.error());
+      // При тихом обновлении оставляем уже показанные данные.
+      if (!keepData) {
+        emit(const PetDetailsState.error());
+      }
+    } finally {
+      event.completer?.complete();
     }
   }
 

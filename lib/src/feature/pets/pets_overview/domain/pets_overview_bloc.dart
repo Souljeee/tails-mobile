@@ -74,6 +74,8 @@ class PetsOverviewBloc extends Bloc<PetsOverviewEvent, PetsOverviewState> {
       if (!event.silent || !hasData) {
         emit(const PetsOverviewState.error());
       }
+    } finally {
+      event.completer?.complete();
     }
   }
 

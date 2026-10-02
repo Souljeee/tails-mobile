@@ -10,6 +10,7 @@ sealed class ScheduleEvent extends Equatable {
     required DateTime endDate,
     int? petId,
     bool silent,
+    Completer<void>? completer,
   }) = ScheduleEvent$FetchRequested;
 
   const factory ScheduleEvent.loadMoreRequested({
@@ -43,11 +44,15 @@ final class ScheduleEvent$FetchRequested extends ScheduleEvent {
   /// Тихое обновление: уже показанные данные не заменяются индикатором загрузки.
   final bool silent;
 
+  /// Завершается, когда обработка закончена (для pull-to-refresh).
+  final Completer<void>? completer;
+
   const ScheduleEvent$FetchRequested({
     required this.startDate,
     required this.endDate,
     this.petId,
     this.silent = false,
+    this.completer,
   });
 
   @override
