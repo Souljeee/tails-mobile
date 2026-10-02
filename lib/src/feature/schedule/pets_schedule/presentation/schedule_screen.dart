@@ -56,6 +56,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
 
   bool? _wasTabActive;
 
+  ShellActionsController? _shell;
+
   /// Загруженный диапазон; сдвигается, когда календарь листают за его пределы.
   ScheduleWindow _window = ScheduleWindow.around(DateTime.now());
 
@@ -75,12 +77,27 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     WidgetsBinding.instance.addObserver(this);
     _monthController.addListener(_onMonthChanged);
 
+    // Просьба могла прийти до создания экрана (например, с карточки питомца).
+    _selectedPetId = context
+        .getInheritedWidgetOfExactType<ShellScope>()
+        ?.controller
+        .takeScheduleFilterRequest()
+        ?.petId;
+
     _loadData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    final shell = ShellScope.maybeOf(context)?.controller;
+
+    if (shell != _shell) {
+      _shell?.scheduleFilterRequest.removeListener(_onFilterRequested);
+      _shell = shell;
+      _shell?.scheduleFilterRequest.addListener(_onFilterRequested);
+    }
 
     // Ветки оболочки живут одновременно. Когда вкладка снова становится активной,
     // тихо обновляем расписание: события могли измениться на карточке питомца.
@@ -102,6 +119,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
 
   @override
   void dispose() {
+    _shell?.scheduleFilterRequest.removeListener(_onFilterRequested);
     WidgetsBinding.instance.removeObserver(this);
     _monthController.removeListener(_onMonthChanged);
     _petsBloc.close();
@@ -231,6 +249,19 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     if (_selectedPetId != null && !currentIds.contains(_selectedPetId)) {
       setState(() => _selectedPetId = null);
     }
+
+    _reloadSchedule();
+  }
+
+  /// Календарь просят показать события одного питомца (например, ссылкой «Все» на карточке).
+  void _onFilterRequested() {
+    final request = _shell?.takeScheduleFilterRequest();
+
+    if (request == null) {
+      return;
+    }
+
+    setState(() => _selectedPetId = request.petId);
 
     _reloadSchedule();
   }

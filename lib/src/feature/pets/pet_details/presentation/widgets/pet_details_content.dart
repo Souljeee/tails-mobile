@@ -200,7 +200,11 @@ class _PetDetailsSheet extends StatelessWidget {
         UiSectionHeader(
           title: l10n.petDetailsUpcoming,
           actionLabel: l10n.all,
-          onActionTap: () => const ScheduleRoute().go(context),
+          onActionTap: () {
+            // Календарь откроется с фильтром по этому питомцу.
+            ShellScope.maybeOf(context)?.controller.requestScheduleFilter(pet.id);
+            const ScheduleRoute().go(context);
+          },
         ),
         const SizedBox(height: UiSpacing.x3),
         if (upcomingEvents.isEmpty)

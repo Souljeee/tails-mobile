@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 /// Вкладки корневой оболочки; порядок совпадает с порядком веток в `HomeShellRoute`.
 enum ShellTab { pets, schedule, profile }
 
+/// Просьба открыть календарь, отфильтрованный по питомцу.
+class ScheduleFilterRequest {
+  const ScheduleFilterRequest({required this.petId});
+
+  final int petId;
+}
+
 /// Хранит действия кнопки «+» для вкладок оболочки.
 ///
 /// Экран вкладки регистрирует своё действие, а оболочка вызывает его при нажатии на «+».
@@ -23,6 +30,28 @@ class ShellActionsController {
 
   /// Действие вкладки [tab], если экран его зарегистрировал.
   VoidCallback? actionFor(ShellTab tab) => _actions[tab];
+
+  /// Ожидающая просьба отфильтровать календарь по питомцу.
+  ///
+  /// Хранится, пока календарь её не заберёт: ветка календаря может быть ещё не создана,
+  /// если пользователь на ней не был.
+  final ValueNotifier<ScheduleFilterRequest?> scheduleFilterRequest = ValueNotifier(null);
+
+  /// Просит календарь показать события только питомца [petId].
+  void requestScheduleFilter(int petId) {
+    scheduleFilterRequest.value = ScheduleFilterRequest(petId: petId);
+  }
+
+  /// Забирает ожидающую просьбу (после этого её нет).
+  ScheduleFilterRequest? takeScheduleFilterRequest() {
+    final request = scheduleFilterRequest.value;
+
+    if (request != null) {
+      scheduleFilterRequest.value = null;
+    }
+
+    return request;
+  }
 }
 
 /// Предоставляет [ShellActionsController] и нижний отступ под плавающую навигацию.
