@@ -157,6 +157,8 @@ class _NavItem extends StatelessWidget {
                   item.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  // Подпись в панели фиксированной высоты: крупный шрифт ограничиваем.
+                  textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3),
                   style: context.uiFonts.footnote.copyWith(
                     color: color,
                     fontWeight: FontWeight.w600,

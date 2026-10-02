@@ -20,6 +20,8 @@ class UiCheckbox extends StatelessWidget {
 
     return Semantics(
       checked: isChecked,
+      button: true,
+      onTap: onTap,
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,

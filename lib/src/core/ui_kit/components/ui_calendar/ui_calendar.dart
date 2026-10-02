@@ -282,11 +282,14 @@ class _DefaultCalendarHeader extends StatelessWidget {
 
     return Row(
       children: [
-        Text(
-          formattedSelectedMonth,
-          style: context.uiFonts.headline.copyWith(color: context.uiPalette.ink),
+        Expanded(
+          child: Text(
+            formattedSelectedMonth,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.uiFonts.headline.copyWith(color: context.uiPalette.ink),
+          ),
         ),
-        const Spacer(),
         _CalendarHeaderButton(
           iconPath: context.uiIcons.doubleArrowLeft.keyName,
           onTap: previousYearButtonHandler,
@@ -371,15 +374,22 @@ class _CalendarBodyState extends State<_CalendarBody> {
           ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 40),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              // Колонки совпадают с колонками дат; подпись уменьшается, если не помещается.
               children: daysOfWeek
                   .map(
-                    (day) => Text(
-                      day.toUpperCase(),
-                      style: context.uiFonts.monoEyebrow.copyWith(
-                        color: context.uiPalette.ink3,
-                        fontSize: 12,
-                        letterSpacing: 0.6,
+                    (day) => Expanded(
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            day.toUpperCase(),
+                            style: context.uiFonts.monoEyebrow.copyWith(
+                              color: context.uiPalette.ink3,
+                              fontSize: 12,
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   )
