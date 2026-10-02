@@ -37,6 +37,10 @@ class PetsOverview extends Equatable {
   /// Число событий на сегодня; `null`, если расписание не удалось загрузить.
   final int? todayEventsCount;
 
+  /// Расписание не загрузилось: числа дел и ближайших событий неизвестны.
+  /// Это не то же самое, что «событий нет».
+  bool get isScheduleUnavailable => todayEventsCount == null;
+
   @override
   List<Object?> get props => [pets, todayEventsCount];
 }

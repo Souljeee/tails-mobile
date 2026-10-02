@@ -1057,6 +1057,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Закрыть'**
   String get discardConfirm;
+
+  /// No description provided for @petsScheduleUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить события'**
+  String get petsScheduleUnavailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

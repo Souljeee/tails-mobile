@@ -82,6 +82,7 @@ void main() {
     expect(overview.pets.single.pet.name, 'Чарли');
     expect(overview.pets.single.pet.weight, 14.9);
     expect(overview.todayEventsCount, 1);
+    expect(overview.isScheduleUnavailable, isFalse);
     expect(overview.pets.single.nextEvent?.event.title, 'Прогулка в парке');
 
     await bloc.close();
@@ -98,6 +99,7 @@ void main() {
 
     expect(overview.pets, hasLength(1));
     expect(overview.todayEventsCount, isNull);
+    expect(overview.isScheduleUnavailable, isTrue);
     expect(overview.pets.single.nextEvent, isNull);
 
     await bloc.close();

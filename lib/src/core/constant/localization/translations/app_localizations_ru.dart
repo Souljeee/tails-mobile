@@ -590,4 +590,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get discardConfirm => 'Закрыть';
+
+  @override
+  String get petsScheduleUnavailable => 'Не удалось загрузить события';
 }

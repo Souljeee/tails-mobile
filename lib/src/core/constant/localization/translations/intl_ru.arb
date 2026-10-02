@@ -226,5 +226,6 @@
   "discardTitle": "Закрыть без сохранения?",
   "discardMessage": "Введённые данные будут потеряны.",
   "discardKeepEditing": "Продолжить",
-  "discardConfirm": "Закрыть"
+  "discardConfirm": "Закрыть",
+  "petsScheduleUnavailable": "Не удалось загрузить события"
 }

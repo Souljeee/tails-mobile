@@ -9,6 +9,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_empty_state/ui_empty_
 import 'package:tails_mobile/src/core/ui_kit/components/ui_errors/ui_fetching_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_button/ui_icon_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_text_link/ui_text_link.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_top_bar/ui_top_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
@@ -119,7 +120,19 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
                     ),
                     success: (state) => state.overview.pets.isEmpty
                         ? const SliverFillRemaining(hasScrollBody: false, child: _PetsEmpty())
-                        : _PetsSliver(overview: state.overview),
+                        : SliverMainAxisGroup(
+                            slivers: [
+                              if (state.overview.isScheduleUnavailable)
+                                SliverToBoxAdapter(
+                                  child: _ScheduleUnavailableBanner(
+                                    onRetry: () => _petsOverviewBloc.add(
+                                      const PetsOverviewEvent.fetchRequested(silent: true),
+                                    ),
+                                  ),
+                                ),
+                              _PetsSliver(overview: state.overview),
+                            ],
+                          ),
                   ),
                 ],
               ),
@@ -136,6 +149,41 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
     final today = overview.todayEventsCount;
 
     return today == null ? count : '$count · ${l10n.petsTodayEvents(today)}';
+  }
+}
+
+/// Предупреждение, что расписание не загрузилось: отличает ошибку от «событий нет».
+class _ScheduleUnavailableBanner extends StatelessWidget {
+  const _ScheduleUnavailableBanner({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.uiPalette;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(UiSpacing.x5, UiSpacing.x2, UiSpacing.x5, 0),
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: palette.amberTint, borderRadius: UiRadius.mdAll),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x4, vertical: UiSpacing.x1),
+          child: Row(
+            children: [
+              Icon(Icons.cloud_off_outlined, size: 20, color: palette.amber),
+              const SizedBox(width: UiSpacing.x3),
+              Expanded(
+                child: Text(
+                  context.l10n.petsScheduleUnavailable,
+                  style: context.uiFonts.callout.copyWith(color: palette.ink),
+                ),
+              ),
+              UiTextLink(label: context.l10n.fetchingErrorRetry, onTap: onRetry),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
