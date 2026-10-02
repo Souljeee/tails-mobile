@@ -9,28 +9,24 @@ import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_
 typedef OnSelectedPetsChanged = void Function(int? selectedPetId);
 
 /// Горизонтальный список чипов «Все» + питомцы для фильтрации расписания.
-class PetsChipList extends StatefulWidget {
-  final List<PetModel> pets;
-  final OnSelectedPetsChanged onSelectedPetsChanged;
-
-  const PetsChipList({required this.pets, required this.onSelectedPetsChanged, super.key});
-
-  @override
-  State<PetsChipList> createState() => _PetsChipListState();
-}
-
-class _PetsChipListState extends State<PetsChipList> {
+///
+/// Выбранный питомец хранит родитель ([selectedPetId]), поэтому выбор не теряется,
+/// когда список перезагружается.
+class PetsChipList extends StatelessWidget {
   static const double _avatarSize = 24;
 
-  int? selectedPetId;
+  final List<PetModel> pets;
 
-  void _select(int? petId) {
-    setState(() {
-      selectedPetId = petId;
-    });
+  /// `null` — выбрано «Все».
+  final int? selectedPetId;
+  final OnSelectedPetsChanged onSelectedPetsChanged;
 
-    widget.onSelectedPetsChanged(petId);
-  }
+  const PetsChipList({
+    required this.pets,
+    required this.selectedPetId,
+    required this.onSelectedPetsChanged,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +36,7 @@ class _PetsChipListState extends State<PetsChipList> {
       height: UiChip.height,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
-        itemCount: widget.pets.length + 1,
+        itemCount: pets.length + 1,
         scrollDirection: Axis.horizontal,
         separatorBuilder: (context, index) => const SizedBox(width: UiSpacing.x2),
         itemBuilder: (context, index) {
@@ -50,17 +46,17 @@ class _PetsChipListState extends State<PetsChipList> {
             return UiChip(
               label: context.l10n.all,
               selected: selected,
-              onTap: () => _select(null),
+              onTap: () => onSelectedPetsChanged(null),
               leading: Icon(Icons.pets, size: 18, color: selected ? palette.surface : palette.ink2),
             );
           }
 
-          final pet = widget.pets[index - 1];
+          final pet = pets[index - 1];
 
           return UiChip(
             label: pet.name,
             selected: selectedPetId == pet.id,
-            onTap: () => _select(pet.id),
+            onTap: () => onSelectedPetsChanged(pet.id),
             leading: UiPetAvatar(imageUrl: pet.image, size: _avatarSize),
           );
         },

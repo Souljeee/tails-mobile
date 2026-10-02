@@ -45,6 +45,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
   DateTime _selectedDate = DateTime.now().withoutTime;
   int? _selectedPetId;
 
+  /// Питомцы, известные после последней загрузки: по ним определяем удалённых.
+  Set<int> _knownPetIds = {};
+
   final _startDate = DateTime.now().subtract(const Duration(days: 180));
   final _endDate = DateTime.now().add(const Duration(days: 180));
 
@@ -130,6 +133,25 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
     return context.uiPalette.petColor(index < 0 ? 0 : index);
   }
 
+  /// Если питомца удалили, сбрасываем фильтр (если выбран именно он) и перезагружаем
+  /// расписание: события удалённого питомца больше не должны показываться.
+  void _onPetsLoaded(PetsState$Success state) {
+    final currentIds = state.pets.map((pet) => pet.id).toSet();
+    final hasRemoved = _knownPetIds.difference(currentIds).isNotEmpty;
+
+    _knownPetIds = currentIds;
+
+    if (!hasRemoved) {
+      return;
+    }
+
+    if (_selectedPetId != null && !currentIds.contains(_selectedPetId)) {
+      setState(() => _selectedPetId = null);
+    }
+
+    _reloadSchedule();
+  }
+
   void _onPetChanged(int? petId) {
     setState(() {
       _selectedPetId = petId;
@@ -170,8 +192,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
 
     return Scaffold(
       backgroundColor: palette.canvas,
-      body: BlocBuilder<PetsBloc, PetsState>(
+      body: BlocConsumer<PetsBloc, PetsState>(
         bloc: _petsBloc,
+        listener: (context, petsState) => petsState.mapOrNull(success: _onPetsLoaded),
         builder: (context, petsState) {
           return BlocBuilder<ScheduleBloc, ScheduleState>(
             bloc: _scheduleBloc,
@@ -190,7 +213,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
                     ),
                     SliverToBoxAdapter(child: _MonthHeader(controller: _monthController)),
                     SliverToBoxAdapter(
-                      child: _PetChipsSection(state: petsState, onChanged: _onPetChanged),
+                      child: _PetChipsSection(
+                        state: petsState,
+                        selectedPetId: _selectedPetId,
+                        onChanged: _onPetChanged,
+                      ),
                     ),
                     const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x4)),
                     SliverToBoxAdapter(
@@ -315,16 +342,25 @@ class _MonthHeader extends StatelessWidget {
 }
 
 class _PetChipsSection extends StatelessWidget {
-  const _PetChipsSection({required this.state, required this.onChanged});
+  const _PetChipsSection({
+    required this.state,
+    required this.selectedPetId,
+    required this.onChanged,
+  });
 
   final PetsState state;
+  final int? selectedPetId;
   final OnSelectedPetsChanged onChanged;
 
   @override
   Widget build(BuildContext context) {
     return state.map(
       loading: (_) => const _PetsShimmer(),
-      success: (state) => PetsChipList(pets: state.pets, onSelectedPetsChanged: onChanged),
+      success: (state) => PetsChipList(
+        pets: state.pets,
+        selectedPetId: selectedPetId,
+        onSelectedPetsChanged: onChanged,
+      ),
       error: (_) => const SizedBox.shrink(),
     );
   }
