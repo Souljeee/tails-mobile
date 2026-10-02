@@ -10,6 +10,10 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 ///
 /// [enableDrag] = `false` нужен листам с `UiDiscardGuard`: закрытие свайпом обходит защиту.
 ///
+/// [fullBleed] = `true` убирает у шторки боковые и нижние отступы и нижнюю безопасную зону:
+/// содержимое само задаёт поля и может занять всю ширину (например, нижняя панель барабана,
+/// доходящая до края экрана). Нижнюю безопасную зону такое содержимое учитывает само.
+///
 /// По умолчанию открывается в корневом навигаторе, то есть поверх нижней панели навигации.
 /// Содержимое не должно зависеть от InheritedWidget'ов, которые находятся ниже корня
 /// (например, от `ShellScope`).
@@ -19,6 +23,7 @@ Future<T?> showUiBottomSheet<T>({
   bool isDismissible = true,
   bool enableDrag = true,
   bool useRootNavigator = true,
+  bool fullBleed = false,
 }) {
   return showModalBottomSheet<T>(
     context: context,
@@ -30,34 +35,36 @@ Future<T?> showUiBottomSheet<T>({
     backgroundColor: context.uiPalette.canvas,
     clipBehavior: Clip.antiAlias,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: UiRadius.xlTop)),
-    builder: (sheetContext) => _UiSheetBody(child: builder(sheetContext)),
+    builder: (sheetContext) => _UiSheetBody(fullBleed: fullBleed, child: builder(sheetContext)),
   );
 }
 
 class _UiSheetBody extends StatelessWidget {
-  const _UiSheetBody({required this.child});
+  const _UiSheetBody({required this.child, required this.fullBleed});
 
   final Widget child;
+  final bool fullBleed;
 
   @override
   Widget build(BuildContext context) {
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const _DragHandle(),
+        Flexible(
+          child: SingleChildScrollView(
+            padding: fullBleed
+                ? EdgeInsets.zero
+                : const EdgeInsets.fromLTRB(UiSpacing.x5, 0, UiSpacing.x5, UiSpacing.x4),
+            child: child,
+          ),
+        ),
+      ],
+    );
+
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const _DragHandle(),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(UiSpacing.x5, 0, UiSpacing.x5, UiSpacing.x4),
-                child: child,
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: fullBleed ? content : SafeArea(top: false, child: content),
     );
   }
 }

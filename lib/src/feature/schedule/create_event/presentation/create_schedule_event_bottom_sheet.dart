@@ -55,6 +55,14 @@ class CreateScheduleEventBottomSheet extends StatefulWidget {
 }
 
 class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBottomSheet> {
+  /// Отступы формы: шторка показывается с `fullBleed`, поэтому поля задаёт содержимое.
+  static const EdgeInsets _contentPadding = EdgeInsets.fromLTRB(
+    UiSpacing.x5,
+    0,
+    UiSpacing.x5,
+    UiSpacing.x4,
+  );
+
   late final CreateEventBloc _createEventBloc = CreateEventBloc(
     scheduleRepository: DependenciesScope.of(context).scheduleRepository,
   );
@@ -133,91 +141,95 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
           _notesController,
         ]),
         builder: (context, child) => UiDiscardGuard(hasChanges: _hasChanges, child: child!),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
-            const SizedBox(height: UiSpacing.x4),
-            _FieldLabel(label: l10n.createEventForWhom),
-            ListenableBuilder(
-              listenable: Listenable.merge([_createEventUio, _showErrors]),
-              builder: (context, child) {
-                final uio = _createEventUio.value;
+        child: SafeArea(
+          top: false,
+          minimum: _contentPadding,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
+              const SizedBox(height: UiSpacing.x4),
+              _FieldLabel(label: l10n.createEventForWhom),
+              ListenableBuilder(
+                listenable: Listenable.merge([_createEventUio, _showErrors]),
+                builder: (context, child) {
+                  final uio = _createEventUio.value;
 
-                return _PetChips(
-                  pets: widget.pets,
-                  selectedPetId: uio.petId,
-                  onPetSelected: _onPetIdSelected,
-                  errorText: _showErrors.value && uio.petId == null
-                      ? l10n.createEventErrorPet
-                      : null,
-                );
-              },
-            ),
-            const SizedBox(height: UiSpacing.x4),
-            ListenableBuilder(
-              listenable: Listenable.merge([_eventTitleController, _showErrors]),
-              builder: (context, child) {
-                final isTitleMissing = _eventTitleController.text.trim().isEmpty;
+                  return _PetChips(
+                    pets: widget.pets,
+                    selectedPetId: uio.petId,
+                    onPetSelected: _onPetIdSelected,
+                    errorText: _showErrors.value && uio.petId == null
+                        ? l10n.createEventErrorPet
+                        : null,
+                  );
+                },
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              ListenableBuilder(
+                listenable: Listenable.merge([_eventTitleController, _showErrors]),
+                builder: (context, child) {
+                  final isTitleMissing = _eventTitleController.text.trim().isEmpty;
 
-                return UiTextField(
-                  controller: _eventTitleController,
-                  labelText: l10n.createEventNameLabel,
-                  placeholderText: l10n.createEventNamePlaceholder,
-                  errorText: _showErrors.value && isTitleMissing
-                      ? l10n.createEventErrorTitle
-                      : null,
-                );
-              },
-            ),
-            const SizedBox(height: UiSpacing.x4),
-            _FieldLabel(label: l10n.createEventTypeLabel),
-            ValueListenableBuilder(
-              valueListenable: _selectedType,
-              builder: (context, selected, child) {
-                return _TypeChips(
-                  selected: selected,
-                  onSelected: (type) => _selectedType.value = type,
-                );
-              },
-            ),
-            const SizedBox(height: UiSpacing.x4),
-            _DateTimeFields(
-              initialDate: widget.date,
-              dateController: _dateController,
-              timeController: _timeController,
-            ),
-            const SizedBox(height: UiSpacing.x4),
-            _RecurrenceSelector(
-              recurrence: _recurrence,
-              onTap: () => _isRecurrenceOpen.value = true,
-            ),
-            const SizedBox(height: UiSpacing.x4),
-            UiTextField(
-              controller: _notesController,
-              labelText: l10n.createEventNotesLabel,
-              placeholderText: l10n.createEventNotesPlaceholder,
-              maxLines: 4,
-            ),
-            const SizedBox(height: UiSpacing.x5),
-            BlocConsumer<CreateEventBloc, CreateEventState>(
-              bloc: _createEventBloc,
-              listener: (context, state) {
-                state.mapOrNull(
-                  success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
-                  error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
-                );
-              },
-              builder: (context, state) {
-                return UiButton.main(
-                  label: l10n.createEventSubmit,
-                  onPressed: _submit,
-                  isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-                );
-              },
-            ),
-          ],
+                  return UiTextField(
+                    controller: _eventTitleController,
+                    labelText: l10n.createEventNameLabel,
+                    placeholderText: l10n.createEventNamePlaceholder,
+                    errorText: _showErrors.value && isTitleMissing
+                        ? l10n.createEventErrorTitle
+                        : null,
+                  );
+                },
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              _FieldLabel(label: l10n.createEventTypeLabel),
+              ValueListenableBuilder(
+                valueListenable: _selectedType,
+                builder: (context, selected, child) {
+                  return _TypeChips(
+                    selected: selected,
+                    onSelected: (type) => _selectedType.value = type,
+                  );
+                },
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              _DateTimeFields(
+                initialDate: widget.date,
+                dateController: _dateController,
+                timeController: _timeController,
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              _RecurrenceSelector(
+                recurrence: _recurrence,
+                onTap: () => _isRecurrenceOpen.value = true,
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              UiTextField(
+                controller: _notesController,
+                labelText: l10n.createEventNotesLabel,
+                placeholderText: l10n.createEventNotesPlaceholder,
+                maxLines: 4,
+              ),
+              const SizedBox(height: UiSpacing.x5),
+              BlocConsumer<CreateEventBloc, CreateEventState>(
+                bloc: _createEventBloc,
+                listener: (context, state) {
+                  state.mapOrNull(
+                    success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
+                    error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
+                  );
+                },
+                builder: (context, state) {
+                  return UiButton.main(
+                    label: l10n.createEventSubmit,
+                    onPressed: _submit,
+                    isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_day_toggle/ui_day_toggle.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_wheel_panel/ui_wheel_panel.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
@@ -193,5 +195,42 @@ void main() {
 
       expect(tester.takeException(), isNull, reason: '$period');
     }
+  });
+
+  testWidgets('в шторке fullBleed панель барабана занимает всю ширину, кнопка — с полями', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(400, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      uiTestApp(
+        Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showUiBottomSheet<void>(
+              context: context,
+              fullBleed: true,
+              builder: (_) =>
+                  RecurrencePage(initial: draft.withTimesCount(2), onApply: (_) {}, onBack: () {}),
+            ),
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    final saveRect = tester.getRect(find.byType(UiButton));
+    expect(saveRect.left, 20);
+    expect(saveRect.right, 380);
+
+    await tester.tap(find.text('Время 1'));
+    await tester.pumpAndSettle();
+
+    final panel = tester.getRect(find.byType(UiWheelPanel));
+    expect(panel.left, 0);
+    expect(panel.right, 400);
+    expect(panel.bottom, 1000);
   });
 }

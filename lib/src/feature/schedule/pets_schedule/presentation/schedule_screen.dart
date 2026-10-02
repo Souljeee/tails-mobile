@@ -191,6 +191,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       context: context,
       // Закрытие свайпом обходит UiDiscardGuard, поэтому его отключаем.
       enableDrag: false,
+      // Страница «Повторение» рисует нижнюю панель барабана от края до края.
+      fullBleed: true,
       builder: (_) => CreateScheduleEventBottomSheet(
         date: _selectedDate,
         pets: _petsBloc.state.mapOrNull<List<PetModel>?>(success: (state) => state.pets) ?? [],

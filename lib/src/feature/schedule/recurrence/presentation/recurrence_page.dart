@@ -20,6 +20,8 @@ import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/widget
 
 /// Вторая страница шторки «Новое событие»: настройка повторения.
 ///
+/// Страница рассчитана на шторку с `fullBleed` и сама задаёт боковые поля и нижнюю безопасную зону.
+///
 /// Итог закреплён сверху, настройки прокручиваются, внизу — «Сохранить», а пока открыт барабан —
 /// панель барабана. [onApply] получает черновик (`null` — «Не повторять»), [onBack] закрывает
 /// страницу без изменений.
@@ -33,6 +35,10 @@ class RecurrencePage extends StatefulWidget {
 
   /// Доля высоты экрана, которую занимает страница: высота не прыгает между периодами.
   static const double heightFactor = 0.86;
+
+  /// Боковые поля содержимого; шторка показывается с `fullBleed`, чтобы панель барабана
+  /// занимала всю ширину.
+  static const EdgeInsets _sidePadding = EdgeInsets.symmetric(horizontal: UiSpacing.x5);
 
   final RecurrenceDraft initial;
   final ValueChanged<RecurrenceDraft?> onApply;
@@ -86,16 +92,23 @@ class _RecurrencePageState extends State<RecurrencePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                UiSheetHeader.back(
-                  title: l10n.recurrenceTitle,
-                  backLabel: l10n.recurrenceBack,
-                  onCancel: widget.onBack,
+                Padding(
+                  padding: RecurrencePage._sidePadding,
+                  child: UiSheetHeader.back(
+                    title: l10n.recurrenceTitle,
+                    backLabel: l10n.recurrenceBack,
+                    onCancel: widget.onBack,
+                  ),
                 ),
                 const SizedBox(height: UiSpacing.x3),
-                RecurrenceSummaryCard(draft: draft),
+                Padding(
+                  padding: RecurrencePage._sidePadding,
+                  child: RecurrenceSummaryCard(draft: draft),
+                ),
                 const SizedBox(height: UiSpacing.x3),
                 Expanded(
                   child: SingleChildScrollView(
+                    padding: RecurrencePage._sidePadding,
                     child: _Settings(
                       draft: draft,
                       onChanged: _change,
@@ -107,9 +120,16 @@ class _RecurrencePageState extends State<RecurrencePage> {
                 ),
                 const SizedBox(height: UiSpacing.x3),
                 if (panel == null)
-                  UiButton.main(
-                    label: l10n.recurrenceSave,
-                    onPressed: draft.canSave ? () => widget.onApply(draft) : null,
+                  SafeArea(
+                    top: false,
+                    minimum: const EdgeInsets.only(bottom: UiSpacing.x4),
+                    child: Padding(
+                      padding: RecurrencePage._sidePadding,
+                      child: UiButton.main(
+                        label: l10n.recurrenceSave,
+                        onPressed: draft.canSave ? () => widget.onApply(draft) : null,
+                      ),
+                    ),
                   )
                 else
                   RecurrencePanelView(

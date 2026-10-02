@@ -128,5 +128,35 @@ void main() {
       await tester.tap(find.text('Применить'));
       expect(applied, 1);
     });
+
+    testWidgets('между барабанами без разделителя есть отступ', (tester) async {
+      await tester.pumpWidget(
+        uiTestApp(
+          UiWheelPanel(
+            title: 'Новая дата',
+            rightLabel: 'Добавить',
+            onRight: () {},
+            columns: [
+              UiWheelColumn(
+                labels: const ['1', '2', '3'],
+                selectedIndex: 0,
+                alignment: Alignment.centerRight,
+                onSelected: (_) {},
+              ),
+              UiWheelColumn(
+                labels: const ['июля', 'августа', 'сентября'],
+                selectedIndex: 0,
+                alignment: Alignment.centerLeft,
+                onSelected: (_) {},
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final day = tester.getRect(find.text('1'));
+      final month = tester.getRect(find.text('июля'));
+      expect(month.left - day.right, greaterThanOrEqualTo(24));
+    });
   });
 }

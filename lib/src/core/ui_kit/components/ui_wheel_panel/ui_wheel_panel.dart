@@ -130,7 +130,9 @@ class UiWheelPanel extends StatelessWidget {
                     child: Row(
                       children: [
                         for (var i = 0; i < columns.length; i++) ...[
-                          if (i == 1 && separator != null)
+                          if (i == 1 && separator == null)
+                            const SizedBox(width: UiSpacing.x6)
+                          else if (i == 1)
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x4),
                               child: Text(
