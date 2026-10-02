@@ -5,6 +5,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_botto
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_discard_guard/ui_discard_guard.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_flyout/ui_flyout.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_avatar/ui_pet_avatar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
@@ -106,83 +107,105 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
-        const SizedBox(height: UiSpacing.x4),
-        _FieldLabel(label: l10n.createEventForWhom),
-        ListenableBuilder(
-          listenable: Listenable.merge([_createEventUio, _showErrors]),
-          builder: (context, child) {
-            final uio = _createEventUio.value;
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        _createEventUio,
+        _selectedType,
+        _eventTitleController,
+        _timeController,
+        _notesController,
+      ]),
+      builder: (context, child) => UiDiscardGuard(hasChanges: _hasChanges, child: child!),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
+          const SizedBox(height: UiSpacing.x4),
+          _FieldLabel(label: l10n.createEventForWhom),
+          ListenableBuilder(
+            listenable: Listenable.merge([_createEventUio, _showErrors]),
+            builder: (context, child) {
+              final uio = _createEventUio.value;
 
-            return _PetChips(
-              pets: widget.pets,
-              selectedPetId: uio.petId,
-              onPetSelected: _onPetIdSelected,
-              errorText: _showErrors.value && uio.petId == null ? l10n.createEventErrorPet : null,
-            );
-          },
-        ),
-        const SizedBox(height: UiSpacing.x4),
-        ListenableBuilder(
-          listenable: Listenable.merge([_eventTitleController, _showErrors]),
-          builder: (context, child) {
-            final isTitleMissing = _eventTitleController.text.trim().isEmpty;
+              return _PetChips(
+                pets: widget.pets,
+                selectedPetId: uio.petId,
+                onPetSelected: _onPetIdSelected,
+                errorText: _showErrors.value && uio.petId == null ? l10n.createEventErrorPet : null,
+              );
+            },
+          ),
+          const SizedBox(height: UiSpacing.x4),
+          ListenableBuilder(
+            listenable: Listenable.merge([_eventTitleController, _showErrors]),
+            builder: (context, child) {
+              final isTitleMissing = _eventTitleController.text.trim().isEmpty;
 
-            return UiTextField(
-              controller: _eventTitleController,
-              labelText: l10n.createEventNameLabel,
-              placeholderText: l10n.createEventNamePlaceholder,
-              errorText: _showErrors.value && isTitleMissing ? l10n.createEventErrorTitle : null,
-            );
-          },
-        ),
-        const SizedBox(height: UiSpacing.x4),
-        _FieldLabel(label: l10n.createEventTypeLabel),
-        ValueListenableBuilder(
-          valueListenable: _selectedType,
-          builder: (context, selected, child) {
-            return _TypeChips(selected: selected, onSelected: (type) => _selectedType.value = type);
-          },
-        ),
-        const SizedBox(height: UiSpacing.x4),
-        _DateTimeFields(
-          initialDate: widget.date,
-          dateController: _dateController,
-          timeController: _timeController,
-        ),
-        const SizedBox(height: UiSpacing.x4),
-        _RecurrenceSelector(controller: _recurrenceController),
-        const SizedBox(height: UiSpacing.x4),
-        UiTextField(
-          controller: _notesController,
-          labelText: l10n.createEventNotesLabel,
-          placeholderText: l10n.createEventNotesPlaceholder,
-          maxLines: 4,
-        ),
-        const SizedBox(height: UiSpacing.x5),
-        BlocConsumer<CreateEventBloc, CreateEventState>(
-          bloc: _createEventBloc,
-          listener: (context, state) {
-            state.mapOrNull(
-              success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
-              error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
-            );
-          },
-          builder: (context, state) {
-            return UiButton.main(
-              label: l10n.createEventSubmit,
-              onPressed: _submit,
-              isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-            );
-          },
-        ),
-      ],
+              return UiTextField(
+                controller: _eventTitleController,
+                labelText: l10n.createEventNameLabel,
+                placeholderText: l10n.createEventNamePlaceholder,
+                errorText: _showErrors.value && isTitleMissing ? l10n.createEventErrorTitle : null,
+              );
+            },
+          ),
+          const SizedBox(height: UiSpacing.x4),
+          _FieldLabel(label: l10n.createEventTypeLabel),
+          ValueListenableBuilder(
+            valueListenable: _selectedType,
+            builder: (context, selected, child) {
+              return _TypeChips(
+                selected: selected,
+                onSelected: (type) => _selectedType.value = type,
+              );
+            },
+          ),
+          const SizedBox(height: UiSpacing.x4),
+          _DateTimeFields(
+            initialDate: widget.date,
+            dateController: _dateController,
+            timeController: _timeController,
+          ),
+          const SizedBox(height: UiSpacing.x4),
+          _RecurrenceSelector(controller: _recurrenceController),
+          const SizedBox(height: UiSpacing.x4),
+          UiTextField(
+            controller: _notesController,
+            labelText: l10n.createEventNotesLabel,
+            placeholderText: l10n.createEventNotesPlaceholder,
+            maxLines: 4,
+          ),
+          const SizedBox(height: UiSpacing.x5),
+          BlocConsumer<CreateEventBloc, CreateEventState>(
+            bloc: _createEventBloc,
+            listener: (context, state) {
+              state.mapOrNull(
+                success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
+                error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
+              );
+            },
+            builder: (context, state) {
+              return UiButton.main(
+                label: l10n.createEventSubmit,
+                onPressed: _submit,
+                isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
+
+  /// Пользователь что-то ввёл или изменил: заранее выбранные питомец и дата не считаются.
+  bool get _hasChanges =>
+      _eventTitleController.text.trim().isNotEmpty ||
+      _timeController.text.trim().isNotEmpty ||
+      _notesController.text.trim().isNotEmpty ||
+      _selectedType.value != null ||
+      _createEventUio.value.petId != widget.selectedPetId ||
+      _createEventUio.value.date != widget.date;
 
   /// Создаёт событие, если обязательные поля заполнены; иначе подсвечивает пустые.
   void _submit() {

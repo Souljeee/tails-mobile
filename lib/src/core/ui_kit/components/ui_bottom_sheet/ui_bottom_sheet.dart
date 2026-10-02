@@ -8,6 +8,8 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 ///
 /// Содержимое прокручивается и поднимается над клавиатурой.
 ///
+/// [enableDrag] = `false` нужен листам с `UiDiscardGuard`: закрытие свайпом обходит защиту.
+///
 /// По умолчанию открывается в корневом навигаторе, то есть поверх нижней панели навигации.
 /// Содержимое не должно зависеть от InheritedWidget'ов, которые находятся ниже корня
 /// (например, от `ShellScope`).
@@ -15,6 +17,7 @@ Future<T?> showUiBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
   bool isDismissible = true,
+  bool enableDrag = true,
   bool useRootNavigator = true,
 }) {
   return showModalBottomSheet<T>(
@@ -22,6 +25,7 @@ Future<T?> showUiBottomSheet<T>({
     isScrollControlled: true,
     useSafeArea: true,
     isDismissible: isDismissible,
+    enableDrag: enableDrag,
     useRootNavigator: useRootNavigator,
     backgroundColor: context.uiPalette.canvas,
     clipBehavior: Clip.antiAlias,

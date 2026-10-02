@@ -578,4 +578,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get createEventErrorTitle => 'Введите название';
+
+  @override
+  String get discardTitle => 'Закрыть без сохранения?';
+
+  @override
+  String get discardMessage => 'Введённые данные будут потеряны.';
+
+  @override
+  String get discardKeepEditing => 'Продолжить';
+
+  @override
+  String get discardConfirm => 'Закрыть';
 }

@@ -1033,6 +1033,30 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Введите название'**
   String get createEventErrorTitle;
+
+  /// No description provided for @discardTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть без сохранения?'**
+  String get discardTitle;
+
+  /// No description provided for @discardMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введённые данные будут потеряны.'**
+  String get discardMessage;
+
+  /// No description provided for @discardKeepEditing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продолжить'**
+  String get discardKeepEditing;
+
+  /// No description provided for @discardConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть'**
+  String get discardConfirm;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

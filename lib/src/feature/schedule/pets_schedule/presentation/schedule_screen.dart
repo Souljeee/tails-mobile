@@ -159,6 +159,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   Future<void> _openCreateEventBottomSheet() async {
     final result = await showUiBottomSheet<CreateScheduleEventResult>(
       context: context,
+      // Закрытие свайпом обходит UiDiscardGuard, поэтому его отключаем.
+      enableDrag: false,
       builder: (_) => CreateScheduleEventBottomSheet(
         date: _selectedDate,
         pets: _petsBloc.state.mapOrNull<List<PetModel>?>(success: (state) => state.pets) ?? [],

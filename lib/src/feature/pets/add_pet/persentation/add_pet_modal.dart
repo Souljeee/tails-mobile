@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_discard_guard/ui_discard_guard.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
@@ -45,6 +46,19 @@ class AddPetFormData extends Equatable {
     this.castration,
     this.image,
   });
+
+  /// Пользователь что-то ввёл или выбрал: тип, пол и «кастрирован» сравниваются
+  /// со значениями по умолчанию.
+  bool get hasChanges =>
+      (name?.trim().isNotEmpty ?? false) ||
+      (color?.trim().isNotEmpty ?? false) ||
+      breedId != null ||
+      weight != null ||
+      birthday != null ||
+      image != null ||
+      petType != PetTypeEnum.cat ||
+      gender != PetSexEnum.male ||
+      (castration ?? false);
 
   bool get isValid =>
       name != null &&
@@ -214,98 +228,103 @@ class _AddPetModalState extends State<AddPetModal> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return Scaffold(
-      backgroundColor: context.uiPalette.canvas,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
-              child: UiSheetHeader(title: l10n.addPetTitle, cancelLabel: l10n.cancel),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+    return ValueListenableBuilder<AddPetFormData>(
+      valueListenable: _formData,
+      builder: (context, formData, child) =>
+          UiDiscardGuard(hasChanges: formData.hasChanges, child: child!),
+      child: Scaffold(
+        backgroundColor: context.uiPalette.canvas,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
+                child: UiSheetHeader(title: l10n.addPetTitle, cancelLabel: l10n.cancel),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.fromLTRB(
+                    UiSpacing.x5,
+                    UiSpacing.x4,
+                    UiSpacing.x5,
+                    UiSpacing.x4,
+                  ),
+                  child: ValueListenableBuilder<AddPetFormData>(
+                    valueListenable: _formData,
+                    builder: (context, formData, _) {
+                      return PetFormBody(
+                        petType: formData.petType,
+                        gender: formData.gender,
+                        nameController: _nameController,
+                        breedController: _breedController,
+                        birthDateController: _birthDateController,
+                        colorController: _colorController,
+                        onImageSelected: _onImageSelected,
+                        onTypeChanged: _onTypeChanged,
+                        onSexChanged: _onSexChanged,
+                        onWeightSelected: _onWeightSelected,
+                        onCastrationSelected: _onCastrationSelected,
+                        onBreedTap: _selectBreed,
+                        onBirthDateTap: _selectBirthDate,
+                        invalidFields: _showErrors ? _missingFields(formData).toSet() : const {},
+                        fieldKeys: _fieldKeys,
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.fromLTRB(
                   UiSpacing.x5,
-                  UiSpacing.x4,
+                  UiSpacing.x2,
                   UiSpacing.x5,
                   UiSpacing.x4,
                 ),
-                child: ValueListenableBuilder<AddPetFormData>(
-                  valueListenable: _formData,
-                  builder: (context, formData, _) {
-                    return PetFormBody(
-                      petType: formData.petType,
-                      gender: formData.gender,
-                      nameController: _nameController,
-                      breedController: _breedController,
-                      birthDateController: _birthDateController,
-                      colorController: _colorController,
-                      onImageSelected: _onImageSelected,
-                      onTypeChanged: _onTypeChanged,
-                      onSexChanged: _onSexChanged,
-                      onWeightSelected: _onWeightSelected,
-                      onCastrationSelected: _onCastrationSelected,
-                      onBreedTap: _selectBreed,
-                      onBirthDateTap: _selectBirthDate,
-                      invalidFields: _showErrors ? _missingFields(formData).toSet() : const {},
-                      fieldKeys: _fieldKeys,
+                child: BlocConsumer<AddPetBloc, AddPetState>(
+                  bloc: _addPetBloc,
+                  listener: (context, state) {
+                    state.mapOrNull(
+                      success: (_) => Navigator.of(context).pop(),
+                      error: (_) => showUiSnackBar(context, message: l10n.tryLater),
+                    );
+                  },
+                  builder: (context, state) {
+                    return ValueListenableBuilder<AddPetFormData>(
+                      valueListenable: _formData,
+                      builder: (context, formData, _) {
+                        return UiButton.main(
+                          isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
+                          label: l10n.addPetSubmit,
+                          onPressed: state.mapOrNull(
+                            initial: (_) => () {
+                              if (!_validate(formData)) {
+                                return;
+                              }
+
+                              _addPetBloc.add(
+                                AddPetEvent.addingRequested(
+                                  name: formData.name!,
+                                  petType: formData.petType!,
+                                  breedId: formData.breedId!,
+                                  color: formData.color!,
+                                  weight: formData.weight!,
+                                  gender: formData.gender!,
+                                  birthday: formData.birthday!,
+                                  castration: formData.castration!,
+                                  image: formData.image,
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                UiSpacing.x5,
-                UiSpacing.x2,
-                UiSpacing.x5,
-                UiSpacing.x4,
-              ),
-              child: BlocConsumer<AddPetBloc, AddPetState>(
-                bloc: _addPetBloc,
-                listener: (context, state) {
-                  state.mapOrNull(
-                    success: (_) => Navigator.of(context).pop(),
-                    error: (_) => showUiSnackBar(context, message: l10n.tryLater),
-                  );
-                },
-                builder: (context, state) {
-                  return ValueListenableBuilder<AddPetFormData>(
-                    valueListenable: _formData,
-                    builder: (context, formData, _) {
-                      return UiButton.main(
-                        isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-                        label: l10n.addPetSubmit,
-                        onPressed: state.mapOrNull(
-                          initial: (_) => () {
-                            if (!_validate(formData)) {
-                              return;
-                            }
-
-                            _addPetBloc.add(
-                              AddPetEvent.addingRequested(
-                                name: formData.name!,
-                                petType: formData.petType!,
-                                breedId: formData.breedId!,
-                                color: formData.color!,
-                                weight: formData.weight!,
-                                gender: formData.gender!,
-                                birthday: formData.birthday!,
-                                castration: formData.castration!,
-                                image: formData.image,
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

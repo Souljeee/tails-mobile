@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_discard_guard/ui_discard_guard.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
@@ -235,108 +236,113 @@ class _EditPetModalState extends State<EditPetModal> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return Scaffold(
-      backgroundColor: context.uiPalette.canvas,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
-              child: UiSheetHeader(title: l10n.editPetTitle, cancelLabel: l10n.cancel),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+    return ValueListenableBuilder<EditPetFormData>(
+      valueListenable: _formData,
+      builder: (context, formData, child) =>
+          UiDiscardGuard(hasChanges: _hasChanges(formData), child: child!),
+      child: Scaffold(
+        backgroundColor: context.uiPalette.canvas,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
+                child: UiSheetHeader(title: l10n.editPetTitle, cancelLabel: l10n.cancel),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.fromLTRB(
+                    UiSpacing.x5,
+                    UiSpacing.x4,
+                    UiSpacing.x5,
+                    UiSpacing.x4,
+                  ),
+                  child: ValueListenableBuilder<EditPetFormData>(
+                    valueListenable: _formData,
+                    builder: (context, formData, _) {
+                      return PetFormBody(
+                        petType: formData.petType,
+                        gender: formData.gender,
+                        nameController: _nameController,
+                        breedController: _breedController,
+                        birthDateController: _birthDateController,
+                        colorController: _colorController,
+                        initialImageUrl: widget.pet.image,
+                        initialWeight: widget.pet.weight,
+                        initialCastration: widget.pet.hasCastration,
+                        onImageSelected: _onImageSelected,
+                        onTypeChanged: _onTypeChanged,
+                        onSexChanged: _onSexChanged,
+                        onWeightSelected: _onWeightSelected,
+                        onCastrationSelected: _onCastrationSelected,
+                        onBreedTap: _selectBreed,
+                        onBirthDateTap: _selectBirthDate,
+                        invalidFields: _showErrors ? _missingFields(formData).toSet() : const {},
+                        fieldKeys: _fieldKeys,
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.fromLTRB(
                   UiSpacing.x5,
-                  UiSpacing.x4,
+                  UiSpacing.x2,
                   UiSpacing.x5,
                   UiSpacing.x4,
                 ),
-                child: ValueListenableBuilder<EditPetFormData>(
-                  valueListenable: _formData,
-                  builder: (context, formData, _) {
-                    return PetFormBody(
-                      petType: formData.petType,
-                      gender: formData.gender,
-                      nameController: _nameController,
-                      breedController: _breedController,
-                      birthDateController: _birthDateController,
-                      colorController: _colorController,
-                      initialImageUrl: widget.pet.image,
-                      initialWeight: widget.pet.weight,
-                      initialCastration: widget.pet.hasCastration,
-                      onImageSelected: _onImageSelected,
-                      onTypeChanged: _onTypeChanged,
-                      onSexChanged: _onSexChanged,
-                      onWeightSelected: _onWeightSelected,
-                      onCastrationSelected: _onCastrationSelected,
-                      onBreedTap: _selectBreed,
-                      onBirthDateTap: _selectBirthDate,
-                      invalidFields: _showErrors ? _missingFields(formData).toSet() : const {},
-                      fieldKeys: _fieldKeys,
+                child: BlocConsumer<EditPetBloc, EditPetState>(
+                  bloc: _editPetBloc,
+                  listener: (context, state) {
+                    state.mapOrNull(
+                      success: (_) => Navigator.of(context).pop(),
+                      error: (_) => showUiSnackBar(context, message: l10n.tryLater),
+                    );
+                  },
+                  builder: (context, state) {
+                    return ValueListenableBuilder<EditPetFormData>(
+                      valueListenable: _formData,
+                      builder: (context, formData, _) {
+                        final hasChanges = _hasChanges(formData);
+
+                        return UiButton.main(
+                          isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
+                          label: l10n.savePet,
+                          onPressed: hasChanges
+                              ? state.mapOrNull(
+                                  initial: (_) => () {
+                                    if (!_validate(formData)) {
+                                      return;
+                                    }
+
+                                    _editPetBloc.add(
+                                      EditPetEvent.editingRequested(
+                                        petId: widget.pet.id,
+                                        pet: EditPetModel(
+                                          name: formData.name,
+                                          petType: formData.petType,
+                                          breedId: formData.breedId,
+                                          color: formData.color,
+                                          weight: formData.weight,
+                                          gender: formData.gender,
+                                          birthday: formData.birthday,
+                                          hasCastration: formData.castration,
+                                        ),
+                                        image: _formData.value.image,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : null,
+                        );
+                      },
                     );
                   },
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                UiSpacing.x5,
-                UiSpacing.x2,
-                UiSpacing.x5,
-                UiSpacing.x4,
-              ),
-              child: BlocConsumer<EditPetBloc, EditPetState>(
-                bloc: _editPetBloc,
-                listener: (context, state) {
-                  state.mapOrNull(
-                    success: (_) => Navigator.of(context).pop(),
-                    error: (_) => showUiSnackBar(context, message: l10n.tryLater),
-                  );
-                },
-                builder: (context, state) {
-                  return ValueListenableBuilder<EditPetFormData>(
-                    valueListenable: _formData,
-                    builder: (context, formData, _) {
-                      final hasChanges = _hasChanges(formData);
-
-                      return UiButton.main(
-                        isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-                        label: l10n.savePet,
-                        onPressed: hasChanges
-                            ? state.mapOrNull(
-                                initial: (_) => () {
-                                  if (!_validate(formData)) {
-                                    return;
-                                  }
-
-                                  _editPetBloc.add(
-                                    EditPetEvent.editingRequested(
-                                      petId: widget.pet.id,
-                                      pet: EditPetModel(
-                                        name: formData.name,
-                                        petType: formData.petType,
-                                        breedId: formData.breedId,
-                                        color: formData.color,
-                                        weight: formData.weight,
-                                        gender: formData.gender,
-                                        birthday: formData.birthday,
-                                        hasCastration: formData.castration,
-                                      ),
-                                      image: _formData.value.image,
-                                    ),
-                                  );
-                                },
-                              )
-                            : null,
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

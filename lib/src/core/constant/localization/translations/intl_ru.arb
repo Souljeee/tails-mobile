@@ -222,5 +222,9 @@
   "petFormErrorWeight": "Укажите вес",
   "petFormErrorColor": "Введите окрас",
   "createEventErrorPet": "Выберите питомца",
-  "createEventErrorTitle": "Введите название"
+  "createEventErrorTitle": "Введите название",
+  "discardTitle": "Закрыть без сохранения?",
+  "discardMessage": "Введённые данные будут потеряны.",
+  "discardKeepEditing": "Продолжить",
+  "discardConfirm": "Закрыть"
 }
