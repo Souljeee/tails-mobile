@@ -63,17 +63,29 @@ class ScheduleRemoteDataSource {
     await restClient.post('/event_schedule/', body: dto.toJson());
   }
 
-  Future<void> markEventAsDone({required String eventId, required DateTime date}) async {
+  /// [time] — время вхождения в UTC (`HH:mm`); сервер требует его, когда у события несколько
+  /// времён в день, и игнорирует в остальных случаях.
+  Future<void> markEventAsDone({
+    required String eventId,
+    required DateTime date,
+    String? time,
+  }) async {
     await restClient.post(
       '/event_schedule/$eventId/mark_done/',
-      body: {'date': DateFormat('yyyy-MM-dd').format(date)},
+      body: {'date': DateFormat('yyyy-MM-dd').format(date), if (time != null) 'time': time},
     );
   }
 
-  Future<void> markEventAsUndone({required String eventId, required DateTime date}) async {
+  /// [time] — время вхождения в UTC (`HH:mm`); сервер требует его, когда у события несколько
+  /// времён в день, и игнорирует в остальных случаях.
+  Future<void> markEventAsUndone({
+    required String eventId,
+    required DateTime date,
+    String? time,
+  }) async {
     await restClient.post(
       '/event_schedule/$eventId/mark_undone/',
-      body: {'date': DateFormat('yyyy-MM-dd').format(date)},
+      body: {'date': DateFormat('yyyy-MM-dd').format(date), if (time != null) 'time': time},
     );
   }
 }

@@ -50,6 +50,8 @@ class _PetUpcomingEventTileState extends State<PetUpcomingEventTile> {
         value: value,
         eventId: widget.event.id,
         date: widget.event.date,
+        time: widget.event.time,
+        timeZoneOffset: widget.event.timeZoneOffset,
       ),
     );
   }

@@ -205,7 +205,7 @@ void main() {
   group('привязка к событию', () {
     test('rebase обновляет нетронутые значения и не трогает настройки пользователя', () {
       var draft = initial().withPeriod(RecurrencePeriod.week).toggleWeekDay(1);
-      draft = draft.rebase(eventDate: DateTime(2026, 10, 1), eventTime: '09:00');
+      draft = draft.rebase(eventDate: DateTime(2026, 10), eventTime: '09:00');
 
       expect(draft.weekDays, [1, 6]); // правили вручную
       expect(draft.monthDays, [const MonthDay(1)]); // нетронутое — обновилось
@@ -217,8 +217,8 @@ void main() {
       final draft = initial().withTimesCount(3);
 
       expect(draft.rebase(eventDate: eventDate, eventTime: '10:00').times.length, 3);
-      expect(draft.rebase(eventDate: eventDate, eventTime: null).times, isEmpty);
-      expect(draft.rebase(eventDate: eventDate, eventTime: null).supportsTimes, isFalse);
+      expect(draft.rebase(eventDate: eventDate).times, isEmpty);
+      expect(draft.rebase(eventDate: eventDate).supportsTimes, isFalse);
     });
   });
 

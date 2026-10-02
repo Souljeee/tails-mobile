@@ -277,7 +277,12 @@ class _ScheduleScreenState extends State<ScheduleScreen>
 
   void _onEventToggle(ScheduleEventModel event, {required bool value}) {
     _scheduleBloc.add(
-      ScheduleEvent.markDoneRequested(eventId: event.id, date: _selectedDate, value: value),
+      ScheduleEvent.markDoneRequested(
+        eventId: event.id,
+        date: _selectedDate,
+        value: value,
+        time: event.time,
+      ),
     );
   }
 

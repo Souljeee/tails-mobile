@@ -1267,6 +1267,228 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'после {n, plural, one{{n} повторения} other{{n} повторений}}'**
   String recurrenceEndAfter(int n);
+
+  /// No description provided for @recurrenceTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторение'**
+  String get recurrenceTitle;
+
+  /// No description provided for @recurrenceReset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не повторять'**
+  String get recurrenceReset;
+
+  /// No description provided for @recurrenceNext.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ближайшие: {dates}'**
+  String recurrenceNext(String dates);
+
+  /// No description provided for @recurrencePeriodDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'День'**
+  String get recurrencePeriodDay;
+
+  /// No description provided for @recurrencePeriodWeek.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неделя'**
+  String get recurrencePeriodWeek;
+
+  /// No description provided for @recurrencePeriodMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Месяц'**
+  String get recurrencePeriodMonth;
+
+  /// No description provided for @recurrencePeriodYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Год'**
+  String get recurrencePeriodYear;
+
+  /// No description provided for @recurrenceIntervalTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторять каждые'**
+  String get recurrenceIntervalTitle;
+
+  /// No description provided for @recurrenceIntervalUnitDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{день} few{дня} many{дней} other{дня}}'**
+  String recurrenceIntervalUnitDays(int n);
+
+  /// No description provided for @recurrenceIntervalUnitWeeks.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{неделя} few{недели} many{недель} other{недели}}'**
+  String recurrenceIntervalUnitWeeks(int n);
+
+  /// No description provided for @recurrenceIntervalUnitMonths.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{месяц} few{месяца} many{месяцев} other{месяца}}'**
+  String recurrenceIntervalUnitMonths(int n);
+
+  /// No description provided for @recurrenceIntervalUnitYears.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{год} few{года} many{лет} other{года}}'**
+  String recurrenceIntervalUnitYears(int n);
+
+  /// No description provided for @recurrenceWeekdayShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'{weekday, select, 1{Пн} 2{Вт} 3{Ср} 4{Чт} 5{Пт} 6{Сб} 7{Вс} other{}}'**
+  String recurrenceWeekdayShort(String weekday);
+
+  /// No description provided for @recurrenceWeekDaysTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дни недели'**
+  String get recurrenceWeekDaysTitle;
+
+  /// No description provided for @recurrencePresetWeekdays.
+  ///
+  /// In ru, this message translates to:
+  /// **'Будни'**
+  String get recurrencePresetWeekdays;
+
+  /// No description provided for @recurrencePresetWeekend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выходные'**
+  String get recurrencePresetWeekend;
+
+  /// No description provided for @recurrencePresetAllDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый день'**
+  String get recurrencePresetAllDays;
+
+  /// No description provided for @recurrenceMonthDaysTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Числа месяца'**
+  String get recurrenceMonthDaysTitle;
+
+  /// No description provided for @recurrenceLastDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последний день'**
+  String get recurrenceLastDay;
+
+  /// No description provided for @recurrenceMonthTransferHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'В коротких месяцах событие перенесётся на последний день месяца'**
+  String get recurrenceMonthTransferHint;
+
+  /// No description provided for @recurrenceYearDatesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Даты'**
+  String get recurrenceYearDatesTitle;
+
+  /// No description provided for @recurrenceAddDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить дату'**
+  String get recurrenceAddDate;
+
+  /// No description provided for @recurrenceFeb29Hint.
+  ///
+  /// In ru, this message translates to:
+  /// **'В невисокосный год событие перенесётся на 28 февраля'**
+  String get recurrenceFeb29Hint;
+
+  /// No description provided for @recurrenceTimesTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Раз в день'**
+  String get recurrenceTimesTitle;
+
+  /// No description provided for @recurrenceTimeN.
+  ///
+  /// In ru, this message translates to:
+  /// **'Время {n}'**
+  String recurrenceTimeN(int n);
+
+  /// No description provided for @recurrenceNoTimeHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите время события, чтобы повторять его несколько раз в день'**
+  String get recurrenceNoTimeHint;
+
+  /// No description provided for @recurrenceEndTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Окончание'**
+  String get recurrenceEndTitle;
+
+  /// No description provided for @recurrenceEndNever.
+  ///
+  /// In ru, this message translates to:
+  /// **'Никогда'**
+  String get recurrenceEndNever;
+
+  /// No description provided for @recurrenceEndOnDate.
+  ///
+  /// In ru, this message translates to:
+  /// **'В дату'**
+  String get recurrenceEndOnDate;
+
+  /// No description provided for @recurrenceEndAfterCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'После N повторений'**
+  String get recurrenceEndAfterCount;
+
+  /// No description provided for @recurrenceEndCountTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Число повторений'**
+  String get recurrenceEndCountTitle;
+
+  /// No description provided for @recurrenceEndErrorBeforeStart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата окончания раньше даты события'**
+  String get recurrenceEndErrorBeforeStart;
+
+  /// No description provided for @recurrenceEndErrorBeforeFirst.
+  ///
+  /// In ru, this message translates to:
+  /// **'Первое повторение — {date}, дата окончания раньше'**
+  String recurrenceEndErrorBeforeFirst(String date);
+
+  /// No description provided for @recurrenceEndLast.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последнее повторение: {date}'**
+  String recurrenceEndLast(String date);
+
+  /// No description provided for @recurrenceDecrease.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уменьшить'**
+  String get recurrenceDecrease;
+
+  /// No description provided for @recurrenceIncrease.
+  ///
+  /// In ru, this message translates to:
+  /// **'Увеличить'**
+  String get recurrenceIncrease;
+
+  /// No description provided for @recurrenceTooManyEvents.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком много повторений. Сделайте их реже или задайте окончание'**
+  String get recurrenceTooManyEvents;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

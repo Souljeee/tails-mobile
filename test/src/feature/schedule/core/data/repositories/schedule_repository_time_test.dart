@@ -9,6 +9,7 @@ import 'package:tails_mobile/src/feature/schedule/core/data/utils/event_time_con
 
 class _FakeDataSource implements ScheduleRemoteDataSource {
   CreateEventDto? created;
+  final marks = <({bool done, String? time})>[];
   ScheduleEventDtoList response = {};
 
   @override
@@ -27,6 +28,20 @@ class _FakeDataSource implements ScheduleRemoteDataSource {
     required DateTime dateFrom,
     int days = 14,
   }) async => response;
+
+  @override
+  Future<void> markEventAsDone({
+    required String eventId,
+    required DateTime date,
+    String? time,
+  }) async => marks.add((done: true, time: time));
+
+  @override
+  Future<void> markEventAsUndone({
+    required String eventId,
+    required DateTime date,
+    String? time,
+  }) async => marks.add((done: false, time: time));
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -100,7 +115,7 @@ void main() {
   });
 
   test('ключ смещения в ответе — timezone_offset', () {
-    final dto = ScheduleEventDto.fromJson({
+    final dto = ScheduleEventDto.fromJson(const {
       'id': 'e1',
       'pet': 1,
       'title': 'Прогулка',
@@ -112,5 +127,31 @@ void main() {
     });
 
     expect(dto.timeZoneOffset, 180);
+  });
+
+  test('отметка выполнения: время вхождения уходит в UTC по смещению события', () async {
+    final date = DateTime(2026, 10, 5);
+
+    await repository.updateEventDoneStatus(
+      value: true,
+      eventId: 'e1',
+      date: date,
+      time: '08:00',
+      timeZoneOffset: 180,
+    );
+    await repository.updateEventDoneStatus(
+      value: false,
+      eventId: 'e1',
+      date: date,
+      time: '21:30',
+      timeZoneOffset: 180,
+    );
+    await repository.updateEventDoneStatus(value: true, eventId: 'e1', date: date);
+
+    expect(dataSource.marks, [
+      (done: true, time: '05:00'),
+      (done: false, time: '18:30'),
+      (done: true, time: null),
+    ]);
   });
 }

@@ -7,7 +7,7 @@ import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/
 void main() {
   group('RecurrenceDto', () {
     test('разбирает ответ API со всеми полями и игнорирует лишние', () {
-      final dto = RecurrenceDto.fromJson({
+      final dto = RecurrenceDto.fromJson(const {
         'frequency': 'monthly',
         'interval': 2,
         'week_days': null,
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('interval по умолчанию 1', () {
-      expect(RecurrenceDto.fromJson({'frequency': 'daily'}).interval, 1);
+      expect(RecurrenceDto.fromJson(const {'frequency': 'daily'}).interval, 1);
     });
 
     test('пустые поля не отправляются', () {

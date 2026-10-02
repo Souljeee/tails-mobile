@@ -460,5 +460,105 @@
         "type": "int"
       }
     }
-  }
+  },
+  "recurrenceTitle": "Повторение",
+  "recurrenceReset": "Не повторять",
+  "recurrenceNext": "Ближайшие: {dates}",
+  "@recurrenceNext": {
+    "placeholders": {
+      "dates": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrencePeriodDay": "День",
+  "recurrencePeriodWeek": "Неделя",
+  "recurrencePeriodMonth": "Месяц",
+  "recurrencePeriodYear": "Год",
+  "recurrenceIntervalTitle": "Повторять каждые",
+  "recurrenceIntervalUnitDays": "{n, plural, one{день} few{дня} many{дней} other{дня}}",
+  "@recurrenceIntervalUnitDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalUnitWeeks": "{n, plural, one{неделя} few{недели} many{недель} other{недели}}",
+  "@recurrenceIntervalUnitWeeks": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalUnitMonths": "{n, plural, one{месяц} few{месяца} many{месяцев} other{месяца}}",
+  "@recurrenceIntervalUnitMonths": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalUnitYears": "{n, plural, one{год} few{года} many{лет} other{года}}",
+  "@recurrenceIntervalUnitYears": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceWeekdayShort": "{weekday, select, 1{Пн} 2{Вт} 3{Ср} 4{Чт} 5{Пт} 6{Сб} 7{Вс} other{}}",
+  "@recurrenceWeekdayShort": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceWeekDaysTitle": "Дни недели",
+  "recurrencePresetWeekdays": "Будни",
+  "recurrencePresetWeekend": "Выходные",
+  "recurrencePresetAllDays": "Каждый день",
+  "recurrenceMonthDaysTitle": "Числа месяца",
+  "recurrenceLastDay": "Последний день",
+  "recurrenceMonthTransferHint": "В коротких месяцах событие перенесётся на последний день месяца",
+  "recurrenceYearDatesTitle": "Даты",
+  "recurrenceAddDate": "Добавить дату",
+  "recurrenceFeb29Hint": "В невисокосный год событие перенесётся на 28 февраля",
+  "recurrenceTimesTitle": "Раз в день",
+  "recurrenceTimeN": "Время {n}",
+  "@recurrenceTimeN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceNoTimeHint": "Укажите время события, чтобы повторять его несколько раз в день",
+  "recurrenceEndTitle": "Окончание",
+  "recurrenceEndNever": "Никогда",
+  "recurrenceEndOnDate": "В дату",
+  "recurrenceEndAfterCount": "После N повторений",
+  "recurrenceEndCountTitle": "Число повторений",
+  "recurrenceEndErrorBeforeStart": "Дата окончания раньше даты события",
+  "recurrenceEndErrorBeforeFirst": "Первое повторение — {date}, дата окончания раньше",
+  "@recurrenceEndErrorBeforeFirst": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceEndLast": "Последнее повторение: {date}",
+  "@recurrenceEndLast": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceDecrease": "Уменьшить",
+  "recurrenceIncrease": "Увеличить",
+  "recurrenceTooManyEvents": "Слишком много повторений. Сделайте их реже или задайте окончание"
 }

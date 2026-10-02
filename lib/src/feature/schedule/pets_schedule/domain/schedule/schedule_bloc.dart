@@ -110,7 +110,9 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
         final List<ScheduleEventModel> updatedEvents = [];
 
         for (final scheduleEvent in events) {
-          if (scheduleEvent.id == event.eventId && scheduleEvent.date.isSameDate(event.date)) {
+          if (scheduleEvent.id == event.eventId &&
+              scheduleEvent.date.isSameDate(event.date) &&
+              scheduleEvent.time == event.time) {
             final newScheduleEvent = scheduleEvent.copyWith(
               done: CopyWithWrapper.value(event.value),
             );

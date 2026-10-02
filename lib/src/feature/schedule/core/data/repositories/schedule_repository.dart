@@ -55,11 +55,21 @@ class ScheduleRepository {
     required bool value,
     required String eventId,
     required DateTime date,
+    String? time,
+    int? timeZoneOffset,
   }) async {
+    // Отметка идёт на конкретное вхождение: время из модели — локальное, серверу нужен UTC.
+    final offset = timeZoneOffset ?? EventTimeConverter.deviceOffsetMinutes(date, time: time);
+    final wireTime = EventTimeConverter.localToUtc(time, offsetMinutes: offset);
+
     if (value) {
-      await _scheduleRemoteDataSource.markEventAsDone(eventId: eventId, date: date);
+      await _scheduleRemoteDataSource.markEventAsDone(eventId: eventId, date: date, time: wireTime);
     } else {
-      await _scheduleRemoteDataSource.markEventAsUndone(eventId: eventId, date: date);
+      await _scheduleRemoteDataSource.markEventAsUndone(
+        eventId: eventId,
+        date: date,
+        time: wireTime,
+      );
     }
   }
 }
