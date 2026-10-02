@@ -24,6 +24,7 @@ import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/create_schedule_event_bottom_sheet.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/pets/pets_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/schedule/schedule_bloc.dart';
+import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/schedule_window.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/pets_chip_list.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/schedule_calendar.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/schedule_event_item.dart';
@@ -35,14 +36,17 @@ class ScheduleScreen extends StatefulWidget {
   State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<ScheduleScreen> {
+class _ScheduleScreenState extends State<ScheduleScreen>
+    with ShellActionMixin<ScheduleScreen>, WidgetsBindingObserver {
   @override
   ShellTab get shellTab => ShellTab.schedule;
 
   @override
   void onShellAction() => _openCreateEventBottomSheet();
 
-  DateTime _selectedDate = DateTime.now().withoutTime;
+  /// Сегодняшний день на момент последней проверки: по нему замечаем смену суток.
+  DateTime _today = DateTime.now().withoutTime;
+  late DateTime _selectedDate = _today;
   int? _selectedPetId;
 
   /// Питомцы, известные после последней загрузки: по ним определяем удалённых.
@@ -50,10 +54,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
 
   bool? _wasTabActive;
 
-  final _startDate = DateTime.now().subtract(const Duration(days: 180));
-  final _endDate = DateTime.now().add(const Duration(days: 180));
+  /// Загруженный диапазон; сдвигается, когда календарь листают за его пределы.
+  ScheduleWindow _window = ScheduleWindow.around(DateTime.now());
 
-  final MonthCalendarController _monthController = MonthCalendarController(DateTime.now());
+  late final MonthCalendarController _monthController = MonthCalendarController(_today);
 
   late final PetsBloc _petsBloc = PetsBloc(
     petRepository: DependenciesScope.of(context).petRepository,
@@ -65,6 +69,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+    _monthController.addListener(_onMonthChanged);
 
     _loadData();
   }
@@ -78,14 +85,23 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
     final isActive = TickerMode.of(context);
 
     if (_wasTabActive == false && isActive) {
-      _reloadSchedule(silent: true);
+      _refresh();
     }
 
     _wasTabActive = isActive;
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && TickerMode.of(context)) {
+      _refresh();
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _monthController.removeListener(_onMonthChanged);
     _petsBloc.close();
     _scheduleBloc.close();
     _monthController.dispose();
@@ -98,11 +114,42 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
     _reloadSchedule();
   }
 
+  /// Тихо обновляет данные; если наступили новые сутки, переносит «сегодня».
+  void _refresh() {
+    final now = DateTime.now().withoutTime;
+
+    if (now != _today) {
+      final wasTodaySelected = _selectedDate == _today;
+
+      _today = now;
+      _window = ScheduleWindow.around(now);
+
+      if (wasTodaySelected) {
+        setState(() => _selectedDate = now);
+        _monthController.goToMonth(now);
+      }
+    }
+
+    _reloadSchedule(silent: true);
+  }
+
+  /// Если пользователь долистал до месяца вне загруженного окна, сдвигаем окно к нему.
+  void _onMonthChanged() {
+    final month = _monthController.value;
+
+    if (_window.coversMonth(month)) {
+      return;
+    }
+
+    _window = ScheduleWindow.around(month);
+    _reloadSchedule(silent: true);
+  }
+
   void _reloadSchedule({bool silent = false}) {
     _scheduleBloc.add(
       ScheduleEvent.fetchRequested(
-        startDate: _startDate,
-        endDate: _endDate,
+        startDate: _window.start,
+        endDate: _window.end,
         petId: _selectedPetId,
         silent: silent,
       ),
@@ -189,8 +236,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
   }
 
   String? _todayCountLabel(ScheduleState state) {
+    final today = DateTime.now().withoutTime;
+
+    // Если окно данных сдвинули далеко от сегодняшнего дня, число дел неизвестно.
+    if (today.isBefore(_window.start) || today.isAfter(_window.end)) {
+      return null;
+    }
+
     final count = state.mapOrNull<int>(
-      success: (state) => (state.scheduleEvents[DateTime.now().withoutTime] ?? []).length,
+      success: (state) => (state.scheduleEvents[today] ?? []).length,
     );
 
     return count == null ? null : context.l10n.scheduleTodayCount(count);
