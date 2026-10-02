@@ -593,4 +593,258 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get petsScheduleUnavailable => 'Не удалось загрузить события';
+
+  @override
+  String get recurrenceAnd => 'и';
+
+  @override
+  String get recurrenceEveryDay => 'Каждый день';
+
+  @override
+  String get recurrenceEveryOtherDay => 'Через день';
+
+  @override
+  String recurrenceEveryNDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n дня',
+      many: 'Каждые $n дней',
+      few: 'Каждые $n дня',
+      one: 'Каждый $n день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recurrenceWeekdays => 'По будням';
+
+  @override
+  String get recurrenceWeekends => 'По выходным';
+
+  @override
+  String recurrenceEveryWeekday(String weekday) {
+    String _temp0 = intl.Intl.selectLogic(weekday, {
+      '1': 'Каждый понедельник',
+      '2': 'Каждый вторник',
+      '3': 'Каждую среду',
+      '4': 'Каждый четверг',
+      '5': 'Каждую пятницу',
+      '6': 'Каждую субботу',
+      '7': 'Каждое воскресенье',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceWeekdayDative(String weekday) {
+    String _temp0 = intl.Intl.selectLogic(weekday, {
+      '1': 'понедельникам',
+      '2': 'вторникам',
+      '3': 'средам',
+      '4': 'четвергам',
+      '5': 'пятницам',
+      '6': 'субботам',
+      '7': 'воскресеньям',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceOnWeekdays(String days) {
+    return 'По $days';
+  }
+
+  @override
+  String recurrenceEveryNWeeksOn(int n, String days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n недели',
+      many: 'Каждые $n недель',
+      few: 'Каждые $n недели',
+      one: 'Каждую $n неделю',
+    );
+    return '$_temp0 по $days';
+  }
+
+  @override
+  String get recurrenceMonthEvery => 'каждого месяца';
+
+  @override
+  String recurrenceMonthEveryN(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'каждые $n месяца',
+      many: 'каждые $n месяцев',
+      few: 'каждые $n месяца',
+      one: 'каждый $n месяц',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceMonthNumbers(String days, String every) {
+    return '$days числа $every';
+  }
+
+  @override
+  String recurrenceMonthLast(String every) {
+    return 'В последний день $every';
+  }
+
+  @override
+  String recurrenceMonthNumbersAndLast(String days, String every) {
+    return '$days числа и в последний день $every';
+  }
+
+  @override
+  String recurrenceMonthGenitive(String month) {
+    String _temp0 = intl.Intl.selectLogic(month, {
+      '1': 'января',
+      '2': 'февраля',
+      '3': 'марта',
+      '4': 'апреля',
+      '5': 'мая',
+      '6': 'июня',
+      '7': 'июля',
+      '8': 'августа',
+      '9': 'сентября',
+      '10': 'октября',
+      '11': 'ноября',
+      '12': 'декабря',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceDayMonth(int day, String month) {
+    return '$day $month';
+  }
+
+  @override
+  String recurrenceYearEvery(String dates) {
+    return '$dates каждого года';
+  }
+
+  @override
+  String recurrenceYearEveryN(String dates, int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'каждые $n года',
+      many: 'каждые $n лет',
+      few: 'каждые $n года',
+      one: 'каждый $n год',
+    );
+    return '$dates, $_temp0';
+  }
+
+  @override
+  String get recurrenceOncePerWeek => 'раз в неделю';
+
+  @override
+  String get recurrenceOncePerMonth => 'раз в месяц';
+
+  @override
+  String get recurrenceOncePerYear => 'раз в год';
+
+  @override
+  String recurrenceTimesPerDay(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 в день';
+  }
+
+  @override
+  String recurrenceTimesPerWeek(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 в неделю';
+  }
+
+  @override
+  String recurrenceTimesPerMonth(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 в месяц';
+  }
+
+  @override
+  String recurrenceTimesPerYear(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 в год';
+  }
+
+  @override
+  String recurrenceOnceInUnits(String unit) {
+    return 'раз в $unit';
+  }
+
+  @override
+  String recurrenceTimesInUnits(int n, String unit) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 за $unit';
+  }
+
+  @override
+  String recurrenceUnitWeeks(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n недели',
+      many: '$n недель',
+      few: '$n недели',
+      one: '$n неделю',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceUnitMonths(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n месяца',
+      many: '$n месяцев',
+      few: '$n месяца',
+      one: '$n месяц',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceUnitYears(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n года',
+      many: '$n лет',
+      few: '$n года',
+      one: '$n год',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceAtTime(String time) {
+    return 'в $time';
+  }
+
+  @override
+  String recurrenceEndUntil(String date) {
+    return 'до $date';
+  }
+
+  @override
+  String recurrenceEndAfter(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n повторений',
+      one: '$n повторения',
+    );
+    return 'после $_temp0';
+  }
 }

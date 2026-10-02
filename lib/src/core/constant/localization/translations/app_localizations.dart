@@ -1063,6 +1063,210 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось загрузить события'**
   String get petsScheduleUnavailable;
+
+  /// Союз в перечислениях правила повторения
+  ///
+  /// In ru, this message translates to:
+  /// **'и'**
+  String get recurrenceAnd;
+
+  /// No description provided for @recurrenceEveryDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый день'**
+  String get recurrenceEveryDay;
+
+  /// No description provided for @recurrenceEveryOtherDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Через день'**
+  String get recurrenceEveryOtherDay;
+
+  /// No description provided for @recurrenceEveryNDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{Каждый {n} день} few{Каждые {n} дня} many{Каждые {n} дней} other{Каждые {n} дня}}'**
+  String recurrenceEveryNDays(int n);
+
+  /// No description provided for @recurrenceWeekdays.
+  ///
+  /// In ru, this message translates to:
+  /// **'По будням'**
+  String get recurrenceWeekdays;
+
+  /// No description provided for @recurrenceWeekends.
+  ///
+  /// In ru, this message translates to:
+  /// **'По выходным'**
+  String get recurrenceWeekends;
+
+  /// Один день недели в итоге правила
+  ///
+  /// In ru, this message translates to:
+  /// **'{weekday, select, 1{Каждый понедельник} 2{Каждый вторник} 3{Каждую среду} 4{Каждый четверг} 5{Каждую пятницу} 6{Каждую субботу} 7{Каждое воскресенье} other{}}'**
+  String recurrenceEveryWeekday(String weekday);
+
+  /// День недели во множественном числе, дательный падеж («по вторникам»)
+  ///
+  /// In ru, this message translates to:
+  /// **'{weekday, select, 1{понедельникам} 2{вторникам} 3{средам} 4{четвергам} 5{пятницам} 6{субботам} 7{воскресеньям} other{}}'**
+  String recurrenceWeekdayDative(String weekday);
+
+  /// No description provided for @recurrenceOnWeekdays.
+  ///
+  /// In ru, this message translates to:
+  /// **'По {days}'**
+  String recurrenceOnWeekdays(String days);
+
+  /// No description provided for @recurrenceEveryNWeeksOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{Каждую {n} неделю} few{Каждые {n} недели} many{Каждые {n} недель} other{Каждые {n} недели}} по {days}'**
+  String recurrenceEveryNWeeksOn(int n, String days);
+
+  /// No description provided for @recurrenceMonthEvery.
+  ///
+  /// In ru, this message translates to:
+  /// **'каждого месяца'**
+  String get recurrenceMonthEvery;
+
+  /// No description provided for @recurrenceMonthEveryN.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{каждый {n} месяц} few{каждые {n} месяца} many{каждые {n} месяцев} other{каждые {n} месяца}}'**
+  String recurrenceMonthEveryN(int n);
+
+  /// No description provided for @recurrenceMonthNumbers.
+  ///
+  /// In ru, this message translates to:
+  /// **'{days} числа {every}'**
+  String recurrenceMonthNumbers(String days, String every);
+
+  /// No description provided for @recurrenceMonthLast.
+  ///
+  /// In ru, this message translates to:
+  /// **'В последний день {every}'**
+  String recurrenceMonthLast(String every);
+
+  /// No description provided for @recurrenceMonthNumbersAndLast.
+  ///
+  /// In ru, this message translates to:
+  /// **'{days} числа и в последний день {every}'**
+  String recurrenceMonthNumbersAndLast(String days, String every);
+
+  /// Название месяца в родительном падеже («15 марта»)
+  ///
+  /// In ru, this message translates to:
+  /// **'{month, select, 1{января} 2{февраля} 3{марта} 4{апреля} 5{мая} 6{июня} 7{июля} 8{августа} 9{сентября} 10{октября} 11{ноября} 12{декабря} other{}}'**
+  String recurrenceMonthGenitive(String month);
+
+  /// No description provided for @recurrenceDayMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'{day} {month}'**
+  String recurrenceDayMonth(int day, String month);
+
+  /// No description provided for @recurrenceYearEvery.
+  ///
+  /// In ru, this message translates to:
+  /// **'{dates} каждого года'**
+  String recurrenceYearEvery(String dates);
+
+  /// No description provided for @recurrenceYearEveryN.
+  ///
+  /// In ru, this message translates to:
+  /// **'{dates}, {n, plural, one{каждый {n} год} few{каждые {n} года} many{каждые {n} лет} other{каждые {n} года}}'**
+  String recurrenceYearEveryN(String dates, int n);
+
+  /// No description provided for @recurrenceOncePerWeek.
+  ///
+  /// In ru, this message translates to:
+  /// **'раз в неделю'**
+  String get recurrenceOncePerWeek;
+
+  /// No description provided for @recurrenceOncePerMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'раз в месяц'**
+  String get recurrenceOncePerMonth;
+
+  /// No description provided for @recurrenceOncePerYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'раз в год'**
+  String get recurrenceOncePerYear;
+
+  /// No description provided for @recurrenceTimesPerDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, few{{n} раза} other{{n} раз}} в день'**
+  String recurrenceTimesPerDay(int n);
+
+  /// No description provided for @recurrenceTimesPerWeek.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, few{{n} раза} other{{n} раз}} в неделю'**
+  String recurrenceTimesPerWeek(int n);
+
+  /// No description provided for @recurrenceTimesPerMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, few{{n} раза} other{{n} раз}} в месяц'**
+  String recurrenceTimesPerMonth(int n);
+
+  /// No description provided for @recurrenceTimesPerYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, few{{n} раза} other{{n} раз}} в год'**
+  String recurrenceTimesPerYear(int n);
+
+  /// No description provided for @recurrenceOnceInUnits.
+  ///
+  /// In ru, this message translates to:
+  /// **'раз в {unit}'**
+  String recurrenceOnceInUnits(String unit);
+
+  /// No description provided for @recurrenceTimesInUnits.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, few{{n} раза} other{{n} раз}} за {unit}'**
+  String recurrenceTimesInUnits(int n, String unit);
+
+  /// No description provided for @recurrenceUnitWeeks.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{{n} неделю} few{{n} недели} many{{n} недель} other{{n} недели}}'**
+  String recurrenceUnitWeeks(int n);
+
+  /// No description provided for @recurrenceUnitMonths.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{{n} месяц} few{{n} месяца} many{{n} месяцев} other{{n} месяца}}'**
+  String recurrenceUnitMonths(int n);
+
+  /// No description provided for @recurrenceUnitYears.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{{n} год} few{{n} года} many{{n} лет} other{{n} года}}'**
+  String recurrenceUnitYears(int n);
+
+  /// No description provided for @recurrenceAtTime.
+  ///
+  /// In ru, this message translates to:
+  /// **'в {time}'**
+  String recurrenceAtTime(String time);
+
+  /// No description provided for @recurrenceEndUntil.
+  ///
+  /// In ru, this message translates to:
+  /// **'до {date}'**
+  String recurrenceEndUntil(String date);
+
+  /// No description provided for @recurrenceEndAfter.
+  ///
+  /// In ru, this message translates to:
+  /// **'после {n, plural, one{{n} повторения} other{{n} повторений}}'**
+  String recurrenceEndAfter(int n);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

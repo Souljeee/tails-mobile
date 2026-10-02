@@ -17,6 +17,7 @@ class ScheduleEventDto extends Equatable {
   final String? time;
   @JsonKey(name: 'start_date')
   final DateTime date;
+  @JsonKey(name: 'timezone_offset')
   final int? timeZoneOffset;
   final ScheduleEventTypeEnum type;
   final bool done;
