@@ -9,6 +9,7 @@ sealed class ScheduleEvent extends Equatable {
     required DateTime startDate,
     required DateTime endDate,
     int? petId,
+    bool silent,
   }) = ScheduleEvent$FetchRequested;
 
   const factory ScheduleEvent.loadMoreRequested({
@@ -39,10 +40,18 @@ final class ScheduleEvent$FetchRequested extends ScheduleEvent {
   final DateTime endDate;
   final int? petId;
 
-  const ScheduleEvent$FetchRequested({required this.startDate, required this.endDate, this.petId});
+  /// Тихое обновление: уже показанные данные не заменяются индикатором загрузки.
+  final bool silent;
+
+  const ScheduleEvent$FetchRequested({
+    required this.startDate,
+    required this.endDate,
+    this.petId,
+    this.silent = false,
+  });
 
   @override
-  List<Object?> get props => [startDate, endDate, petId];
+  List<Object?> get props => [startDate, endDate, petId, silent];
 }
 
 final class ScheduleEvent$LoadMoreRequested extends ScheduleEvent {

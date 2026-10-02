@@ -30,8 +30,13 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     ScheduleEvent$FetchRequested event,
     Emitter<ScheduleState> emit,
   ) async {
+    final hasData = state is ScheduleState$Success;
+    final keepData = event.silent && hasData;
+
     try {
-      emit(const ScheduleState.loading());
+      if (!keepData) {
+        emit(const ScheduleState.loading());
+      }
 
       final ScheduleEventModelList scheduleEvents = await _scheduleRepository.getScheduleEvents(
         startDate: event.startDate,
@@ -43,7 +48,10 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     } catch (e, s) {
       addError(e, s);
 
-      emit(const ScheduleState.error());
+      // При тихом обновлении оставляем уже показанные данные.
+      if (!keepData) {
+        emit(const ScheduleState.error());
+      }
     }
   }
 

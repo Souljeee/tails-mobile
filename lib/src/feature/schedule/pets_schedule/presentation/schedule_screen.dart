@@ -48,6 +48,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
   /// Питомцы, известные после последней загрузки: по ним определяем удалённых.
   Set<int> _knownPetIds = {};
 
+  bool? _wasTabActive;
+
   final _startDate = DateTime.now().subtract(const Duration(days: 180));
   final _endDate = DateTime.now().add(const Duration(days: 180));
 
@@ -68,6 +70,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Ветки оболочки живут одновременно. Когда вкладка снова становится активной,
+    // тихо обновляем расписание: события могли измениться на карточке питомца.
+    final isActive = TickerMode.of(context);
+
+    if (_wasTabActive == false && isActive) {
+      _reloadSchedule(silent: true);
+    }
+
+    _wasTabActive = isActive;
+  }
+
+  @override
   void dispose() {
     _petsBloc.close();
     _scheduleBloc.close();
@@ -81,9 +98,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> with ShellActionMixin<S
     _reloadSchedule();
   }
 
-  void _reloadSchedule() {
+  void _reloadSchedule({bool silent = false}) {
     _scheduleBloc.add(
-      ScheduleEvent.fetchRequested(startDate: _startDate, endDate: _endDate, petId: _selectedPetId),
+      ScheduleEvent.fetchRequested(
+        startDate: _startDate,
+        endDate: _endDate,
+        petId: _selectedPetId,
+        silent: silent,
+      ),
     );
   }
 
