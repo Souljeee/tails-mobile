@@ -1,29 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_popup/ui_popup.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_badge/ui_icon_badge.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/delete_pet/domain/delete_pet_bloc.dart';
 
-enum DeletePetStatus {
-  deleted,
-  error,
-}
+enum DeletePetStatus { deleted, error }
 
 class DeletePetBottomSheet extends StatefulWidget {
   final int petId;
 
-  static Future<DeletePetStatus?> show({
-    required BuildContext context,
-    required int petId,
-  }) =>
-      showUiPopup<DeletePetStatus>(
+  static Future<DeletePetStatus?> show({required BuildContext context, required int petId}) =>
+      showUiBottomSheet<DeletePetStatus>(
         context: context,
         isDismissible: false,
-        child: DeletePetBottomSheet._(petId: petId),
+        builder: (_) => DeletePetBottomSheet._(petId: petId),
       );
 
   const DeletePetBottomSheet._({required this.petId});
@@ -33,38 +28,44 @@ class DeletePetBottomSheet extends StatefulWidget {
 }
 
 class _DeletePetBottomSheetState extends State<DeletePetBottomSheet> {
-  late final DeletePetBloc _deletePetBloc = DeletePetBloc(petRepository: DependenciesScope.of(context).petRepository);
+  late final DeletePetBloc _deletePetBloc = DeletePetBloc(
+    petRepository: DependenciesScope.of(context).petRepository,
+  );
 
   @override
   void dispose() {
     _deletePetBloc.close();
-    
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.uiPalette;
+    final fonts = context.uiFonts;
+
     return Column(
       children: [
-        UiSvgImage(
-          svgPath: context.uiIcons.alert.path,
-          height: 64,
-          width: 64,
-          color: context.uiColors.orangePrimary,
+        UiIconBadge(
+          icon: Icons.delete_outline,
+          size: 64,
+          iconSize: 28,
+          foregroundColor: palette.danger,
+          backgroundColor: palette.dangerTint,
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: UiSpacing.x5),
         Text(
           context.l10n.deletePetTitle,
-          style: context.uiFonts.header32Semibold,
+          style: fonts.displayS.copyWith(color: palette.ink),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: UiSpacing.x2),
         Text(
           context.l10n.deletePetSubtitle,
-          style: context.uiFonts.text16Regular,
+          style: fonts.body.copyWith(color: palette.ink2),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: UiSpacing.x6),
         BlocConsumer<DeletePetBloc, DeletePetState>(
           bloc: _deletePetBloc,
           listener: (context, state) {
@@ -74,25 +75,24 @@ class _DeletePetBottomSheetState extends State<DeletePetBottomSheet> {
             );
           },
           builder: (context, state) {
+            final isLoading = state.maybeMap(loading: (_) => true, orElse: () => false);
+
             return Row(
               children: [
                 Expanded(
                   child: UiButton.secondary(
                     label: context.l10n.deletePetCancel,
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: isLoading ? null : () => Navigator.pop(context),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: UiSpacing.x3),
                 Expanded(
                   child: UiButton.main(
                     label: context.l10n.deletePetDelete,
-                    isLoading: state.maybeMap(
-                      loading: (_) => true,
-                      orElse: () => false,
-                    ),
-                    onPressed: () {
-                      _deletePetBloc.add(DeletePetEvent.deleteRequested(id: widget.petId));
-                    },
+                    isLoading: isLoading,
+                    staticFillColor: palette.danger,
+                    onPressed: () =>
+                        _deletePetBloc.add(DeletePetEvent.deleteRequested(id: widget.petId)),
                   ),
                 ),
               ],

@@ -7,11 +7,15 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 /// Показывает bottom sheet Design 2.0: фон `canvas`, верхние углы xl, ручка сверху.
 ///
 /// Содержимое прокручивается и поднимается над клавиатурой.
+///
+/// По умолчанию открывается в корневом навигаторе, то есть поверх нижней панели навигации.
+/// Содержимое не должно зависеть от InheritedWidget'ов, которые находятся ниже корня
+/// (например, от `ShellScope`).
 Future<T?> showUiBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
   bool isDismissible = true,
-  bool useRootNavigator = false,
+  bool useRootNavigator = true,
 }) {
   return showModalBottomSheet<T>(
     context: context,
