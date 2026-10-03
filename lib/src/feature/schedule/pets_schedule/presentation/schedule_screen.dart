@@ -191,6 +191,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       context: context,
       // Закрытие свайпом обходит UiDiscardGuard, поэтому его отключаем.
       enableDrag: false,
+      // Страница «Повторение» рисует нижнюю панель барабана от края до края.
+      fullBleed: true,
       builder: (_) => CreateScheduleEventBottomSheet(
         date: _selectedDate,
         pets: _petsBloc.state.mapOrNull<List<PetModel>?>(success: (state) => state.pets) ?? [],
@@ -277,7 +279,12 @@ class _ScheduleScreenState extends State<ScheduleScreen>
 
   void _onEventToggle(ScheduleEventModel event, {required bool value}) {
     _scheduleBloc.add(
-      ScheduleEvent.markDoneRequested(eventId: event.id, date: _selectedDate, value: value),
+      ScheduleEvent.markDoneRequested(
+        eventId: event.id,
+        date: _selectedDate,
+        value: value,
+        time: event.time,
+      ),
     );
   }
 
@@ -570,7 +577,8 @@ class _EventsSliver extends StatelessWidget {
                     final event = events[index];
 
                     return ScheduleEventItem(
-                      key: ValueKey(event.id),
+                      // Слоты «несколько раз в день» — записи с одним id, различаются временем.
+                      key: ValueKey('${event.id}_${event.time}'),
                       event: event,
                       pet: pets.firstWhereOrNull((pet) => pet.id == event.petId),
                       petColor: petColorOf(event.petId),

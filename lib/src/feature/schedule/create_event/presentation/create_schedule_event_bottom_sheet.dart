@@ -1,14 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_card/ui_card.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_discard_guard/ui_discard_guard.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_flyout/ui_flyout.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_avatar/ui_pet_avatar.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_svg_image/ui_svg_image.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
@@ -23,10 +24,16 @@ import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scop
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/domain/create_event_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/uio/create_event_uio.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/utils/event_type_options.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/time_picker_carousel_popup.dart';
+import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_calculator.dart';
+import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_draft.dart';
+import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_summary.dart';
+import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/recurrence_page.dart';
+import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/utils/recurrence_date_format.dart';
 
 enum CreateScheduleEventResult { success, error }
 
@@ -48,6 +55,14 @@ class CreateScheduleEventBottomSheet extends StatefulWidget {
 }
 
 class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBottomSheet> {
+  /// Отступы формы: шторка показывается с `fullBleed`, поэтому поля задаёт содержимое.
+  static const EdgeInsets _contentPadding = EdgeInsets.fromLTRB(
+    UiSpacing.x5,
+    0,
+    UiSpacing.x5,
+    UiSpacing.x4,
+  );
+
   late final CreateEventBloc _createEventBloc = CreateEventBloc(
     scheduleRepository: DependenciesScope.of(context).scheduleRepository,
   );
@@ -62,8 +77,14 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   final UiTextFieldController _eventTitleController = UiTextFieldController();
   final UiTextFieldController _dateController = UiTextFieldController();
   final UiTextFieldController _timeController = UiTextFieldController();
-  final UiTextFieldController _recurrenceController = UiTextFieldController();
   final UiTextFieldController _notesController = UiTextFieldController();
+
+  /// Повторение: `null` — событие не повторяется. Хранится черновик, чтобы при смене даты
+  /// и времени события нетронутые значения по умолчанию пересчитывались.
+  final ValueNotifier<RecurrenceDraft?> _recurrence = ValueNotifier(null);
+
+  /// Открыта ли вторая страница шторки — «Повторение».
+  final ValueNotifier<bool> _isRecurrenceOpen = ValueNotifier(false);
 
   /// Ошибки показываем только после первой попытки создать событие.
   final ValueNotifier<bool> _showErrors = ValueNotifier(false);
@@ -76,16 +97,9 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
 
     _eventTitleController.addListener(_onTitleChanged);
     _timeController.addListener(_onTimeChanged);
+    _dateController.addListener(_rebaseRecurrence);
+    _timeController.addListener(_rebaseRecurrence);
     _notesController.addListener(_onNotesChanged);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (_recurrenceController.text.isEmpty) {
-      _recurrenceController.text = context.l10n.createEventNoRecurrence;
-    }
   }
 
   @override
@@ -93,11 +107,12 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     _createEventBloc.close();
     _createEventUio.dispose();
     _selectedType.dispose();
+    _recurrence.dispose();
+    _isRecurrenceOpen.dispose();
     _showErrors.dispose();
     _eventTitleController.dispose();
     _dateController.dispose();
     _timeController.dispose();
-    _recurrenceController.dispose();
     _notesController.dispose();
 
     super.dispose();
@@ -107,95 +122,154 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return ListenableBuilder(
-      listenable: Listenable.merge([
-        _createEventUio,
-        _selectedType,
-        _eventTitleController,
-        _timeController,
-        _notesController,
-      ]),
-      builder: (context, child) => UiDiscardGuard(hasChanges: _hasChanges, child: child!),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
-          const SizedBox(height: UiSpacing.x4),
-          _FieldLabel(label: l10n.createEventForWhom),
-          ListenableBuilder(
-            listenable: Listenable.merge([_createEventUio, _showErrors]),
-            builder: (context, child) {
-              final uio = _createEventUio.value;
+    return ValueListenableBuilder(
+      valueListenable: _isRecurrenceOpen,
+      builder: (context, isOpen, form) => isOpen
+          ? RecurrencePage(
+              initial: _recurrence.value ?? _initialRecurrenceDraft(),
+              onBack: () => _isRecurrenceOpen.value = false,
+              onApply: _applyRecurrence,
+            )
+          : form!,
+      child: ListenableBuilder(
+        listenable: Listenable.merge([
+          _createEventUio,
+          _recurrence,
+          _selectedType,
+          _eventTitleController,
+          _timeController,
+          _notesController,
+        ]),
+        builder: (context, child) => UiDiscardGuard(hasChanges: _hasChanges, child: child!),
+        child: SafeArea(
+          top: false,
+          minimum: _contentPadding,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
+              const SizedBox(height: UiSpacing.x4),
+              _FieldLabel(label: l10n.createEventForWhom),
+              ListenableBuilder(
+                listenable: Listenable.merge([_createEventUio, _showErrors]),
+                builder: (context, child) {
+                  final uio = _createEventUio.value;
 
-              return _PetChips(
-                pets: widget.pets,
-                selectedPetId: uio.petId,
-                onPetSelected: _onPetIdSelected,
-                errorText: _showErrors.value && uio.petId == null ? l10n.createEventErrorPet : null,
-              );
-            },
-          ),
-          const SizedBox(height: UiSpacing.x4),
-          ListenableBuilder(
-            listenable: Listenable.merge([_eventTitleController, _showErrors]),
-            builder: (context, child) {
-              final isTitleMissing = _eventTitleController.text.trim().isEmpty;
+                  return _PetChips(
+                    pets: widget.pets,
+                    selectedPetId: uio.petId,
+                    onPetSelected: _onPetIdSelected,
+                    errorText: _showErrors.value && uio.petId == null
+                        ? l10n.createEventErrorPet
+                        : null,
+                  );
+                },
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              ListenableBuilder(
+                listenable: Listenable.merge([_eventTitleController, _showErrors]),
+                builder: (context, child) {
+                  final isTitleMissing = _eventTitleController.text.trim().isEmpty;
 
-              return UiTextField(
-                controller: _eventTitleController,
-                labelText: l10n.createEventNameLabel,
-                placeholderText: l10n.createEventNamePlaceholder,
-                errorText: _showErrors.value && isTitleMissing ? l10n.createEventErrorTitle : null,
-              );
-            },
+                  return UiTextField(
+                    controller: _eventTitleController,
+                    labelText: l10n.createEventNameLabel,
+                    placeholderText: l10n.createEventNamePlaceholder,
+                    errorText: _showErrors.value && isTitleMissing
+                        ? l10n.createEventErrorTitle
+                        : null,
+                  );
+                },
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              _FieldLabel(label: l10n.createEventTypeLabel),
+              ValueListenableBuilder(
+                valueListenable: _selectedType,
+                builder: (context, selected, child) {
+                  return _TypeChips(
+                    selected: selected,
+                    onSelected: (type) => _selectedType.value = type,
+                  );
+                },
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              _DateTimeFields(
+                initialDate: widget.date,
+                dateController: _dateController,
+                timeController: _timeController,
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              _RecurrenceSelector(
+                recurrence: _recurrence,
+                onTap: () => _isRecurrenceOpen.value = true,
+              ),
+              const SizedBox(height: UiSpacing.x4),
+              UiTextField(
+                controller: _notesController,
+                labelText: l10n.createEventNotesLabel,
+                placeholderText: l10n.createEventNotesPlaceholder,
+                maxLines: 4,
+              ),
+              const SizedBox(height: UiSpacing.x5),
+              BlocConsumer<CreateEventBloc, CreateEventState>(
+                bloc: _createEventBloc,
+                listener: (context, state) {
+                  state.mapOrNull(
+                    success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
+                    error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
+                  );
+                },
+                builder: (context, state) {
+                  return UiButton.main(
+                    label: l10n.createEventSubmit,
+                    onPressed: _submit,
+                    isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
+                  );
+                },
+              ),
+            ],
           ),
-          const SizedBox(height: UiSpacing.x4),
-          _FieldLabel(label: l10n.createEventTypeLabel),
-          ValueListenableBuilder(
-            valueListenable: _selectedType,
-            builder: (context, selected, child) {
-              return _TypeChips(
-                selected: selected,
-                onSelected: (type) => _selectedType.value = type,
-              );
-            },
-          ),
-          const SizedBox(height: UiSpacing.x4),
-          _DateTimeFields(
-            initialDate: widget.date,
-            dateController: _dateController,
-            timeController: _timeController,
-          ),
-          const SizedBox(height: UiSpacing.x4),
-          _RecurrenceSelector(controller: _recurrenceController),
-          const SizedBox(height: UiSpacing.x4),
-          UiTextField(
-            controller: _notesController,
-            labelText: l10n.createEventNotesLabel,
-            placeholderText: l10n.createEventNotesPlaceholder,
-            maxLines: 4,
-          ),
-          const SizedBox(height: UiSpacing.x5),
-          BlocConsumer<CreateEventBloc, CreateEventState>(
-            bloc: _createEventBloc,
-            listener: (context, state) {
-              state.mapOrNull(
-                success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
-                error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
-              );
-            },
-            builder: (context, state) {
-              return UiButton.main(
-                label: l10n.createEventSubmit,
-                onPressed: _submit,
-                isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
+  }
+
+  /// Дата события из поля (если не разобрать — исходная дата шторки).
+  DateTime get _eventDate =>
+      DateFormat('dd.MM.yyyy').tryParseStrict(_dateController.text.trim()) ?? widget.date;
+
+  /// Время события `HH:mm` либо `null` («весь день»).
+  String? get _eventTime {
+    final time = _timeController.text.trim();
+
+    return LocalTime.tryParse(time)?.format();
+  }
+
+  RecurrenceDraft _initialRecurrenceDraft() =>
+      RecurrenceDraft.initial(eventDate: _eventDate, eventTime: _eventTime);
+
+  /// Дата или время события изменились: нетронутые значения повторения пересчитываются.
+  void _rebaseRecurrence() {
+    final draft = _recurrence.value;
+    if (draft == null) {
+      return;
+    }
+
+    _recurrence.value = draft.rebase(eventDate: _eventDate, eventTime: _eventTime);
+  }
+
+  /// `null` — «Не повторять». Время события берётся из первого слота повторения.
+  void _applyRecurrence(RecurrenceDraft? draft) {
+    _isRecurrenceOpen.value = false;
+    _recurrence.value = draft;
+
+    // Время события берётся из первого времени «в течение дня» (его можно поменять на экране
+    // повторения), поэтому поле «Время» следует за ним.
+    final time = draft?.resultingEventTime;
+    if (time != null && time != _eventTime) {
+      _timeController.text = time;
+    }
   }
 
   /// Пользователь что-то ввёл или изменил: заранее выбранные питомец и дата не считаются.
@@ -204,6 +278,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       _timeController.text.trim().isNotEmpty ||
       _notesController.text.trim().isNotEmpty ||
       _selectedType.value != null ||
+      _recurrence.value != null ||
       _createEventUio.value.petId != widget.selectedPetId ||
       _createEventUio.value.date != widget.date;
 
@@ -217,12 +292,23 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       return;
     }
 
+    // Дату события могли сдвинуть за дату окончания повторения: просим поправить правило.
+    if (_recurrence.value case final draft? when !draft.canSave) {
+      _isRecurrenceOpen.value = true;
+
+      return;
+    }
+
     _createEvent();
   }
 
   void _createEvent() {
     final date = DateFormat('dd.MM.yyyy').parseStrict(_dateController.text.trim());
-    final time = _timeController.text.trim();
+    final recurrence = _recurrence.value?.toModel();
+    // Первое из нескольких времён в день становится временем события.
+    final time = recurrence != null && recurrence.times.length > 1
+        ? recurrence.times.first.format()
+        : _timeController.text.trim();
 
     final createEventModel = CreateEventModel(
       title: _eventTitleController.text,
@@ -231,7 +317,8 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       description: _notesController.text,
       petId: _createEventUio.value.petId!,
       type: _selectedType.value ?? ScheduleEventTypeEnum.custom,
-      isRecurring: false,
+      isRecurring: recurrence != null,
+      recurrence: recurrence,
     );
 
     _createEventBloc.add(CreateEventEvent.createRequested(model: createEventModel));
@@ -365,31 +452,72 @@ class _TypeChips extends StatelessWidget {
 }
 
 class _RecurrenceSelector extends StatelessWidget {
-  const _RecurrenceSelector({required this.controller});
+  const _RecurrenceSelector({required this.recurrence, required this.onTap});
 
-  final UiTextFieldController controller;
+  final ValueListenable<RecurrenceDraft?> recurrence;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final palette = context.uiPalette;
+    final fonts = context.uiFonts;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        // TODO: настройка повторения
+    return ValueListenableBuilder(
+      valueListenable: recurrence,
+      builder: (context, draft, child) {
+        final model = draft?.toModel();
+        final title = draft == null
+            ? l10n.createEventNoRecurrence
+            : RecurrenceSummaryBuilder(
+                l10n,
+              ).build(model!, start: draft.eventDate, eventTime: draft.eventTime?.format()).title;
+        final next = draft == null
+            ? const <DateTime>[]
+            : RecurrenceCalculator.nextOccurrences(model!, draft.eventDate);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _FieldLabel(label: l10n.createEventRecurrenceLabel),
+            UiCard(
+              showShadow: false,
+              showBorder: true,
+              borderRadius: UiRadius.mdAll,
+              onTap: onTap,
+              padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x4, vertical: UiSpacing.x3),
+              child: Row(
+                children: [
+                  Icon(Icons.repeat_rounded, size: 24, color: palette.ink2),
+                  const SizedBox(width: UiSpacing.x3),
+                  Expanded(
+                    child: Text(title, style: fonts.body.copyWith(color: palette.ink)),
+                  ),
+                  Icon(Icons.chevron_right_rounded, color: palette.ink3),
+                ],
+              ),
+            ),
+            if (next.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: UiSpacing.x2),
+                child: Text(
+                  l10n.recurrenceNext(
+                    next
+                        .map(
+                          (date) => RecurrenceDateFormat.pill(
+                            l10n,
+                            date,
+                            withYear: draft!.period == RecurrencePeriod.year,
+                          ),
+                        )
+                        .join(', '),
+                  ),
+                  style: fonts.footnote.copyWith(color: palette.ink3),
+                ),
+              ),
+          ],
+        );
       },
-      child: IgnorePointer(
-        child: UiTextField(
-          controller: controller,
-          labelText: l10n.createEventRecurrenceLabel,
-          placeholderText: l10n.createEventRecurrenceLabel,
-          // TODO: заменить временную иконку повтора на финальную из набора.
-          trailingIcon: UiSvgImage(
-            svgPath: context.uiIcons.placeholderRepeat.path,
-            color: context.uiPalette.ink2,
-          ),
-        ),
-      ),
     );
   }
 }

@@ -212,7 +212,8 @@ class _PetDetailsSheet extends StatelessWidget {
         else
           for (final event in upcomingEvents) ...[
             PetUpcomingEventTile(
-              key: ValueKey('${event.id}_${event.date}'),
+              // Слоты «несколько раз в день» — записи с одним id и датой, различаются временем.
+              key: ValueKey('${event.id}_${event.date}_${event.time}'),
               event: event,
               petImage: pet.image,
               petColor: palette.petColor(pet.colorIndex),
