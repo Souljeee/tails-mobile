@@ -20,6 +20,10 @@ import 'package:tails_mobile/src/feature/initialization/model/dependencies_conta
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/pet_color_store.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
+import 'package:tails_mobile/src/feature/profile/core/data/data_sources/device_info_data_source.dart';
+import 'package:tails_mobile/src/feature/profile/core/data/data_sources/notification_permission_data_source.dart';
+import 'package:tails_mobile/src/feature/profile/core/data/data_sources/profile_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/schedule_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
@@ -159,7 +163,10 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final restClient = await _initRestClient(config, secureTokenStorage, refreshService);
 
-    final authRemoteDataSource = AuthRemoteDataSource(restClient: notAuthClient);
+    final authRemoteDataSource = AuthRemoteDataSource(
+      restClient: notAuthClient,
+      authorizedRestClient: restClient,
+    );
 
     final authRepository = AuthRepository(
       authRemoteDataSource: authRemoteDataSource,
@@ -192,6 +199,13 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       scheduleRemoteDataSource: scheduleRemoteDataSource,
     );
 
+    final profileRepository = ProfileRepository(
+      remoteDataSource: ProfileRemoteDataSource(restClient: restClient),
+      deviceInfoDataSource: const DeviceInfoDataSource(),
+      notificationPermissionDataSource: const NotificationPermissionDataSource(),
+      packageInfo: packageInfo,
+    );
+
     return DependenciesContainer(
       logger: logger,
       config: config,
@@ -205,6 +219,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       codeTimerBloc: codeTimerBloc,
       petRepository: petRepository,
       scheduleRepository: scheduleRepository,
+      profileRepository: profileRepository,
     );
   }
 }

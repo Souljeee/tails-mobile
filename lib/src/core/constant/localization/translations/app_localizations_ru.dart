@@ -299,6 +299,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get eventTypeFleaTreatment => 'Обработка от блох';
 
   @override
+  String get eventTypeVetVisit => 'Визит к ветеринару';
+
+  @override
   String get eventTypeCustom => 'Другое';
 
   @override

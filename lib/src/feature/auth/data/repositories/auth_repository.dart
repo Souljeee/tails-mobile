@@ -53,10 +53,27 @@ class AuthRepository {
     await _tokenStorage.save(token);
   }
 
-  /// Method to logout the user.
+  /// Выход из аккаунта.
   ///
-  /// Throws RestClientException if the request fails.
+  /// Сначала просит сервер отозвать refresh-токен, но локальные токены очищаются в любом
+  /// случае: пользователь, нажавший «Выйти», не должен остаться в приложении из-за сбоя сети.
+  /// Ошибка отзыва на сервере пробрасывается после очистки.
   ///
-  /// Returns void if the logout is successful.
-  Future<void> logout() => _authRemoteDataSource.logout();
+  /// Throws RestClientException if the server request fails.
+  Future<void> logout() async {
+    final token = await _tokenStorage.load();
+
+    try {
+      if (token != null) {
+        await _authRemoteDataSource.logout(refreshToken: token.refreshToken);
+      }
+    } finally {
+      await _tokenStorage.clear();
+    }
+  }
+
+  /// Забывает локальную сессию без обращения к серверу.
+  ///
+  /// Нужно, когда сервер уже сам закрыл все сессии (например, после удаления аккаунта).
+  Future<void> clearSession() => _tokenStorage.clear();
 }

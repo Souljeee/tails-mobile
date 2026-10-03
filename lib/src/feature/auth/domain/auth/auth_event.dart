@@ -16,15 +16,19 @@ sealed class AuthEvent extends Equatable {
 
   const factory AuthEvent.logout() = AuthEvent$Logout;
 
+  const factory AuthEvent.accountDeleted() = AuthEvent$AccountDeleted;
+
   T map<T>({
     required AuthEventMatch<T, AuthEvent$Login> login,
     required AuthEventMatch<T, AuthEvent$AuthorizationStatusUpdated> authorizationStatusUpdated,
     required AuthEventMatch<T, AuthEvent$Logout> logout,
+    required AuthEventMatch<T, AuthEvent$AccountDeleted> accountDeleted,
   }) =>
       switch (this) {
         final AuthEvent$Login event => login(event),
         final AuthEvent$AuthorizationStatusUpdated event => authorizationStatusUpdated(event),
         final AuthEvent$Logout event => logout(event),
+        final AuthEvent$AccountDeleted event => accountDeleted(event),
       };
 }
 
@@ -62,4 +66,12 @@ final class AuthEvent$Login extends AuthEvent {
         phoneNumber,
         code,
       ];
+}
+
+/// Сервер удалил аккаунт и закрыл все сессии: остаётся забыть токены на устройстве.
+final class AuthEvent$AccountDeleted extends AuthEvent {
+  const AuthEvent$AccountDeleted();
+
+  @override
+  List<Object?> get props => [];
 }

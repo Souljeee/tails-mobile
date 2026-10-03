@@ -542,6 +542,12 @@ abstract class AppLocalizations {
   /// **'Обработка от блох'**
   String get eventTypeFleaTreatment;
 
+  /// No description provided for @eventTypeVetVisit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Визит к ветеринару'**
+  String get eventTypeVetVisit;
+
   /// No description provided for @eventTypeCustom.
   ///
   /// In ru, this message translates to:

@@ -24,6 +24,8 @@ enum ScheduleEventTypeEnum {
   nailTrimming,
   // Лечение от блох
   fleaTreatment,
+  // Визит к ветеринару
+  vetVisit,
   // Пользовательское
   custom,
 }

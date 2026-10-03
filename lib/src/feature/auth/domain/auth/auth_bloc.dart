@@ -20,6 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         login: (event) => _onLogin(event, emit),
         authorizationStatusUpdated: (event) => _onAuthorizationStatusUpdated(event, emit),
         logout: (event) => _onLogout(event, emit),
+        accountDeleted: (event) => _onAccountDeleted(event, emit),
       ),
     );
 
@@ -73,6 +74,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       emit(AuthState.error(status: state.status));
       emit(AuthState.idle(status: state.status));
+    }
+  }
+
+  Future<void> _onAccountDeleted(AuthEvent$AccountDeleted event, Emitter<AuthState> emit) async {
+    try {
+      await _authRepository.clearSession();
+    } catch (e, s) {
+      addError(e, s);
     }
   }
 }

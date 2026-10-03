@@ -121,6 +121,7 @@
   "eventTypeFeeding": "Кормление",
   "eventTypeNailTrimming": "Стрижка когтей",
   "eventTypeFleaTreatment": "Обработка от блох",
+  "eventTypeVetVisit": "Визит к ветеринару",
   "eventTypeCustom": "Другое",
   "cancel": "Отмена",
   "createEventTitle": "Новое событие",

@@ -6,10 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_photo_picker/ui_photo_picker.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
-import 'package:tails_mobile/src/core/ui_kit/tokens/ui_shadows.dart';
-import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 
 /// Виджет для загрузки фото питомца
@@ -28,8 +27,6 @@ class PhotoUploadWidget extends StatefulWidget {
 }
 
 class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
-  static const double _size = 120;
-
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
@@ -104,82 +101,21 @@ class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final palette = context.uiPalette;
-    final fonts = context.uiFonts;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Semantics(
-          button: true,
-          label: _hasImage ? l10n.petPhotoChange : l10n.petPhotoAdd,
-          excludeSemantics: true,
-          child: GestureDetector(
-            onTap: _showImageSourceBottomSheet,
-            child: SizedBox.square(
-              dimension: _size + UiSpacing.x2,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  CustomPaint(
-                    foregroundPainter: _hasImage ? null : _DashedCirclePainter(palette.controlLine),
-                    child: ClipOval(
-                      child: SizedBox.square(
-                        dimension: _size,
-                        child: ColoredBox(
-                          color: palette.sunken,
-                          child: _selectedImage != null
-                              ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                              : _hasInitialImageUrl
-                              ? CachedNetworkImage(
-                                  imageUrl: widget.initialImageUrl!,
-                                  fit: BoxFit.cover,
-                                  errorWidget: (context, url, error) =>
-                                      Icon(Icons.pets, size: 48, color: palette.ink3),
-                                )
-                              : Icon(Icons.photo_camera_outlined, size: 40, color: palette.ink3),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: UiSpacing.x1,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: palette.accent,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: palette.canvas, width: 3),
-                        boxShadow: UiShadows.e1,
-                      ),
-                      child: SizedBox.square(
-                        dimension: 36,
-                        child: Icon(
-                          _hasImage ? Icons.edit : Icons.add,
-                          color: palette.surface,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: UiSpacing.x3),
-        Text(
-          _hasImage ? l10n.petPhotoChange : l10n.petPhotoAdd,
-          style: fonts.callout.copyWith(color: palette.accent, fontWeight: FontWeight.w700),
-        ),
-        if (!_hasImage) ...[
-          const SizedBox(height: UiSpacing.x1),
-          Text(
-            l10n.petPhotoHint,
-            textAlign: TextAlign.center,
-            style: fonts.footnote.copyWith(color: palette.ink3),
-          ),
-        ],
-      ],
+    return UiPhotoPicker(
+      hasPhoto: _hasImage,
+      label: _hasImage ? l10n.petPhotoChange : l10n.petPhotoAdd,
+      hint: l10n.petPhotoHint,
+      onTap: _showImageSourceBottomSheet,
+      image: _selectedImage != null
+          ? Image.file(_selectedImage!, fit: BoxFit.cover)
+          : _hasInitialImageUrl
+          ? CachedNetworkImage(
+              imageUrl: widget.initialImageUrl!,
+              fit: BoxFit.cover,
+              errorWidget: (context, url, error) => Icon(Icons.pets, size: 48, color: palette.ink3),
+            )
+          : null,
     );
   }
 }
@@ -202,34 +138,4 @@ class _SourceTile extends StatelessWidget {
       onTap: onTap,
     );
   }
-}
-
-/// Пунктирная окружность вокруг пустой области фото.
-class _DashedCirclePainter extends CustomPainter {
-  const _DashedCirclePainter(this.color);
-
-  final Color color;
-
-  static const double _dash = 6;
-  static const double _gap = 5;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    final radius = size.shortestSide / 2 - 1;
-    final circumference = 2 * 3.141592653589793 * radius;
-    final count = (circumference / (_dash + _gap)).floor();
-    final sweep = 2 * 3.141592653589793 / count;
-    final rect = Rect.fromCircle(center: size.center(Offset.zero), radius: radius);
-
-    for (var i = 0; i < count; i++) {
-      canvas.drawArc(rect, i * sweep, sweep * _dash / (_dash + _gap), false, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedCirclePainter oldDelegate) => oldDelegate.color != color;
 }

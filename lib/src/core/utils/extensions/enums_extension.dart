@@ -15,6 +15,7 @@ extension ScheduleEventTypeEnumExtension on ScheduleEventTypeEnum {
     ScheduleEventTypeEnum.feeding => Icons.restaurant,
     ScheduleEventTypeEnum.nailTrimming => Icons.pets,
     ScheduleEventTypeEnum.fleaTreatment => Icons.bug_report,
+    ScheduleEventTypeEnum.vetVisit => Icons.local_hospital,
     ScheduleEventTypeEnum.custom => Icons.pets,
   };
 
@@ -30,6 +31,7 @@ extension ScheduleEventTypeEnumExtension on ScheduleEventTypeEnum {
     ScheduleEventTypeEnum.feeding => l10n.eventTypeFeeding,
     ScheduleEventTypeEnum.nailTrimming => l10n.eventTypeNailTrimming,
     ScheduleEventTypeEnum.fleaTreatment => l10n.eventTypeFleaTreatment,
+    ScheduleEventTypeEnum.vetVisit => l10n.eventTypeVetVisit,
     ScheduleEventTypeEnum.custom => l10n.eventTypeCustom,
   };
 }

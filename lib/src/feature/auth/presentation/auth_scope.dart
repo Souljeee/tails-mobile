@@ -10,6 +10,9 @@ abstract interface class AuthController {
   void login(String phoneNumber, String code);
 
   void logout();
+
+  /// Аккаунт удалён на сервере: забыть локальную сессию.
+  void accountDeleted();
 }
 
 class AuthScope extends StatefulWidget {
@@ -43,6 +46,11 @@ class _AuthScopeState extends State<AuthScope> implements AuthController {
   @override
   void logout() {
     widget.authBloc.add(const AuthEvent.logout());
+  }
+
+  @override
+  void accountDeleted() {
+    widget.authBloc.add(const AuthEvent.accountDeleted());
   }
 
   @override

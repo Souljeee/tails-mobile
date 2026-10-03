@@ -11,11 +11,11 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
+import 'package:tails_mobile/src/core/utils/phone_format.dart';
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_scope.dart';
-import 'package:tails_mobile/src/feature/auth/presentation/utils/phone_format.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 
 class EnterCodeScreen extends StatelessWidget {

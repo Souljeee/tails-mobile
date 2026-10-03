@@ -9,12 +9,16 @@ import 'package:tails_mobile/src/feature/auth/exceptions/invalid_number_format.d
 /// A data source that fetches auth data from the remote source.
 /// {@endtemplate}
 class AuthRemoteDataSource {
-  /// {@macro auth_remote_data_source}
+  /// Клиент без авторизации: отправка и проверка кода.
   final RestClient restClient;
+
+  /// Клиент с токеном пользователя: выход из аккаунта требует авторизации.
+  final RestClient authorizedRestClient;
 
   /// {@macro auth_remote_data_source}
   const AuthRemoteDataSource({
     required this.restClient,
+    required this.authorizedRestClient,
   });
 
   /// Бекенд может отдавать expires как секунды или миллисекунды с эпохи.
@@ -109,15 +113,15 @@ class AuthRemoteDataSource {
     }
   }
 
-  /// Method to logout the user.
+  /// Отзывает refresh-токен на сервере.
+  ///
+  /// Бэкенд принимает только токен текущей сессии и только от авторизованного пользователя.
   ///
   /// Throws RestClientException if the request fails.
-  ///
-  /// Returns void if the logout is successful.
-  Future<void> logout() async {
-    await restClient.post(
+  Future<void> logout({required String refreshToken}) async {
+    await authorizedRestClient.post(
       '/auth/logout/',
-      body: {},
+      body: {'refresh': refreshToken},
     );
   }
 }

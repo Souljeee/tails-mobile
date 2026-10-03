@@ -26,6 +26,12 @@ class ApplicationConfig {
 
   /// Whether Sentry is enabled.
   bool get enableSentry => sentryDsn.isNotEmpty;
+
+  /// Ссылка на пользовательское соглашение. Пусто, пока документ не опубликован.
+  String get termsUrl => const String.fromEnvironment('TERMS_URL').trim();
+
+  /// Ссылка на политику конфиденциальности. Пусто, пока документ не опубликован.
+  String get privacyUrl => const String.fromEnvironment('PRIVACY_URL').trim();
 }
 
 /// {@template testing_dependencies_container}

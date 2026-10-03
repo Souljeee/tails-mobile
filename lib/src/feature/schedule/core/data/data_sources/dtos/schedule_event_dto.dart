@@ -18,6 +18,8 @@ class ScheduleEventDto extends Equatable {
   @JsonKey(name: 'start_date')
   final DateTime date;
   final int? timeZoneOffset;
+  // Новый тип на сервере не должен ронять разбор всего расписания.
+  @JsonKey(unknownEnumValue: ScheduleEventTypeEnum.custom)
   final ScheduleEventTypeEnum type;
   final bool done;
   final RecurrenceDto? recurrence;
