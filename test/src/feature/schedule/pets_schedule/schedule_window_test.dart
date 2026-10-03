@@ -32,5 +32,11 @@ void main() {
 
       expect(shifted.coversMonth(DateTime(2027, 6)), isTrue);
     });
+
+    test('окно не длиннее 400 дней: больше сервер не отдаёт (/period/)', () {
+      final window = ScheduleWindow.around(DateTime(2026, 9, 29));
+
+      expect(window.end.difference(window.start).inDays, lessThanOrEqualTo(400));
+    });
   });
 }

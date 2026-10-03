@@ -29,6 +29,8 @@ class MarkDoneBloc extends Bloc<MarkDoneEvent, MarkDoneState> {
         value: event.value,
         eventId: event.eventId,
         date: event.date,
+        time: event.time,
+        timeZoneOffset: event.timeZoneOffset,
       );
 
       emit(const MarkDoneState.success());

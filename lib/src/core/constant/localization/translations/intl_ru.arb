@@ -227,5 +227,396 @@
   "discardMessage": "Введённые данные будут потеряны.",
   "discardKeepEditing": "Продолжить",
   "discardConfirm": "Закрыть",
-  "petsScheduleUnavailable": "Не удалось загрузить события"
+  "petsScheduleUnavailable": "Не удалось загрузить события",
+  "recurrenceAnd": "и",
+  "@recurrenceAnd": {
+    "description": "Союз в перечислениях правила повторения"
+  },
+  "recurrenceEveryDay": "Каждый день",
+  "recurrenceEveryOtherDay": "Через день",
+  "recurrenceEveryNDays": "{n, plural, one{Каждый {n} день} few{Каждые {n} дня} many{Каждые {n} дней} other{Каждые {n} дня}}",
+  "@recurrenceEveryNDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceWeekdays": "По будням",
+  "recurrenceWeekends": "По выходным",
+  "recurrenceEveryWeekday": "{weekday, select, 1{Каждый понедельник} 2{Каждый вторник} 3{Каждую среду} 4{Каждый четверг} 5{Каждую пятницу} 6{Каждую субботу} 7{Каждое воскресенье} other{}}",
+  "@recurrenceEveryWeekday": {
+    "description": "Один день недели в итоге правила",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceWeekdayDative": "{weekday, select, 1{понедельникам} 2{вторникам} 3{средам} 4{четвергам} 5{пятницам} 6{субботам} 7{воскресеньям} other{}}",
+  "@recurrenceWeekdayDative": {
+    "description": "День недели во множественном числе, дательный падеж («по вторникам»)",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceOnWeekdays": "По {days}",
+  "@recurrenceOnWeekdays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceEveryNWeeksOn": "{n, plural, one{Каждую {n} неделю} few{Каждые {n} недели} many{Каждые {n} недель} other{Каждые {n} недели}} по {days}",
+  "@recurrenceEveryNWeeksOn": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceMonthEvery": "каждого месяца",
+  "recurrenceMonthEveryN": "{n, plural, one{каждый {n} месяц} few{каждые {n} месяца} many{каждые {n} месяцев} other{каждые {n} месяца}}",
+  "@recurrenceMonthEveryN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceMonthNumbers": "{days} числа {every}",
+  "@recurrenceMonthNumbers": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "every": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceMonthLast": "В последний день {every}",
+  "@recurrenceMonthLast": {
+    "placeholders": {
+      "every": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceMonthNumbersAndLast": "{days} числа и в последний день {every}",
+  "@recurrenceMonthNumbersAndLast": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "every": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceMonthGenitive": "{month, select, 1{января} 2{февраля} 3{марта} 4{апреля} 5{мая} 6{июня} 7{июля} 8{августа} 9{сентября} 10{октября} 11{ноября} 12{декабря} other{}}",
+  "@recurrenceMonthGenitive": {
+    "description": "Название месяца в родительном падеже («15 марта»)",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceDayMonth": "{day} {month}",
+  "@recurrenceDayMonth": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceYearEvery": "{dates} каждого года",
+  "@recurrenceYearEvery": {
+    "placeholders": {
+      "dates": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceYearEveryN": "{dates}, {n, plural, one{каждый {n} год} few{каждые {n} года} many{каждые {n} лет} other{каждые {n} года}}",
+  "@recurrenceYearEveryN": {
+    "placeholders": {
+      "dates": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceOncePerWeek": "раз в неделю",
+  "recurrenceOncePerMonth": "раз в месяц",
+  "recurrenceOncePerYear": "раз в год",
+  "recurrenceTimesPerDay": "{n, plural, few{{n} раза} other{{n} раз}} в день",
+  "@recurrenceTimesPerDay": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceTimesPerWeek": "{n, plural, few{{n} раза} other{{n} раз}} в неделю",
+  "@recurrenceTimesPerWeek": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceTimesPerMonth": "{n, plural, few{{n} раза} other{{n} раз}} в месяц",
+  "@recurrenceTimesPerMonth": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceTimesPerYear": "{n, plural, few{{n} раза} other{{n} раз}} в год",
+  "@recurrenceTimesPerYear": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceOnceInUnits": "раз в {unit}",
+  "@recurrenceOnceInUnits": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceTimesInUnits": "{n, plural, few{{n} раза} other{{n} раз}} за {unit}",
+  "@recurrenceTimesInUnits": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceUnitWeeks": "{n, plural, one{{n} неделю} few{{n} недели} many{{n} недель} other{{n} недели}}",
+  "@recurrenceUnitWeeks": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceUnitMonths": "{n, plural, one{{n} месяц} few{{n} месяца} many{{n} месяцев} other{{n} месяца}}",
+  "@recurrenceUnitMonths": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceUnitYears": "{n, plural, one{{n} год} few{{n} года} many{{n} лет} other{{n} года}}",
+  "@recurrenceUnitYears": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceAtTime": "в {time}",
+  "@recurrenceAtTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceEndUntil": "до {date}",
+  "@recurrenceEndUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceEndAfter": "после {n, plural, one{{n} повторения} other{{n} повторений}}",
+  "@recurrenceEndAfter": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceTitle": "Повторение",
+  "recurrenceReset": "Не повторять",
+  "recurrenceNext": "Ближайшие: {dates}",
+  "@recurrenceNext": {
+    "placeholders": {
+      "dates": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrencePeriodDay": "День",
+  "recurrencePeriodWeek": "Неделя",
+  "recurrencePeriodMonth": "Месяц",
+  "recurrencePeriodYear": "Год",
+  "recurrenceWeekdayShort": "{weekday, select, 1{Пн} 2{Вт} 3{Ср} 4{Чт} 5{Пт} 6{Сб} 7{Вс} other{}}",
+  "@recurrenceWeekdayShort": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrencePresetWeekdays": "Будни",
+  "recurrencePresetWeekend": "Выходные",
+  "recurrencePresetAllDays": "Каждый день",
+  "recurrenceLastDay": "Последний день",
+  "recurrenceMonthTransferHint": "В коротких месяцах событие переносится на последний день — например, {examples}",
+  "@recurrenceMonthTransferHint": {
+    "placeholders": {
+      "examples": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceFeb29Hint": "В невисокосный год событие перенесётся на 28 февраля",
+  "recurrenceTimeN": "Время {n}",
+  "@recurrenceTimeN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceEndTitle": "Окончание",
+  "recurrenceEndNever": "Без окончания",
+  "recurrenceEndOnDate": "До определённой даты",
+  "recurrenceEndAfterCount": "После нескольких повторений",
+  "recurrenceEndErrorBeforeStart": "Дата окончания раньше даты события",
+  "recurrenceEndErrorBeforeFirst": "Первое повторение — {date}, дата окончания раньше",
+  "@recurrenceEndErrorBeforeFirst": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceDecrease": "Уменьшить",
+  "recurrenceIncrease": "Увеличить",
+  "recurrenceTooManyEvents": "Слишком много повторений. Сделайте их реже или задайте окончание",
+  "recurrenceWeekdayAbbr": "{weekday, select, 1{пн} 2{вт} 3{ср} 4{чт} 5{пт} 6{сб} 7{вс} other{}}",
+  "@recurrenceWeekdayAbbr": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceMonthAbbr": "{month, select, 1{янв} 2{фев} 3{мар} 4{апр} 5{мая} 6{июн} 7{июл} 8{авг} 9{сен} 10{окт} 11{ноя} 12{дек} other{}}",
+  "@recurrenceMonthAbbr": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceIntervalRowDay": "{n, plural, one{Каждый {n} день} few{Каждые {n} дня} many{Каждые {n} дней} other{Каждые {n} дня}}",
+  "@recurrenceIntervalRowDay": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalRowWeek": "{n, plural, one{Каждую {n} неделю} few{Каждые {n} недели} many{Каждые {n} недель} other{Каждые {n} недели}}",
+  "@recurrenceIntervalRowWeek": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalRowMonth": "{n, plural, one{Каждый {n} месяц} few{Каждые {n} месяца} many{Каждые {n} месяцев} other{Каждые {n} месяца}}",
+  "@recurrenceIntervalRowMonth": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalRowYear": "{n, plural, one{Каждый {n} год} few{Каждые {n} года} many{Каждые {n} лет} other{Каждые {n} года}}",
+  "@recurrenceIntervalRowYear": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceIntervalSubtitle": "Интервал",
+  "recurrenceDuringDay": "В течение дня",
+  "recurrenceTimesSubtitle": "Сколько раз за день",
+  "recurrenceAsInEvent": "Как в событии",
+  "recurrenceEventTimeHint": "Это время события — если поменять его здесь, оно поменяется и там",
+  "recurrenceTimeFromEvent": "В {time} — время из события",
+  "@recurrenceTimeFromEvent": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceWeekDaysLabel": "Дни недели",
+  "recurrenceMonthDaysLabel": "Числа месяца",
+  "recurrenceYearDatesLabel": "Даты в году",
+  "recurrenceMonthPickHint": "Выберите одно или несколько чисел",
+  "recurrenceCollapse": "Свернуть",
+  "recurrenceEdit": "Изменить",
+  "recurrenceMonthExamplesFeb": "28 февраля",
+  "recurrenceMonthExamplesNovFeb": "30 ноября и 28 февраля",
+  "recurrenceAddDateRow": "Добавить дату",
+  "recurrenceNewDate": "Новая дата",
+  "recurrenceDateTitle": "Дата",
+  "recurrenceEndDateTitle": "Дата окончания",
+  "recurrenceEndValueUntil": "До {date}",
+  "@recurrenceEndValueUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recurrenceEndValueAfter": "{n, plural, one{После {n} повторения} other{После {n} повторений}}",
+  "@recurrenceEndValueAfter": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recurrenceEndCountLabel": "Число повторений",
+  "recurrenceDelete": "Удалить",
+  "recurrenceApply": "Применить",
+  "recurrenceAdd": "Добавить",
+  "recurrenceSave": "Сохранить",
+  "recurrenceBack": "Назад",
+  "recurrenceIntervalRowDayOne": "Каждый день",
+  "recurrenceIntervalRowWeekOne": "Каждую неделю",
+  "recurrenceIntervalRowMonthOne": "Каждый месяц",
+  "recurrenceIntervalRowYearOne": "Каждый год"
 }

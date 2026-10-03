@@ -54,6 +54,8 @@ class _ScheduleEventItemState extends State<ScheduleEventItem> {
         value: !widget.event.done,
         eventId: widget.event.id,
         date: widget.event.date,
+        time: widget.event.time,
+        timeZoneOffset: widget.event.timeZoneOffset,
       ),
     );
   }

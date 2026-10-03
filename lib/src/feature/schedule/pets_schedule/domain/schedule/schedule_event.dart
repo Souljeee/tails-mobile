@@ -23,6 +23,7 @@ sealed class ScheduleEvent extends Equatable {
     required String eventId,
     required DateTime date,
     required bool value,
+    String? time,
   }) = ScheduleEvent$MarkDoneRequested;
 
   T map<T>({
@@ -79,12 +80,16 @@ final class ScheduleEvent$MarkDoneRequested extends ScheduleEvent {
   final DateTime date;
   final bool value;
 
+  /// Локальное время вхождения: у события с несколькими временами в день это отдельные записи.
+  final String? time;
+
   const ScheduleEvent$MarkDoneRequested({
     required this.eventId,
     required this.date,
     required this.value,
+    this.time,
   });
 
   @override
-  List<Object?> get props => [eventId, date, value];
+  List<Object?> get props => [eventId, date, value, time];
 }

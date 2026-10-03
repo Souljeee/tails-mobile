@@ -593,4 +593,541 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get petsScheduleUnavailable => 'Не удалось загрузить события';
+
+  @override
+  String get recurrenceAnd => 'и';
+
+  @override
+  String get recurrenceEveryDay => 'Каждый день';
+
+  @override
+  String get recurrenceEveryOtherDay => 'Через день';
+
+  @override
+  String recurrenceEveryNDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n дня',
+      many: 'Каждые $n дней',
+      few: 'Каждые $n дня',
+      one: 'Каждый $n день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recurrenceWeekdays => 'По будням';
+
+  @override
+  String get recurrenceWeekends => 'По выходным';
+
+  @override
+  String recurrenceEveryWeekday(String weekday) {
+    String _temp0 = intl.Intl.selectLogic(weekday, {
+      '1': 'Каждый понедельник',
+      '2': 'Каждый вторник',
+      '3': 'Каждую среду',
+      '4': 'Каждый четверг',
+      '5': 'Каждую пятницу',
+      '6': 'Каждую субботу',
+      '7': 'Каждое воскресенье',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceWeekdayDative(String weekday) {
+    String _temp0 = intl.Intl.selectLogic(weekday, {
+      '1': 'понедельникам',
+      '2': 'вторникам',
+      '3': 'средам',
+      '4': 'четвергам',
+      '5': 'пятницам',
+      '6': 'субботам',
+      '7': 'воскресеньям',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceOnWeekdays(String days) {
+    return 'По $days';
+  }
+
+  @override
+  String recurrenceEveryNWeeksOn(int n, String days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n недели',
+      many: 'Каждые $n недель',
+      few: 'Каждые $n недели',
+      one: 'Каждую $n неделю',
+    );
+    return '$_temp0 по $days';
+  }
+
+  @override
+  String get recurrenceMonthEvery => 'каждого месяца';
+
+  @override
+  String recurrenceMonthEveryN(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'каждые $n месяца',
+      many: 'каждые $n месяцев',
+      few: 'каждые $n месяца',
+      one: 'каждый $n месяц',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceMonthNumbers(String days, String every) {
+    return '$days числа $every';
+  }
+
+  @override
+  String recurrenceMonthLast(String every) {
+    return 'В последний день $every';
+  }
+
+  @override
+  String recurrenceMonthNumbersAndLast(String days, String every) {
+    return '$days числа и в последний день $every';
+  }
+
+  @override
+  String recurrenceMonthGenitive(String month) {
+    String _temp0 = intl.Intl.selectLogic(month, {
+      '1': 'января',
+      '2': 'февраля',
+      '3': 'марта',
+      '4': 'апреля',
+      '5': 'мая',
+      '6': 'июня',
+      '7': 'июля',
+      '8': 'августа',
+      '9': 'сентября',
+      '10': 'октября',
+      '11': 'ноября',
+      '12': 'декабря',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceDayMonth(int day, String month) {
+    return '$day $month';
+  }
+
+  @override
+  String recurrenceYearEvery(String dates) {
+    return '$dates каждого года';
+  }
+
+  @override
+  String recurrenceYearEveryN(String dates, int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'каждые $n года',
+      many: 'каждые $n лет',
+      few: 'каждые $n года',
+      one: 'каждый $n год',
+    );
+    return '$dates, $_temp0';
+  }
+
+  @override
+  String get recurrenceOncePerWeek => 'раз в неделю';
+
+  @override
+  String get recurrenceOncePerMonth => 'раз в месяц';
+
+  @override
+  String get recurrenceOncePerYear => 'раз в год';
+
+  @override
+  String recurrenceTimesPerDay(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 в день';
+  }
+
+  @override
+  String recurrenceTimesPerWeek(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 в неделю';
+  }
+
+  @override
+  String recurrenceTimesPerMonth(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 в месяц';
+  }
+
+  @override
+  String recurrenceTimesPerYear(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 в год';
+  }
+
+  @override
+  String recurrenceOnceInUnits(String unit) {
+    return 'раз в $unit';
+  }
+
+  @override
+  String recurrenceTimesInUnits(int n, String unit) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n раз', few: '$n раза');
+    return '$_temp0 за $unit';
+  }
+
+  @override
+  String recurrenceUnitWeeks(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n недели',
+      many: '$n недель',
+      few: '$n недели',
+      one: '$n неделю',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceUnitMonths(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n месяца',
+      many: '$n месяцев',
+      few: '$n месяца',
+      one: '$n месяц',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceUnitYears(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n года',
+      many: '$n лет',
+      few: '$n года',
+      one: '$n год',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceAtTime(String time) {
+    return 'в $time';
+  }
+
+  @override
+  String recurrenceEndUntil(String date) {
+    return 'до $date';
+  }
+
+  @override
+  String recurrenceEndAfter(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n повторений',
+      one: '$n повторения',
+    );
+    return 'после $_temp0';
+  }
+
+  @override
+  String get recurrenceTitle => 'Повторение';
+
+  @override
+  String get recurrenceReset => 'Не повторять';
+
+  @override
+  String recurrenceNext(String dates) {
+    return 'Ближайшие: $dates';
+  }
+
+  @override
+  String get recurrencePeriodDay => 'День';
+
+  @override
+  String get recurrencePeriodWeek => 'Неделя';
+
+  @override
+  String get recurrencePeriodMonth => 'Месяц';
+
+  @override
+  String get recurrencePeriodYear => 'Год';
+
+  @override
+  String recurrenceWeekdayShort(String weekday) {
+    String _temp0 = intl.Intl.selectLogic(weekday, {
+      '1': 'Пн',
+      '2': 'Вт',
+      '3': 'Ср',
+      '4': 'Чт',
+      '5': 'Пт',
+      '6': 'Сб',
+      '7': 'Вс',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get recurrencePresetWeekdays => 'Будни';
+
+  @override
+  String get recurrencePresetWeekend => 'Выходные';
+
+  @override
+  String get recurrencePresetAllDays => 'Каждый день';
+
+  @override
+  String get recurrenceLastDay => 'Последний день';
+
+  @override
+  String recurrenceMonthTransferHint(String examples) {
+    return 'В коротких месяцах событие переносится на последний день — например, $examples';
+  }
+
+  @override
+  String get recurrenceFeb29Hint => 'В невисокосный год событие перенесётся на 28 февраля';
+
+  @override
+  String recurrenceTimeN(int n) {
+    return 'Время $n';
+  }
+
+  @override
+  String get recurrenceEndTitle => 'Окончание';
+
+  @override
+  String get recurrenceEndNever => 'Без окончания';
+
+  @override
+  String get recurrenceEndOnDate => 'До определённой даты';
+
+  @override
+  String get recurrenceEndAfterCount => 'После нескольких повторений';
+
+  @override
+  String get recurrenceEndErrorBeforeStart => 'Дата окончания раньше даты события';
+
+  @override
+  String recurrenceEndErrorBeforeFirst(String date) {
+    return 'Первое повторение — $date, дата окончания раньше';
+  }
+
+  @override
+  String get recurrenceDecrease => 'Уменьшить';
+
+  @override
+  String get recurrenceIncrease => 'Увеличить';
+
+  @override
+  String get recurrenceTooManyEvents =>
+      'Слишком много повторений. Сделайте их реже или задайте окончание';
+
+  @override
+  String recurrenceWeekdayAbbr(String weekday) {
+    String _temp0 = intl.Intl.selectLogic(weekday, {
+      '1': 'пн',
+      '2': 'вт',
+      '3': 'ср',
+      '4': 'чт',
+      '5': 'пт',
+      '6': 'сб',
+      '7': 'вс',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceMonthAbbr(String month) {
+    String _temp0 = intl.Intl.selectLogic(month, {
+      '1': 'янв',
+      '2': 'фев',
+      '3': 'мар',
+      '4': 'апр',
+      '5': 'мая',
+      '6': 'июн',
+      '7': 'июл',
+      '8': 'авг',
+      '9': 'сен',
+      '10': 'окт',
+      '11': 'ноя',
+      '12': 'дек',
+      'other': '',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceIntervalRowDay(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n дня',
+      many: 'Каждые $n дней',
+      few: 'Каждые $n дня',
+      one: 'Каждый $n день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceIntervalRowWeek(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n недели',
+      many: 'Каждые $n недель',
+      few: 'Каждые $n недели',
+      one: 'Каждую $n неделю',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceIntervalRowMonth(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n месяца',
+      many: 'Каждые $n месяцев',
+      few: 'Каждые $n месяца',
+      one: 'Каждый $n месяц',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recurrenceIntervalRowYear(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Каждые $n года',
+      many: 'Каждые $n лет',
+      few: 'Каждые $n года',
+      one: 'Каждый $n год',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recurrenceIntervalSubtitle => 'Интервал';
+
+  @override
+  String get recurrenceDuringDay => 'В течение дня';
+
+  @override
+  String get recurrenceTimesSubtitle => 'Сколько раз за день';
+
+  @override
+  String get recurrenceAsInEvent => 'Как в событии';
+
+  @override
+  String get recurrenceEventTimeHint =>
+      'Это время события — если поменять его здесь, оно поменяется и там';
+
+  @override
+  String recurrenceTimeFromEvent(String time) {
+    return 'В $time — время из события';
+  }
+
+  @override
+  String get recurrenceWeekDaysLabel => 'Дни недели';
+
+  @override
+  String get recurrenceMonthDaysLabel => 'Числа месяца';
+
+  @override
+  String get recurrenceYearDatesLabel => 'Даты в году';
+
+  @override
+  String get recurrenceMonthPickHint => 'Выберите одно или несколько чисел';
+
+  @override
+  String get recurrenceCollapse => 'Свернуть';
+
+  @override
+  String get recurrenceEdit => 'Изменить';
+
+  @override
+  String get recurrenceMonthExamplesFeb => '28 февраля';
+
+  @override
+  String get recurrenceMonthExamplesNovFeb => '30 ноября и 28 февраля';
+
+  @override
+  String get recurrenceAddDateRow => 'Добавить дату';
+
+  @override
+  String get recurrenceNewDate => 'Новая дата';
+
+  @override
+  String get recurrenceDateTitle => 'Дата';
+
+  @override
+  String get recurrenceEndDateTitle => 'Дата окончания';
+
+  @override
+  String recurrenceEndValueUntil(String date) {
+    return 'До $date';
+  }
+
+  @override
+  String recurrenceEndValueAfter(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'После $n повторений',
+      one: 'После $n повторения',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recurrenceEndCountLabel => 'Число повторений';
+
+  @override
+  String get recurrenceDelete => 'Удалить';
+
+  @override
+  String get recurrenceApply => 'Применить';
+
+  @override
+  String get recurrenceAdd => 'Добавить';
+
+  @override
+  String get recurrenceSave => 'Сохранить';
+
+  @override
+  String get recurrenceBack => 'Назад';
+
+  @override
+  String get recurrenceIntervalRowDayOne => 'Каждый день';
+
+  @override
+  String get recurrenceIntervalRowWeekOne => 'Каждую неделю';
+
+  @override
+  String get recurrenceIntervalRowMonthOne => 'Каждый месяц';
+
+  @override
+  String get recurrenceIntervalRowYearOne => 'Каждый год';
 }
