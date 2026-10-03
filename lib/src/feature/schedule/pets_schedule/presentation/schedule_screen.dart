@@ -577,7 +577,8 @@ class _EventsSliver extends StatelessWidget {
                     final event = events[index];
 
                     return ScheduleEventItem(
-                      key: ValueKey(event.id),
+                      // Слоты «несколько раз в день» — записи с одним id, различаются временем.
+                      key: ValueKey('${event.id}_${event.time}'),
                       event: event,
                       pet: pets.firstWhereOrNull((pet) => pet.id == event.petId),
                       petColor: petColorOf(event.petId),
