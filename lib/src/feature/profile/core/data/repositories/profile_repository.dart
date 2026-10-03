@@ -33,6 +33,11 @@ class ProfileRepository {
 
   Stream<ProfileRepositoryEvent> get eventStream => _eventStreamController.stream;
 
+  /// Версия и номер сборки приложения для экрана «О приложении».
+  String get appVersion => _packageInfo.version;
+
+  String get appBuildNumber => _packageInfo.buildNumber;
+
   Future<ProfileModel> getProfile() async =>
       ProfileModel.fromDto(await _remoteDataSource.getProfile());
 

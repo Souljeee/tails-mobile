@@ -1133,4 +1133,344 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get recurrenceIntervalRowYearOne => 'Каждый год';
+
+  @override
+  String get profileTitle => 'Профиль';
+
+  @override
+  String get profileNamePlaceholder => 'Ваше имя';
+
+  @override
+  String get profileEditCaption => 'Редактировать профиль';
+
+  @override
+  String get profileAddPhotoCaption => 'Добавить фото';
+
+  @override
+  String get profileMyPets => 'Мои питомцы';
+
+  @override
+  String get profileSectionApp => 'Приложение';
+
+  @override
+  String get profileSectionSupport => 'Поддержка';
+
+  @override
+  String get profileNotifications => 'Уведомления';
+
+  @override
+  String get profileNotificationsAllOn => 'Включены';
+
+  @override
+  String get profileNotificationsAllOff => 'Выключены';
+
+  @override
+  String get profileNotificationsBlocked => 'Отключены в системе';
+
+  @override
+  String profileNotificationsPartial(int enabled, int total) {
+    return '$enabled из $total';
+  }
+
+  @override
+  String get profileHelp => 'Помощь и обратная связь';
+
+  @override
+  String get profileAbout => 'О приложении';
+
+  @override
+  String get profileLogout => 'Выйти из аккаунта';
+
+  @override
+  String get profileLogoutTitle => 'Выйти из аккаунта?';
+
+  @override
+  String profileLogoutMessage(String phone) {
+    return 'Питомцы и события останутся в аккаунте. Чтобы вернуться к ним, войдите снова по номеру $phone.';
+  }
+
+  @override
+  String get profileLogoutConfirm => 'Выйти';
+
+  @override
+  String get editProfileTitle => 'Профиль';
+
+  @override
+  String get editProfileSave => 'Сохранить';
+
+  @override
+  String get editProfileNameLabel => 'Имя';
+
+  @override
+  String get editProfileNamePlaceholder => 'Как к вам обращаться';
+
+  @override
+  String get editProfilePhoneLabel => 'Номер телефона';
+
+  @override
+  String get editProfilePhoneHint => 'По этому номеру вы входите в приложение';
+
+  @override
+  String get editProfilePhotoAdd => 'Добавить фото';
+
+  @override
+  String get editProfilePhotoChange => 'Изменить фото';
+
+  @override
+  String get editProfileInvalid => 'Не удалось сохранить: проверьте имя и фото.';
+
+  @override
+  String get editProfileAccountSection => 'Аккаунт';
+
+  @override
+  String get editProfileDeleteAccount => 'Удалить аккаунт';
+
+  @override
+  String get editProfileDeleteAccountHint => 'Вместе с питомцами и событиями';
+
+  @override
+  String get profilePhotoSheetTitle => 'Фото профиля';
+
+  @override
+  String get profilePhotoCamera => 'Сделать фото';
+
+  @override
+  String get profilePhotoGallery => 'Выбрать из галереи';
+
+  @override
+  String get profilePhotoDelete => 'Удалить фото';
+
+  @override
+  String get notificationsSettingsTitle => 'Уведомления';
+
+  @override
+  String get notificationsSettingsIntro =>
+      'Напоминания приходят о делах из календаря. Выберите, о чём напомнить.';
+
+  @override
+  String get notificationsSettingsSection => 'Напоминать о';
+
+  @override
+  String get notificationsSettingsFooter => 'Когда именно напомнить, задаётся в самом событии.';
+
+  @override
+  String get notificationsSettingsFooterBlocked =>
+      'Ваш выбор сохранится и заработает, как только уведомления будут разрешены.';
+
+  @override
+  String get notificationWalks => 'Прогулки';
+
+  @override
+  String get notificationFeeding => 'Кормление';
+
+  @override
+  String get notificationMedications => 'Лекарства';
+
+  @override
+  String get notificationVaccinations => 'Прививки';
+
+  @override
+  String get notificationVetVisits => 'Визиты к врачу';
+
+  @override
+  String get notificationsBlockedTitle => 'Уведомления отключены в настройках устройства';
+
+  @override
+  String get notificationsBlockedText =>
+      'Пока они выключены, Хвостики не смогут напомнить о прогулках и лекарствах.';
+
+  @override
+  String get notificationsBlockedAction => 'Открыть настройки';
+
+  @override
+  String get aboutTitle => 'О приложении';
+
+  @override
+  String aboutVersion(String version, String build) {
+    return 'Версия $version · сборка $build';
+  }
+
+  @override
+  String get aboutDescription =>
+      'Профили питомцев, календарь заботы и напоминания — всё о ваших животных в одном месте.';
+
+  @override
+  String get aboutDocumentsSection => 'Документы';
+
+  @override
+  String get aboutTerms => 'Условия использования';
+
+  @override
+  String get aboutPrivacy => 'Политика конфиденциальности';
+
+  @override
+  String aboutCopyright(int year) {
+    return '© $year Хвостики';
+  }
+
+  @override
+  String get aboutDocumentSoon => 'Документ скоро появится';
+
+  @override
+  String get aboutDocumentOpenError => 'Не удалось открыть документ';
+
+  @override
+  String get helpTitle => 'Помощь и обратная связь';
+
+  @override
+  String get helpSubtitle => 'Сообщение прочитает команда Хвостиков';
+
+  @override
+  String get helpTopicProblem => 'Сообщить о проблеме';
+
+  @override
+  String get helpTopicProblemHint => 'Что-то работает не так';
+
+  @override
+  String get helpTopicIdea => 'Предложить идею';
+
+  @override
+  String get helpTopicIdeaHint => 'Чего не хватает в приложении';
+
+  @override
+  String get helpTopicQuestion => 'Задать вопрос';
+
+  @override
+  String get helpTopicQuestionHint => 'Как что-то сделать в приложении';
+
+  @override
+  String get feedbackTitle => 'Обратная связь';
+
+  @override
+  String get feedbackTopicLabel => 'Тема';
+
+  @override
+  String get feedbackTopicProblem => 'Проблема';
+
+  @override
+  String get feedbackTopicIdea => 'Идея';
+
+  @override
+  String get feedbackTopicQuestion => 'Вопрос';
+
+  @override
+  String get feedbackMessageLabel => 'Сообщение';
+
+  @override
+  String get feedbackPlaceholderProblem => 'Опишите, что пошло не так';
+
+  @override
+  String get feedbackPlaceholderIdea => 'Что хотелось бы добавить или изменить';
+
+  @override
+  String get feedbackPlaceholderQuestion => 'Опишите, что хотите сделать';
+
+  @override
+  String get feedbackScreenshotAdd => 'Прикрепить скриншот';
+
+  @override
+  String get feedbackScreenshotRemove => 'Убрать скриншот';
+
+  @override
+  String get feedbackDeviceNotePrefix => 'Вместе с сообщением отправим версию приложения ';
+
+  @override
+  String get feedbackDeviceNoteSuffix => ' и модель телефона — так мы быстрее разберёмся.';
+
+  @override
+  String get feedbackSend => 'Отправить';
+
+  @override
+  String get feedbackSent => 'Спасибо! Мы получили ваше обращение.';
+
+  @override
+  String get feedbackRateLimit => 'Вы отправляете обращения слишком часто. Попробуйте чуть позже.';
+
+  @override
+  String get deleteAccountTitle => 'Удаление аккаунта';
+
+  @override
+  String get deleteAccountHeadline => 'Удалить аккаунт навсегда?';
+
+  @override
+  String get deleteAccountLead =>
+      'Восстановить данные после удаления будет нельзя — ни нам, ни вам.';
+
+  @override
+  String get deleteAccountWhatSection => 'Что удалится';
+
+  @override
+  String get deleteAccountItemProfile => 'Профиль';
+
+  @override
+  String deleteAccountItemProfileHint(String phone) {
+    return 'Имя, фото и номер $phone';
+  }
+
+  @override
+  String deleteAccountItemPetsHint(String names) {
+    return '$names: фото, вес, здоровье';
+  }
+
+  @override
+  String get deleteAccountNamesJoiner => ' и ';
+
+  @override
+  String get deleteAccountItemEvents => 'Календарь';
+
+  @override
+  String get deleteAccountItemEventsHint => 'Все события и напоминания';
+
+  @override
+  String get deleteAccountPauseHintPrefix => 'Хотите просто сделать перерыв? ';
+
+  @override
+  String get deleteAccountPauseHintLink => 'Выйдите из аккаунта';
+
+  @override
+  String get deleteAccountPauseHintSuffix => ' — данные сохраняются.';
+
+  @override
+  String get deleteAccountAcknowledge => 'Я понимаю, что это навсегда';
+
+  @override
+  String get deleteAccountAcknowledgeHint => 'Без этого удалить аккаунт нельзя';
+
+  @override
+  String get deleteAccountContinue => 'Продолжить';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Подтвердите удаление';
+
+  @override
+  String deleteAccountConfirmLead(String phone) {
+    return 'Мы позвонили на $phone. Введите код из звонка. Это последний шаг — после него аккаунт удалится.';
+  }
+
+  @override
+  String get deleteAccountCodeLabel => 'Код из звонка';
+
+  @override
+  String get deleteAccountCodeInvalid => 'Неверный код. Попробуйте ещё раз.';
+
+  @override
+  String get deleteAccountCodeTooSoon => 'Код уже отправлен. Повторить можно через минуту.';
+
+  @override
+  String deleteAccountResendIn(String time) {
+    return 'Позвонить ещё раз через $time';
+  }
+
+  @override
+  String get deleteAccountConfirm => 'Удалить аккаунт';
+
+  @override
+  String get accountDeletedTitle => 'Аккаунт удалён';
+
+  @override
+  String get accountDeletedMessage =>
+      'Мы удалили профиль, питомцев и события. Спасибо, что были с Хвостиками.';
+
+  @override
+  String get accountDeletedButton => 'Вернуться ко входу';
 }

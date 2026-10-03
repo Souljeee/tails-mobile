@@ -30,7 +30,10 @@ final class RedirectIfNotAuthorizedGuard extends Guard {
   @override
   /// Не редиректим, пока пользователь находится в auth-флоу.
   /// Иначе при переходе на `/enter-code` будет "петля" обратно на `/auth`.
-  Pattern get matchPattern => RegExp('^/(auth|enter-code)');
+  ///
+  /// `/account-deleted` тоже исключён: после удаления аккаунта токены забываются, пока этот
+  /// экран открыт, и пользователя нельзя уводить с него на вход, пока он не нажал кнопку.
+  Pattern get matchPattern => RegExp('^/(auth|enter-code|account-deleted)');
 
   @override
   bool get invertRedirect => true;

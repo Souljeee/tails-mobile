@@ -14,6 +14,8 @@ class UiPhoneField extends StatelessWidget {
     this.countryCode = '+7',
     this.labelText,
     this.placeholderText,
+    this.helperText,
+    this.enabled = true,
     this.onChanged,
     this.onSubmitted,
     this.focusNode,
@@ -31,6 +33,10 @@ class UiPhoneField extends StatelessWidget {
   final String countryCode;
   final String? labelText;
   final String? placeholderText;
+  final String? helperText;
+
+  /// `false` — номер только для показа (например, в профиле).
+  final bool enabled;
   final void Function(String)? onChanged;
   final void Function(String)? onSubmitted;
   final FocusNode? focusNode;
@@ -46,6 +52,8 @@ class UiPhoneField extends StatelessWidget {
       controller: controller,
       labelText: labelText,
       placeholderText: placeholderText,
+      helperText: helperText,
+      enabled: enabled,
       keyboardType: TextInputType.phone,
       inputMask: inputMask,
       inputFilter: {'#': RegExp(r'\d')},
@@ -54,7 +62,7 @@ class UiPhoneField extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus,
       textInputAction: textInputAction,
-      inputTextStyle: digitsStyle.copyWith(color: palette.ink),
+      inputTextStyle: digitsStyle.copyWith(color: enabled ? palette.ink : palette.ink3),
       placeholderStyle: digitsStyle.copyWith(color: palette.ink3),
       trailingConstraints: const BoxConstraints(),
       trailingIcon: Padding(

@@ -10,7 +10,16 @@ import 'package:tails_mobile/src/feature/pets/edit_pet/presentation/edit_pet_mod
 import 'package:tails_mobile/src/feature/pets/pet_details/presentation/pet_details_screen.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/presentation/pets_screen.dart';
 import 'package:tails_mobile/src/feature/pets/select_breed/presentation/select_breed_modal.dart';
-import 'package:tails_mobile/src/feature/profile/presentation/profile_screen.dart';
+import 'package:tails_mobile/src/feature/profile/about/presentation/about_screen.dart';
+import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/profile_model.dart';
+import 'package:tails_mobile/src/feature/profile/core/enums/feedback_topic.dart';
+import 'package:tails_mobile/src/feature/profile/delete_account/presentation/account_deleted_screen.dart';
+import 'package:tails_mobile/src/feature/profile/delete_account/presentation/delete_account_confirm_screen.dart';
+import 'package:tails_mobile/src/feature/profile/delete_account/presentation/delete_account_screen.dart';
+import 'package:tails_mobile/src/feature/profile/edit_profile/presentation/edit_profile_screen.dart';
+import 'package:tails_mobile/src/feature/profile/feedback/presentation/feedback_screen.dart';
+import 'package:tails_mobile/src/feature/profile/notifications_settings/presentation/notifications_settings_screen.dart';
+import 'package:tails_mobile/src/feature/profile/profile_overview/presentation/profile_screen.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/schedule_screen.dart';
 
 part 'routes.g.dart';
@@ -24,6 +33,19 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
     TypedGoRoute<SelectBreedRoute>(path: '/select-breed', name: 'select-breed'),
     TypedGoRoute<AddPetRoute>(path: '/add-pet', name: 'add-pet'),
     TypedGoRoute<EditPetRoute>(path: '/edit-pet', name: 'edit-pet'),
+    TypedGoRoute<EditProfileRoute>(path: '/edit-profile', name: 'edit-profile'),
+    TypedGoRoute<NotificationsSettingsRoute>(
+      path: '/notifications-settings',
+      name: 'notifications-settings',
+    ),
+    TypedGoRoute<AboutRoute>(path: '/about', name: 'about'),
+    TypedGoRoute<FeedbackRoute>(path: '/feedback', name: 'feedback'),
+    TypedGoRoute<DeleteAccountRoute>(path: '/delete-account', name: 'delete-account'),
+    TypedGoRoute<DeleteAccountConfirmRoute>(
+      path: '/delete-account/confirm',
+      name: 'delete-account-confirm',
+    ),
+    TypedGoRoute<AccountDeletedRoute>(path: '/account-deleted', name: 'account-deleted'),
     TypedStatefulShellRoute<HomeShellRoute>(
       branches: [
         TypedStatefulShellBranch<PetsBranch>(
@@ -126,6 +148,68 @@ class EditPetRoute extends GoRouteData with $EditPetRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) => EditPetModal(pet: $extra);
+}
+
+class EditProfileRoute extends GoRouteData with $EditProfileRoute {
+  /// Профиль передаётся объектом, чтобы форма открылась без повторной загрузки.
+  final ProfileModel $extra;
+
+  const EditProfileRoute({required this.$extra});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => EditProfileScreen(profile: $extra);
+}
+
+class NotificationsSettingsRoute extends GoRouteData with $NotificationsSettingsRoute {
+  const NotificationsSettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const NotificationsSettingsScreen();
+}
+
+class AboutRoute extends GoRouteData with $AboutRoute {
+  const AboutRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const AboutScreen();
+}
+
+class FeedbackRoute extends GoRouteData with $FeedbackRoute {
+  /// Имя темы обращения (`FeedbackTopic.name`).
+  final String topic;
+
+  const FeedbackRoute({required this.topic});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      FeedbackScreen(topic: FeedbackTopic.fromName(topic));
+}
+
+class DeleteAccountRoute extends GoRouteData with $DeleteAccountRoute {
+  final String phoneNumber;
+
+  const DeleteAccountRoute({required this.phoneNumber});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      DeleteAccountScreen(phoneNumber: phoneNumber);
+}
+
+class DeleteAccountConfirmRoute extends GoRouteData with $DeleteAccountConfirmRoute {
+  final String phoneNumber;
+
+  const DeleteAccountConfirmRoute({required this.phoneNumber});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      DeleteAccountConfirmScreen(phoneNumber: phoneNumber);
+}
+
+class AccountDeletedRoute extends GoRouteData with $AccountDeletedRoute {
+  const AccountDeletedRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const AccountDeletedScreen();
 }
 
 class PetDetailsRoute extends GoRouteData with $PetDetailsRoute {

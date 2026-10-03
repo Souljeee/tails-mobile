@@ -1633,6 +1633,642 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Каждый год'**
   String get recurrenceIntervalRowYearOne;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль'**
+  String get profileTitle;
+
+  /// No description provided for @profileNamePlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ваше имя'**
+  String get profileNamePlaceholder;
+
+  /// No description provided for @profileEditCaption.
+  ///
+  /// In ru, this message translates to:
+  /// **'Редактировать профиль'**
+  String get profileEditCaption;
+
+  /// No description provided for @profileAddPhotoCaption.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить фото'**
+  String get profileAddPhotoCaption;
+
+  /// No description provided for @profileMyPets.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои питомцы'**
+  String get profileMyPets;
+
+  /// No description provided for @profileSectionApp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приложение'**
+  String get profileSectionApp;
+
+  /// No description provided for @profileSectionSupport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поддержка'**
+  String get profileSectionSupport;
+
+  /// No description provided for @profileNotifications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления'**
+  String get profileNotifications;
+
+  /// No description provided for @profileNotificationsAllOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включены'**
+  String get profileNotificationsAllOn;
+
+  /// No description provided for @profileNotificationsAllOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выключены'**
+  String get profileNotificationsAllOff;
+
+  /// No description provided for @profileNotificationsBlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отключены в системе'**
+  String get profileNotificationsBlocked;
+
+  /// No description provided for @profileNotificationsPartial.
+  ///
+  /// In ru, this message translates to:
+  /// **'{enabled} из {total}'**
+  String profileNotificationsPartial(int enabled, int total);
+
+  /// No description provided for @profileHelp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Помощь и обратная связь'**
+  String get profileHelp;
+
+  /// No description provided for @profileAbout.
+  ///
+  /// In ru, this message translates to:
+  /// **'О приложении'**
+  String get profileAbout;
+
+  /// No description provided for @profileLogout.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти из аккаунта'**
+  String get profileLogout;
+
+  /// No description provided for @profileLogoutTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти из аккаунта?'**
+  String get profileLogoutTitle;
+
+  /// No description provided for @profileLogoutMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Питомцы и события останутся в аккаунте. Чтобы вернуться к ним, войдите снова по номеру {phone}.'**
+  String profileLogoutMessage(String phone);
+
+  /// No description provided for @profileLogoutConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти'**
+  String get profileLogoutConfirm;
+
+  /// No description provided for @editProfileTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль'**
+  String get editProfileTitle;
+
+  /// No description provided for @editProfileSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить'**
+  String get editProfileSave;
+
+  /// No description provided for @editProfileNameLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя'**
+  String get editProfileNameLabel;
+
+  /// No description provided for @editProfileNamePlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как к вам обращаться'**
+  String get editProfileNamePlaceholder;
+
+  /// No description provided for @editProfilePhoneLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер телефона'**
+  String get editProfilePhoneLabel;
+
+  /// No description provided for @editProfilePhoneHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'По этому номеру вы входите в приложение'**
+  String get editProfilePhoneHint;
+
+  /// No description provided for @editProfilePhotoAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить фото'**
+  String get editProfilePhotoAdd;
+
+  /// No description provided for @editProfilePhotoChange.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить фото'**
+  String get editProfilePhotoChange;
+
+  /// No description provided for @editProfileInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить: проверьте имя и фото.'**
+  String get editProfileInvalid;
+
+  /// No description provided for @editProfileAccountSection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Аккаунт'**
+  String get editProfileAccountSection;
+
+  /// No description provided for @editProfileDeleteAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить аккаунт'**
+  String get editProfileDeleteAccount;
+
+  /// No description provided for @editProfileDeleteAccountHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вместе с питомцами и событиями'**
+  String get editProfileDeleteAccountHint;
+
+  /// No description provided for @profilePhotoSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фото профиля'**
+  String get profilePhotoSheetTitle;
+
+  /// No description provided for @profilePhotoCamera.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сделать фото'**
+  String get profilePhotoCamera;
+
+  /// No description provided for @profilePhotoGallery.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрать из галереи'**
+  String get profilePhotoGallery;
+
+  /// No description provided for @profilePhotoDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить фото'**
+  String get profilePhotoDelete;
+
+  /// No description provided for @notificationsSettingsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления'**
+  String get notificationsSettingsTitle;
+
+  /// No description provided for @notificationsSettingsIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напоминания приходят о делах из календаря. Выберите, о чём напомнить.'**
+  String get notificationsSettingsIntro;
+
+  /// No description provided for @notificationsSettingsSection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напоминать о'**
+  String get notificationsSettingsSection;
+
+  /// No description provided for @notificationsSettingsFooter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда именно напомнить, задаётся в самом событии.'**
+  String get notificationsSettingsFooter;
+
+  /// No description provided for @notificationsSettingsFooterBlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ваш выбор сохранится и заработает, как только уведомления будут разрешены.'**
+  String get notificationsSettingsFooterBlocked;
+
+  /// No description provided for @notificationWalks.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прогулки'**
+  String get notificationWalks;
+
+  /// No description provided for @notificationFeeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кормление'**
+  String get notificationFeeding;
+
+  /// No description provided for @notificationMedications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лекарства'**
+  String get notificationMedications;
+
+  /// No description provided for @notificationVaccinations.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прививки'**
+  String get notificationVaccinations;
+
+  /// No description provided for @notificationVetVisits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Визиты к врачу'**
+  String get notificationVetVisits;
+
+  /// No description provided for @notificationsBlockedTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления отключены в настройках устройства'**
+  String get notificationsBlockedTitle;
+
+  /// No description provided for @notificationsBlockedText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока они выключены, Хвостики не смогут напомнить о прогулках и лекарствах.'**
+  String get notificationsBlockedText;
+
+  /// No description provided for @notificationsBlockedAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть настройки'**
+  String get notificationsBlockedAction;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'О приложении'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutVersion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия {version} · сборка {build}'**
+  String aboutVersion(String version, String build);
+
+  /// No description provided for @aboutDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профили питомцев, календарь заботы и напоминания — всё о ваших животных в одном месте.'**
+  String get aboutDescription;
+
+  /// No description provided for @aboutDocumentsSection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Документы'**
+  String get aboutDocumentsSection;
+
+  /// No description provided for @aboutTerms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Условия использования'**
+  String get aboutTerms;
+
+  /// No description provided for @aboutPrivacy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Политика конфиденциальности'**
+  String get aboutPrivacy;
+
+  /// No description provided for @aboutCopyright.
+  ///
+  /// In ru, this message translates to:
+  /// **'© {year} Хвостики'**
+  String aboutCopyright(int year);
+
+  /// No description provided for @aboutDocumentSoon.
+  ///
+  /// In ru, this message translates to:
+  /// **'Документ скоро появится'**
+  String get aboutDocumentSoon;
+
+  /// No description provided for @aboutDocumentOpenError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось открыть документ'**
+  String get aboutDocumentOpenError;
+
+  /// No description provided for @helpTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Помощь и обратная связь'**
+  String get helpTitle;
+
+  /// No description provided for @helpSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение прочитает команда Хвостиков'**
+  String get helpSubtitle;
+
+  /// No description provided for @helpTopicProblem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщить о проблеме'**
+  String get helpTopicProblem;
+
+  /// No description provided for @helpTopicProblemHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что-то работает не так'**
+  String get helpTopicProblemHint;
+
+  /// No description provided for @helpTopicIdea.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предложить идею'**
+  String get helpTopicIdea;
+
+  /// No description provided for @helpTopicIdeaHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чего не хватает в приложении'**
+  String get helpTopicIdeaHint;
+
+  /// No description provided for @helpTopicQuestion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задать вопрос'**
+  String get helpTopicQuestion;
+
+  /// No description provided for @helpTopicQuestionHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как что-то сделать в приложении'**
+  String get helpTopicQuestionHint;
+
+  /// No description provided for @feedbackTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обратная связь'**
+  String get feedbackTitle;
+
+  /// No description provided for @feedbackTopicLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема'**
+  String get feedbackTopicLabel;
+
+  /// No description provided for @feedbackTopicProblem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проблема'**
+  String get feedbackTopicProblem;
+
+  /// No description provided for @feedbackTopicIdea.
+  ///
+  /// In ru, this message translates to:
+  /// **'Идея'**
+  String get feedbackTopicIdea;
+
+  /// No description provided for @feedbackTopicQuestion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вопрос'**
+  String get feedbackTopicQuestion;
+
+  /// No description provided for @feedbackMessageLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщение'**
+  String get feedbackMessageLabel;
+
+  /// No description provided for @feedbackPlaceholderProblem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Опишите, что пошло не так'**
+  String get feedbackPlaceholderProblem;
+
+  /// No description provided for @feedbackPlaceholderIdea.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что хотелось бы добавить или изменить'**
+  String get feedbackPlaceholderIdea;
+
+  /// No description provided for @feedbackPlaceholderQuestion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Опишите, что хотите сделать'**
+  String get feedbackPlaceholderQuestion;
+
+  /// No description provided for @feedbackScreenshotAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прикрепить скриншот'**
+  String get feedbackScreenshotAdd;
+
+  /// No description provided for @feedbackScreenshotRemove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать скриншот'**
+  String get feedbackScreenshotRemove;
+
+  /// No description provided for @feedbackDeviceNotePrefix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вместе с сообщением отправим версию приложения '**
+  String get feedbackDeviceNotePrefix;
+
+  /// No description provided for @feedbackDeviceNoteSuffix.
+  ///
+  /// In ru, this message translates to:
+  /// **' и модель телефона — так мы быстрее разберёмся.'**
+  String get feedbackDeviceNoteSuffix;
+
+  /// No description provided for @feedbackSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправить'**
+  String get feedbackSend;
+
+  /// No description provided for @feedbackSent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Спасибо! Мы получили ваше обращение.'**
+  String get feedbackSent;
+
+  /// No description provided for @feedbackRateLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вы отправляете обращения слишком часто. Попробуйте чуть позже.'**
+  String get feedbackRateLimit;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удаление аккаунта'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountHeadline.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить аккаунт навсегда?'**
+  String get deleteAccountHeadline;
+
+  /// No description provided for @deleteAccountLead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить данные после удаления будет нельзя — ни нам, ни вам.'**
+  String get deleteAccountLead;
+
+  /// No description provided for @deleteAccountWhatSection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что удалится'**
+  String get deleteAccountWhatSection;
+
+  /// No description provided for @deleteAccountItemProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль'**
+  String get deleteAccountItemProfile;
+
+  /// No description provided for @deleteAccountItemProfileHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя, фото и номер {phone}'**
+  String deleteAccountItemProfileHint(String phone);
+
+  /// No description provided for @deleteAccountItemPetsHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'{names}: фото, вес, здоровье'**
+  String deleteAccountItemPetsHint(String names);
+
+  /// No description provided for @deleteAccountNamesJoiner.
+  ///
+  /// In ru, this message translates to:
+  /// **' и '**
+  String get deleteAccountNamesJoiner;
+
+  /// No description provided for @deleteAccountItemEvents.
+  ///
+  /// In ru, this message translates to:
+  /// **'Календарь'**
+  String get deleteAccountItemEvents;
+
+  /// No description provided for @deleteAccountItemEventsHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все события и напоминания'**
+  String get deleteAccountItemEventsHint;
+
+  /// No description provided for @deleteAccountPauseHintPrefix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хотите просто сделать перерыв? '**
+  String get deleteAccountPauseHintPrefix;
+
+  /// No description provided for @deleteAccountPauseHintLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйдите из аккаунта'**
+  String get deleteAccountPauseHintLink;
+
+  /// No description provided for @deleteAccountPauseHintSuffix.
+  ///
+  /// In ru, this message translates to:
+  /// **' — данные сохраняются.'**
+  String get deleteAccountPauseHintSuffix;
+
+  /// No description provided for @deleteAccountAcknowledge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Я понимаю, что это навсегда'**
+  String get deleteAccountAcknowledge;
+
+  /// No description provided for @deleteAccountAcknowledgeHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Без этого удалить аккаунт нельзя'**
+  String get deleteAccountAcknowledgeHint;
+
+  /// No description provided for @deleteAccountContinue.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продолжить'**
+  String get deleteAccountContinue;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердите удаление'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountConfirmLead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мы позвонили на {phone}. Введите код из звонка. Это последний шаг — после него аккаунт удалится.'**
+  String deleteAccountConfirmLead(String phone);
+
+  /// No description provided for @deleteAccountCodeLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код из звонка'**
+  String get deleteAccountCodeLabel;
+
+  /// No description provided for @deleteAccountCodeInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неверный код. Попробуйте ещё раз.'**
+  String get deleteAccountCodeInvalid;
+
+  /// No description provided for @deleteAccountCodeTooSoon.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код уже отправлен. Повторить можно через минуту.'**
+  String get deleteAccountCodeTooSoon;
+
+  /// No description provided for @deleteAccountResendIn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Позвонить ещё раз через {time}'**
+  String deleteAccountResendIn(String time);
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить аккаунт'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @accountDeletedTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Аккаунт удалён'**
+  String get accountDeletedTitle;
+
+  /// No description provided for @accountDeletedMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мы удалили профиль, питомцев и события. Спасибо, что были с Хвостиками.'**
+  String get accountDeletedMessage;
+
+  /// No description provided for @accountDeletedButton.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуться ко входу'**
+  String get accountDeletedButton;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

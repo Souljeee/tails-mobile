@@ -4,27 +4,40 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_user_avatar/ui_user_a
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 
-/// Карточка пользователя на вкладке «Профиль» (RProfileCard): аватар, имя и подпись-действие.
+/// Карточка пользователя в профиле: фото, имя, номер и подпись-действие.
 ///
-/// Если имени нет, вместо него серым показывается [namePlaceholder].
+/// Вся карточка ведёт к редактированию ([onTap]). Если фото нет, вместо него пунктирный
+/// круг с камерой; нажатие на него вызывает [onAvatarTap] и сразу открывает выбор фото.
+/// Если имя не указано, показывается серая подсказка [namePlaceholder].
 class UiProfileCard extends StatelessWidget {
   const UiProfileCard({
     required this.name,
     required this.namePlaceholder,
     required this.caption,
     required this.onTap,
+    this.phone,
     this.imageUrl,
+    this.onAvatarTap,
+    this.avatarSemanticLabel,
+    this.isAvatarBusy = false,
     super.key,
   });
 
-  /// Имя пользователя; пустая строка и `null` считаются «имени нет».
+  static const double avatarSize = 72;
+
   final String? name;
   final String namePlaceholder;
 
-  /// Подпись под именем, например «Редактировать профиль».
+  /// Уже отформатированный номер телефона.
+  final String? phone;
+
+  /// Подпись-действие под номером: «Редактировать профиль» или «Добавить фото».
   final String caption;
   final String? imageUrl;
   final VoidCallback? onTap;
+  final VoidCallback? onAvatarTap;
+  final String? avatarSemanticLabel;
+  final bool isAvatarBusy;
 
   bool get _hasName => name != null && name!.trim().isNotEmpty;
 
@@ -32,27 +45,35 @@ class UiProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.uiPalette;
     final fonts = context.uiFonts;
+    final title = _hasName ? name!.trim() : namePlaceholder;
 
     return Semantics(
-      button: true,
-      label: _hasName ? '${name!.trim()}. $caption' : '$namePlaceholder. $caption',
-      excludeSemantics: true,
+      container: true,
       child: UiCard(
         onTap: onTap,
         child: Row(
           children: [
-            UiUserAvatar(imageUrl: imageUrl),
+            UiUserAvatar(
+              imageUrl: imageUrl,
+              size: avatarSize,
+              invitesPhoto: true,
+              isBusy: isAvatarBusy,
+              onTap: onAvatarTap,
+              semanticLabel: avatarSemanticLabel,
+            ),
             const SizedBox(width: UiSpacing.x4),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _hasName ? name!.trim() : namePlaceholder,
+                    title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: fonts.headline.copyWith(color: _hasName ? palette.ink : palette.ink3),
                   ),
+                  if (phone != null && phone!.isNotEmpty)
+                    Text(phone!, style: fonts.monoMeta.copyWith(color: palette.ink2)),
                   const SizedBox(height: UiSpacing.x1),
                   Text(
                     caption,

@@ -55,7 +55,7 @@ class UiPhotoPicker extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   CustomPaint(
-                    foregroundPainter: hasPhoto ? null : _DashedCirclePainter(palette.controlLine),
+                    foregroundPainter: hasPhoto ? null : UiDashedCirclePainter(palette.controlLine),
                     child: ClipOval(
                       child: SizedBox.square(
                         dimension: size,
@@ -112,8 +112,8 @@ class UiPhotoPicker extends StatelessWidget {
 }
 
 /// Пунктирная окружность вокруг пустой области фото.
-class _DashedCirclePainter extends CustomPainter {
-  const _DashedCirclePainter(this.color);
+class UiDashedCirclePainter extends CustomPainter {
+  const UiDashedCirclePainter(this.color);
 
   final Color color;
 
@@ -138,5 +138,5 @@ class _DashedCirclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DashedCirclePainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(UiDashedCirclePainter oldDelegate) => oldDelegate.color != color;
 }

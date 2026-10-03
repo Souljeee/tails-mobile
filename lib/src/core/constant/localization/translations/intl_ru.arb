@@ -619,5 +619,173 @@
   "recurrenceIntervalRowDayOne": "Каждый день",
   "recurrenceIntervalRowWeekOne": "Каждую неделю",
   "recurrenceIntervalRowMonthOne": "Каждый месяц",
-  "recurrenceIntervalRowYearOne": "Каждый год"
+  "recurrenceIntervalRowYearOne": "Каждый год",
+  "profileTitle": "Профиль",
+  "profileNamePlaceholder": "Ваше имя",
+  "profileEditCaption": "Редактировать профиль",
+  "profileAddPhotoCaption": "Добавить фото",
+  "profileMyPets": "Мои питомцы",
+  "profileSectionApp": "Приложение",
+  "profileSectionSupport": "Поддержка",
+  "profileNotifications": "Уведомления",
+  "profileNotificationsAllOn": "Включены",
+  "profileNotificationsAllOff": "Выключены",
+  "profileNotificationsBlocked": "Отключены в системе",
+  "profileNotificationsPartial": "{enabled} из {total}",
+  "@profileNotificationsPartial": {
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileHelp": "Помощь и обратная связь",
+  "profileAbout": "О приложении",
+  "profileLogout": "Выйти из аккаунта",
+  "profileLogoutTitle": "Выйти из аккаунта?",
+  "profileLogoutMessage": "Питомцы и события останутся в аккаунте. Чтобы вернуться к ним, войдите снова по номеру {phone}.",
+  "@profileLogoutMessage": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLogoutConfirm": "Выйти",
+  "editProfileTitle": "Профиль",
+  "editProfileSave": "Сохранить",
+  "editProfileNameLabel": "Имя",
+  "editProfileNamePlaceholder": "Как к вам обращаться",
+  "editProfilePhoneLabel": "Номер телефона",
+  "editProfilePhoneHint": "По этому номеру вы входите в приложение",
+  "editProfilePhotoAdd": "Добавить фото",
+  "editProfilePhotoChange": "Изменить фото",
+  "editProfileInvalid": "Не удалось сохранить: проверьте имя и фото.",
+  "editProfileAccountSection": "Аккаунт",
+  "editProfileDeleteAccount": "Удалить аккаунт",
+  "editProfileDeleteAccountHint": "Вместе с питомцами и событиями",
+  "profilePhotoSheetTitle": "Фото профиля",
+  "profilePhotoCamera": "Сделать фото",
+  "profilePhotoGallery": "Выбрать из галереи",
+  "profilePhotoDelete": "Удалить фото",
+  "notificationsSettingsTitle": "Уведомления",
+  "notificationsSettingsIntro": "Напоминания приходят о делах из календаря. Выберите, о чём напомнить.",
+  "notificationsSettingsSection": "Напоминать о",
+  "notificationsSettingsFooter": "Когда именно напомнить, задаётся в самом событии.",
+  "notificationsSettingsFooterBlocked": "Ваш выбор сохранится и заработает, как только уведомления будут разрешены.",
+  "notificationWalks": "Прогулки",
+  "notificationFeeding": "Кормление",
+  "notificationMedications": "Лекарства",
+  "notificationVaccinations": "Прививки",
+  "notificationVetVisits": "Визиты к врачу",
+  "notificationsBlockedTitle": "Уведомления отключены в настройках устройства",
+  "notificationsBlockedText": "Пока они выключены, Хвостики не смогут напомнить о прогулках и лекарствах.",
+  "notificationsBlockedAction": "Открыть настройки",
+  "aboutTitle": "О приложении",
+  "aboutVersion": "Версия {version} · сборка {build}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutDescription": "Профили питомцев, календарь заботы и напоминания — всё о ваших животных в одном месте.",
+  "aboutDocumentsSection": "Документы",
+  "aboutTerms": "Условия использования",
+  "aboutPrivacy": "Политика конфиденциальности",
+  "aboutCopyright": "© {year} Хвостики",
+  "@aboutCopyright": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "aboutDocumentSoon": "Документ скоро появится",
+  "aboutDocumentOpenError": "Не удалось открыть документ",
+  "helpTitle": "Помощь и обратная связь",
+  "helpSubtitle": "Сообщение прочитает команда Хвостиков",
+  "helpTopicProblem": "Сообщить о проблеме",
+  "helpTopicProblemHint": "Что-то работает не так",
+  "helpTopicIdea": "Предложить идею",
+  "helpTopicIdeaHint": "Чего не хватает в приложении",
+  "helpTopicQuestion": "Задать вопрос",
+  "helpTopicQuestionHint": "Как что-то сделать в приложении",
+  "feedbackTitle": "Обратная связь",
+  "feedbackTopicLabel": "Тема",
+  "feedbackTopicProblem": "Проблема",
+  "feedbackTopicIdea": "Идея",
+  "feedbackTopicQuestion": "Вопрос",
+  "feedbackMessageLabel": "Сообщение",
+  "feedbackPlaceholderProblem": "Опишите, что пошло не так",
+  "feedbackPlaceholderIdea": "Что хотелось бы добавить или изменить",
+  "feedbackPlaceholderQuestion": "Опишите, что хотите сделать",
+  "feedbackScreenshotAdd": "Прикрепить скриншот",
+  "feedbackScreenshotRemove": "Убрать скриншот",
+  "feedbackDeviceNotePrefix": "Вместе с сообщением отправим версию приложения ",
+  "feedbackDeviceNoteSuffix": " и модель телефона — так мы быстрее разберёмся.",
+  "feedbackSend": "Отправить",
+  "feedbackSent": "Спасибо! Мы получили ваше обращение.",
+  "feedbackRateLimit": "Вы отправляете обращения слишком часто. Попробуйте чуть позже.",
+  "deleteAccountTitle": "Удаление аккаунта",
+  "deleteAccountHeadline": "Удалить аккаунт навсегда?",
+  "deleteAccountLead": "Восстановить данные после удаления будет нельзя — ни нам, ни вам.",
+  "deleteAccountWhatSection": "Что удалится",
+  "deleteAccountItemProfile": "Профиль",
+  "deleteAccountItemProfileHint": "Имя, фото и номер {phone}",
+  "@deleteAccountItemProfileHint": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountItemPetsHint": "{names}: фото, вес, здоровье",
+  "@deleteAccountItemPetsHint": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountNamesJoiner": " и ",
+  "deleteAccountItemEvents": "Календарь",
+  "deleteAccountItemEventsHint": "Все события и напоминания",
+  "deleteAccountPauseHintPrefix": "Хотите просто сделать перерыв? ",
+  "deleteAccountPauseHintLink": "Выйдите из аккаунта",
+  "deleteAccountPauseHintSuffix": " — данные сохраняются.",
+  "deleteAccountAcknowledge": "Я понимаю, что это навсегда",
+  "deleteAccountAcknowledgeHint": "Без этого удалить аккаунт нельзя",
+  "deleteAccountContinue": "Продолжить",
+  "deleteAccountConfirmTitle": "Подтвердите удаление",
+  "deleteAccountConfirmLead": "Мы позвонили на {phone}. Введите код из звонка. Это последний шаг — после него аккаунт удалится.",
+  "@deleteAccountConfirmLead": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountCodeLabel": "Код из звонка",
+  "deleteAccountCodeInvalid": "Неверный код. Попробуйте ещё раз.",
+  "deleteAccountCodeTooSoon": "Код уже отправлен. Повторить можно через минуту.",
+  "deleteAccountResendIn": "Позвонить ещё раз через {time}",
+  "@deleteAccountResendIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountConfirm": "Удалить аккаунт",
+  "accountDeletedTitle": "Аккаунт удалён",
+  "accountDeletedMessage": "Мы удалили профиль, питомцев и события. Спасибо, что были с Хвостиками.",
+  "accountDeletedButton": "Вернуться ко входу"
 }

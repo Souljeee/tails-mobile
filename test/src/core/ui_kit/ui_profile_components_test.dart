@@ -277,17 +277,19 @@ void main() {
                   context: context,
                   title: 'Фото профиля',
                   cancelLabel: 'Отмена',
-                  items: const [
-                    UiActionSheetItem(
-                      value: 'gallery',
-                      icon: Icons.photo_library_outlined,
-                      label: 'Галерея',
-                    ),
-                    UiActionSheetItem(
-                      value: 'camera',
-                      icon: Icons.photo_camera_outlined,
-                      label: 'Камера',
-                    ),
+                  groups: const [
+                    [
+                      UiActionSheetItem<String>(
+                        value: 'gallery',
+                        icon: Icons.photo_library_outlined,
+                        label: 'Галерея',
+                      ),
+                      UiActionSheetItem(
+                        value: 'camera',
+                        icon: Icons.photo_camera_outlined,
+                        label: 'Камера',
+                      ),
+                    ],
                   ],
                 );
               },
@@ -318,7 +320,6 @@ void main() {
               onPressed: () async {
                 result = await showUiConfirmSheet(
                   context: context,
-                  icon: Icons.logout,
                   title: 'Выйти из аккаунта?',
                   message: 'Данные сохранятся',
                   confirmLabel: 'Выйти',

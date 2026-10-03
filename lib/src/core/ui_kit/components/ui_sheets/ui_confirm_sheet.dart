@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_badge/ui_icon_badge.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 
-/// Шторка подтверждения: иконка, заголовок, пояснение и пара кнопок «отмена / подтвердить».
+/// Шторка подтверждения: заголовок, пояснение и две кнопки друг под другом —
+/// «подтвердить» (спокойная, в тоне акцента или опасности) и «Отмена».
 ///
 /// Возвращает `true`, только если пользователь нажал кнопку подтверждения. Если
-/// [destructive], иконка и кнопка подтверждения красные («Выйти», «Удалить»).
+/// [destructive], кнопка подтверждения красная, иначе в цвете акцента. [highlight] — фрагмент
+/// [message] (например, номер телефона), который показывается моноширинным шрифтом.
 Future<bool> showUiConfirmSheet({
   required BuildContext context,
-  required IconData icon,
   required String title,
   required String message,
   required String confirmLabel,
   required String cancelLabel,
-  bool destructive = true,
+  String? highlight,
+  bool destructive = false,
 }) async {
   final confirmed = await showUiBottomSheet<bool>(
     context: context,
     builder: (sheetContext) => _ConfirmSheet(
-      icon: icon,
       title: title,
       message: message,
+      highlight: highlight,
       confirmLabel: confirmLabel,
       cancelLabel: cancelLabel,
       destructive: destructive,
@@ -35,17 +36,17 @@ Future<bool> showUiConfirmSheet({
 
 class _ConfirmSheet extends StatelessWidget {
   const _ConfirmSheet({
-    required this.icon,
     required this.title,
     required this.message,
+    required this.highlight,
     required this.confirmLabel,
     required this.cancelLabel,
     required this.destructive,
   });
 
-  final IconData icon;
   final String title;
   final String message;
+  final String? highlight;
   final String confirmLabel;
   final String cancelLabel;
   final bool destructive;
@@ -54,48 +55,55 @@ class _ConfirmSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.uiPalette;
     final fonts = context.uiFonts;
+    final bodyStyle = fonts.body.copyWith(color: palette.ink2);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        UiIconBadge(
-          icon: icon,
-          size: 64,
-          iconSize: 28,
-          foregroundColor: destructive ? palette.danger : palette.accent,
-          backgroundColor: destructive ? palette.dangerTint : palette.accentTint,
-        ),
-        const SizedBox(height: UiSpacing.x5),
-        Text(
-          title,
-          style: fonts.displayS.copyWith(color: palette.ink),
-          textAlign: TextAlign.center,
+        Semantics(
+          header: true,
+          child: Text(title, style: fonts.displayS.copyWith(color: palette.ink)),
         ),
         const SizedBox(height: UiSpacing.x2),
-        Text(
-          message,
-          style: fonts.body.copyWith(color: palette.ink2),
-          textAlign: TextAlign.center,
+        Text.rich(TextSpan(style: bodyStyle, children: _messageSpans(fonts.monoDigits.copyWith(color: palette.ink)))),
+        const SizedBox(height: UiSpacing.x5),
+        UiButton.main(
+          label: confirmLabel,
+          staticFillColor: destructive ? palette.dangerTint : palette.accentTint,
+          staticItemColor: destructive ? palette.danger : palette.accent,
+          pressedFillColor: destructive ? palette.dangerTint : palette.accentTint,
+          pressedItemColor: destructive ? palette.danger : palette.accent,
+          onPressed: () => Navigator.of(context).pop(true),
         ),
-        const SizedBox(height: UiSpacing.x6),
-        Row(
-          children: [
-            Expanded(
-              child: UiButton.secondary(
-                label: cancelLabel,
-                onPressed: () => Navigator.of(context).pop(false),
-              ),
-            ),
-            const SizedBox(width: UiSpacing.x3),
-            Expanded(
-              child: UiButton.main(
-                label: confirmLabel,
-                staticFillColor: destructive ? palette.danger : null,
-                onPressed: () => Navigator.of(context).pop(true),
-              ),
-            ),
-          ],
+        const SizedBox(height: UiSpacing.x3),
+        UiButton.secondary(
+          label: cancelLabel,
+          staticFillColor: palette.surface,
+          staticItemColor: palette.ink,
+          defaultBorderColor: palette.line,
+          onPressed: () => Navigator.of(context).pop(false),
         ),
       ],
     );
+  }
+
+  List<InlineSpan> _messageSpans(TextStyle monoStyle) {
+    final part = highlight;
+
+    if (part == null || part.isEmpty || !message.contains(part)) {
+      return [TextSpan(text: message)];
+    }
+
+    final index = message.indexOf(part);
+
+    return [
+      TextSpan(text: message.substring(0, index)),
+      TextSpan(
+        text: part,
+        style: monoStyle.copyWith(fontSize: 15),
+      ),
+      TextSpan(text: message.substring(index + part.length)),
+    ];
   }
 }

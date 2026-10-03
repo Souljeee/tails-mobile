@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_compact_button/ui_compact_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
-import 'package:tails_mobile/src/core/ui_kit/tokens/ui_sizes.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 
 /// Янтарная плашка: иконка, необязательный заголовок, текст и необязательная кнопка-действие,
@@ -46,28 +46,10 @@ class UiNoticeBanner extends StatelessWidget {
                   if (title != null)
                     Text(title!, style: fonts.bodySemibold.copyWith(color: palette.ink)),
                   Text(text, style: fonts.footnote.copyWith(color: palette.ink2)),
-                  if (hasAction)
-                    Semantics(
-                      button: true,
-                      child: InkWell(
-                        onTap: onAction,
-                        splashFactory: NoSplash.splashFactory,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: UiSizes.minTapTarget),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            widthFactor: 1,
-                            child: Text(
-                              actionLabel!,
-                              style: fonts.callout.copyWith(
-                                color: palette.accent,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                  if (hasAction) ...[
+                    const SizedBox(height: UiSpacing.x3),
+                    UiCompactButton(label: actionLabel!, onPressed: onAction),
+                  ],
                 ],
               ),
             ),
