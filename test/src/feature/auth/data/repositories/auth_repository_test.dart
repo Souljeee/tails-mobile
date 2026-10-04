@@ -51,6 +51,33 @@ void main() {
       expect(tokenStorage.clearCalls, 1);
     });
 
+    test('перед выходом вызывает beforeLogout, пока токены ещё действуют', () async {
+      OAuth2Token? tokenInHook;
+      final calls = <String>[];
+      authorizedClient.handler = (request) {
+        calls.add(request.path);
+
+        return null;
+      };
+      repository = AuthRepository(
+        authRemoteDataSource: AuthRemoteDataSource(
+          restClient: notAuthClient,
+          authorizedRestClient: authorizedClient,
+        ),
+        tokenStorage: tokenStorage,
+        beforeLogout: () async {
+          calls.add('beforeLogout');
+          tokenInHook = tokenStorage.token;
+        },
+      );
+
+      await repository.logout();
+
+      expect(calls, ['beforeLogout', '/auth/logout/']);
+      expect(tokenInHook, _token);
+      expect(tokenStorage.token, isNull);
+    });
+
     test('без сохранённого токена не ходит на сервер, но очищает хранилище', () async {
       tokenStorage.token = null;
 

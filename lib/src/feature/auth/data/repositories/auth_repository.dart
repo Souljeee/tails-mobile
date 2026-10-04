@@ -8,13 +8,20 @@ class AuthRepository {
   /// {@macro auth_repository}
   final AuthRemoteDataSource _authRemoteDataSource;
   final TokenStorage<OAuth2Token> _tokenStorage;
+  final Future<void> Function()? _beforeLogout;
 
   /// {@macro auth_repository}
+  ///
+  /// [beforeLogout] вызывается перед выходом, пока токены ещё действуют (например, чтобы
+  /// отвязать устройство от push-уведомлений). Он не должен выбрасывать ошибки: выход
+  /// выполняется в любом случае.
   const AuthRepository({
     required AuthRemoteDataSource authRemoteDataSource,
     required TokenStorage<OAuth2Token> tokenStorage,
+    Future<void> Function()? beforeLogout,
   }) : _authRemoteDataSource = authRemoteDataSource,
-       _tokenStorage = tokenStorage;
+       _tokenStorage = tokenStorage,
+       _beforeLogout = beforeLogout;
 
     Stream<AuthorizationStatus> get authorizationStatus => _tokenStorage.getStream().map(
         (token) =>
@@ -61,6 +68,8 @@ class AuthRepository {
   ///
   /// Throws RestClientException if the server request fails.
   Future<void> logout() async {
+    await _beforeLogout?.call();
+
     final token = await _tokenStorage.load();
 
     try {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "330277912058",
+    "project_id": "hvostiki",
+    "storage_bucket": "hvostiki.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330277912058:android:6a145adf0c0b2c92cc3843",
+        "android_client_info": {
+          "package_name": "com.tailstech.tails_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhoLXWW1QF4-zvfQNq5Wa9ymDReNeSY40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

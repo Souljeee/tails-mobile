@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tails_mobile/src/core/constant/localization/localization.dart';
 import 'package:tails_mobile/src/core/navigation/go_router_refresh_stream.dart';
 import 'package:tails_mobile/src/core/navigation/router.dart';
+import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_loader_overlay/loader_overlay.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/push_notifications/presentation/push_notifications_listener.dart';
 import 'package:tails_mobile/src/feature/settings/model/app_theme.dart';
 import 'package:tails_mobile/src/feature/settings/widget/settings_scope.dart';
 
@@ -26,7 +29,7 @@ class MaterialContext extends StatefulWidget {
 
 class _MaterialContextState extends State<MaterialContext> {
   GoRouterRefreshStream? _routerRefresh;
-  RouterConfig<Object>? _routerConfig;
+  GoRouter? _router;
 
   @override
   void didChangeDependencies() {
@@ -36,7 +39,7 @@ class _MaterialContextState extends State<MaterialContext> {
     _routerRefresh ??= GoRouterRefreshStream(
       DependenciesScope.of(context).authorizationBloc.stream,
     );
-    _routerConfig ??= AppRouter.create(refreshListenable: _routerRefresh!);
+    _router ??= AppRouter.create(refreshListenable: _routerRefresh!);
   }
 
   @override
@@ -63,15 +66,20 @@ class _MaterialContextState extends State<MaterialContext> {
       locale: settings.locale,
       localizationsDelegates: Localization.localizationDelegates,
       supportedLocales: Localization.supportedLocales,
-      routerConfig: _routerConfig,
-      builder: (context, child) => MediaQuery(
-        key: MaterialContext._globalKey,
-        data: mediaQueryData.copyWith(
-          textScaler: TextScaler.linear(
-            mediaQueryData.textScaler.scale(settings.textScale ?? 1).clamp(0.5, 2),
+      routerConfig: _router,
+      builder: (context, child) => PushNotificationsListener(
+        bloc: DependenciesScope.of(context).pushNotificationsBloc,
+        // Пока открываем «Расписание»; переход к конкретному событию/дню — позже.
+        onOpened: (_) => _router?.go(const ScheduleRoute().location),
+        child: MediaQuery(
+          key: MaterialContext._globalKey,
+          data: mediaQueryData.copyWith(
+            textScaler: TextScaler.linear(
+              mediaQueryData.textScaler.scale(settings.textScale ?? 1).clamp(0.5, 2),
+            ),
           ),
+          child: LoaderOverlay(child: child!),
         ),
-        child: LoaderOverlay(child: child!),
       ),
     );
   }

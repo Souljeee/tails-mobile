@@ -24,6 +24,11 @@ import 'package:tails_mobile/src/feature/profile/core/data/data_sources/device_i
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/profile_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
+import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/devices_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/local_notifications_data_source.dart';
+import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/push_messaging_data_source.dart';
+import 'package:tails_mobile/src/feature/push_notifications/data/repositories/push_notifications_repository.dart';
+import 'package:tails_mobile/src/feature/push_notifications/domain/push_notifications_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/schedule_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
 import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
@@ -163,6 +168,13 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final restClient = await _initRestClient(config, secureTokenStorage, refreshService);
 
+    final pushNotificationsRepository = PushNotificationsRepository(
+      messagingDataSource: FirebasePushMessagingDataSource(logger: logger),
+      localNotificationsDataSource: FlutterLocalNotificationsDataSource(),
+      devicesRemoteDataSource: DevicesRemoteDataSource(restClient: restClient),
+      logger: logger,
+    );
+
     final authRemoteDataSource = AuthRemoteDataSource(
       restClient: notAuthClient,
       authorizedRestClient: restClient,
@@ -171,15 +183,22 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
     final authRepository = AuthRepository(
       authRemoteDataSource: authRemoteDataSource,
       tokenStorage: secureTokenStorage,
+      beforeLogout: pushNotificationsRepository.unregisterDevice,
     );
 
+    final initialAuthorizationStatus = authorizationToken != null
+        ? AuthorizationStatus.authorized
+        : AuthorizationStatus.notAuthorized;
+
     final authorizationBloc = AuthBloc(
-      AuthState.idle(
-        status: authorizationToken != null
-            ? AuthorizationStatus.authorized
-            : AuthorizationStatus.notAuthorized,
-      ),
+      AuthState.idle(status: initialAuthorizationStatus),
       authRepository: authRepository,
+    );
+
+    final pushNotificationsBloc = PushNotificationsBloc(
+      repository: pushNotificationsRepository,
+      initialAuthorizationStatus: initialAuthorizationStatus,
+      authorizationStatus: authRepository.authorizationStatus,
     );
 
     final sendCodeBloc = SendCodeBloc(authRepository: authRepository);
@@ -220,6 +239,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       petRepository: petRepository,
       scheduleRepository: scheduleRepository,
       profileRepository: profileRepository,
+      pushNotificationsBloc: pushNotificationsBloc,
     );
   }
 }

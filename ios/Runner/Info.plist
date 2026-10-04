@@ -49,5 +49,9 @@
 		<string>Нужен доступ к камере для фото питомца</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Нужен доступ к галерее для выбора фото питомца</string>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>remote-notification</string>
+		</array>
 	</dict>
 </plist>
