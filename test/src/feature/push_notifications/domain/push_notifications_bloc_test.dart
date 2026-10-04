@@ -124,7 +124,7 @@ void main() {
     final first = await _until(bloc.stream, (s) => s.openedCount == 1);
 
     expect(first.lastOpened?.title, 'Бакс: Корм');
-    expect(first.lastOpened?.payload.eventId, 7);
+    expect(first.lastOpened?.payload.eventId, '7');
 
     // Повторное нажатие на то же уведомление тоже замечается.
     messaging.opened.add(

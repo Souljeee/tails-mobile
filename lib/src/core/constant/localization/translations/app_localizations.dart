@@ -1916,6 +1916,108 @@ abstract class AppLocalizations {
   /// **'Открыть настройки'**
   String get notificationsBlockedAction;
 
+  /// No description provided for @inboxTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления'**
+  String get inboxTitle;
+
+  /// No description provided for @inboxFilterAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get inboxFilterAll;
+
+  /// No description provided for @inboxFilterUnread.
+  ///
+  /// In ru, this message translates to:
+  /// **'Непрочитанные'**
+  String get inboxFilterUnread;
+
+  /// Чип фильтра непрочитанных уведомлений с их числом
+  ///
+  /// In ru, this message translates to:
+  /// **'Непрочитанные · {count}'**
+  String inboxFilterUnreadCount(int count);
+
+  /// No description provided for @inboxReadAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прочитать все'**
+  String get inboxReadAll;
+
+  /// No description provided for @inboxSectionToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня'**
+  String get inboxSectionToday;
+
+  /// No description provided for @inboxSectionYesterday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вчера'**
+  String get inboxSectionYesterday;
+
+  /// No description provided for @inboxSectionEarlier.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ранее'**
+  String get inboxSectionEarlier;
+
+  /// No description provided for @inboxEmptyTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нет уведомлений'**
+  String get inboxEmptyTitle;
+
+  /// No description provided for @inboxEmptyMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здесь появятся напоминания о лекарствах, прививках, кормлении и других делах ваших питомцев.'**
+  String get inboxEmptyMessage;
+
+  /// No description provided for @inboxEmptyAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настроить уведомления'**
+  String get inboxEmptyAction;
+
+  /// No description provided for @inboxAllReadTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всё прочитано'**
+  String get inboxAllReadTitle;
+
+  /// No description provided for @inboxAllReadMessage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новых уведомлений пока нет. Вся история — во вкладке «Все».'**
+  String get inboxAllReadMessage;
+
+  /// Сколько минут назад пришло уведомление
+  ///
+  /// In ru, this message translates to:
+  /// **'{count} мин'**
+  String inboxTimeMinutes(int count);
+
+  /// Сколько часов назад пришло уведомление
+  ///
+  /// In ru, this message translates to:
+  /// **'{count} ч'**
+  String inboxTimeHours(int count);
+
+  /// No description provided for @inboxItemNewSemantics.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое'**
+  String get inboxItemNewSemantics;
+
+  /// Подпись колокольчика для скринридера, когда есть непрочитанные
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления, непрочитанных: {count}'**
+  String notificationsUnreadLabel(int count);
+
   /// No description provided for @aboutTitle.
   ///
   /// In ru, this message translates to:

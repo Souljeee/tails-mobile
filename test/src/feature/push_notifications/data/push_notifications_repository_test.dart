@@ -150,6 +150,28 @@ void main() {
       expect(local.shown.single.payload, _eventMessage.data);
     });
 
+    test('сообщают о приходе уведомления с разобранными данными', () async {
+      final received = <PushNotification>[];
+      final subscription = repository.receivedNotifications.listen(received.add);
+      await repository.connectDevice();
+
+      messaging.messages.add(
+        const PushMessageDto(
+          messageId: 'm2',
+          title: 'Корм',
+          body: 'Пора',
+          data: {'notification_id': 'n-9', 'pet_id': '3'},
+        ),
+      );
+      await pump();
+      await subscription.cancel();
+
+      expect(received, hasLength(1));
+      expect(received.single.title, 'Корм');
+      expect(received.single.payload.notificationId, 'n-9');
+      expect(received.single.payload.petId, 3);
+    });
+
     test('на iOS не дублируют системный баннер', () async {
       messaging.platform = 'ios';
       await repository.connectDevice();
@@ -187,7 +209,7 @@ void main() {
 
       expect(opened, hasLength(1));
       expect(opened.single.title, 'Бакс: Корм');
-      expect(opened.single.payload.eventId, 7);
+      expect(opened.single.payload.eventId, '7');
       expect(opened.single.payload.date, DateTime(2026, 10, 5));
     });
 
@@ -198,7 +220,7 @@ void main() {
       await pump();
 
       expect(opened, hasLength(1));
-      expect(opened.single.payload.eventId, 7);
+      expect(opened.single.payload.eventId, '7');
     });
 
     test('нажатие на локальное уведомление', () async {

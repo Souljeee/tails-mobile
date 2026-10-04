@@ -1283,6 +1283,66 @@ class AppLocalizationsRu extends AppLocalizations {
   String get notificationsBlockedAction => 'Открыть настройки';
 
   @override
+  String get inboxTitle => 'Уведомления';
+
+  @override
+  String get inboxFilterAll => 'Все';
+
+  @override
+  String get inboxFilterUnread => 'Непрочитанные';
+
+  @override
+  String inboxFilterUnreadCount(int count) {
+    return 'Непрочитанные · $count';
+  }
+
+  @override
+  String get inboxReadAll => 'Прочитать все';
+
+  @override
+  String get inboxSectionToday => 'Сегодня';
+
+  @override
+  String get inboxSectionYesterday => 'Вчера';
+
+  @override
+  String get inboxSectionEarlier => 'Ранее';
+
+  @override
+  String get inboxEmptyTitle => 'Пока нет уведомлений';
+
+  @override
+  String get inboxEmptyMessage =>
+      'Здесь появятся напоминания о лекарствах, прививках, кормлении и других делах ваших питомцев.';
+
+  @override
+  String get inboxEmptyAction => 'Настроить уведомления';
+
+  @override
+  String get inboxAllReadTitle => 'Всё прочитано';
+
+  @override
+  String get inboxAllReadMessage => 'Новых уведомлений пока нет. Вся история — во вкладке «Все».';
+
+  @override
+  String inboxTimeMinutes(int count) {
+    return '$count мин';
+  }
+
+  @override
+  String inboxTimeHours(int count) {
+    return '$count ч';
+  }
+
+  @override
+  String get inboxItemNewSemantics => 'Новое';
+
+  @override
+  String notificationsUnreadLabel(int count) {
+    return 'Уведомления, непрочитанных: $count';
+  }
+
+  @override
   String get aboutTitle => 'О приложении';
 
   @override

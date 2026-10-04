@@ -23,25 +23,46 @@ enum PushNotificationType {
 
 /// Данные пуша о событии: по ним открывается нужное место в приложении.
 class PushPayload extends Equatable {
-  const PushPayload({this.eventId, this.type = PushNotificationType.unknown, this.date, this.time});
+  const PushPayload({
+    this.notificationId,
+    this.eventId,
+    this.petId,
+    this.eventType,
+    this.type = PushNotificationType.unknown,
+    this.date,
+    this.time,
+  });
 
   /// Разбирает данные FCM; отсутствующие или некорректные поля становятся `null`.
   factory PushPayload.fromData(Map<String, String> data) => PushPayload(
-    eventId: int.tryParse(data['event_id'] ?? ''),
+    notificationId: _nonEmpty(data['notification_id']),
+    eventId: _nonEmpty(data['event_id']),
+    petId: int.tryParse(data['pet_id'] ?? ''),
+    eventType: _nonEmpty(data['event_type']),
     type: PushNotificationType.fromWire(data['type']),
     date: DateTime.tryParse(data['date'] ?? ''),
     time: data['time'],
   );
 
-  final int? eventId;
+  /// Запись в центре уведомлений; по ней уведомление отмечается прочитанным.
+  final String? notificationId;
+
+  /// Идентификатор события (UUID).
+  final String? eventId;
+  final int? petId;
+
+  /// Тип события (`ScheduleEventTypeEnum.name`).
+  final String? eventType;
   final PushNotificationType type;
 
   /// Дата вхождения события.
   final DateTime? date;
 
-  /// Время слота `HH:MM`, если у события несколько времён в день.
+  /// Время слота `HH:MM` (UTC), если у события несколько времён в день.
   final String? time;
 
+  static String? _nonEmpty(String? value) => value == null || value.isEmpty ? null : value;
+
   @override
-  List<Object?> get props => [eventId, type, date, time];
+  List<Object?> get props => [notificationId, eventId, petId, eventType, type, date, time];
 }

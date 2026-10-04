@@ -16,6 +16,7 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/notifications_inbox/domain/notifications_unread_bloc.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/domain/models/pets_overview.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/domain/pets_overview_bloc.dart';
 import 'package:tails_mobile/src/feature/pets/pets_overview/presentation/widgets/pet_overview_card.dart';
@@ -33,6 +34,10 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
     scheduleRepository: DependenciesScope.of(context).scheduleRepository,
   );
 
+  late final NotificationsUnreadBloc _unreadBloc = NotificationsUnreadBloc(
+    inboxRepository: DependenciesScope.of(context).notificationsInboxRepository,
+  );
+
   bool? _wasTabActive;
 
   @override
@@ -48,6 +53,7 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
     super.initState();
 
     _petsOverviewBloc.add(const PetsOverviewEvent.fetchRequested());
+    _unreadBloc.add(const NotificationsUnreadEvent.refreshRequested());
   }
 
   @override
@@ -60,6 +66,7 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
 
     if (_wasTabActive == false && isActive) {
       _petsOverviewBloc.add(const PetsOverviewEvent.fetchRequested(silent: true));
+      _unreadBloc.add(const NotificationsUnreadEvent.refreshRequested());
     }
 
     _wasTabActive = isActive;
@@ -68,6 +75,7 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
   @override
   void dispose() {
     _petsOverviewBloc.close();
+    _unreadBloc.close();
 
     super.dispose();
   }
@@ -104,11 +112,16 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
                       subtitle: state.mapOrNull(
                         success: (state) => _subtitle(context, state.overview),
                       ),
-                      trailing: UiIconButton(
-                        icon: Icons.notifications_none,
-                        semanticLabel: context.l10n.notificationsLabel,
-                        // TODO: открыть страницу уведомлений, когда она появится.
-                        onPressed: () {},
+                      trailing: BlocBuilder<NotificationsUnreadBloc, NotificationsUnreadState>(
+                        bloc: _unreadBloc,
+                        builder: (context, unread) => UiIconButton(
+                          icon: Icons.notifications_none,
+                          semanticLabel: unread.count > 0
+                              ? context.l10n.notificationsUnreadLabel(unread.count)
+                              : context.l10n.notificationsLabel,
+                          badgeCount: unread.count,
+                          onPressed: () => const NotificationsRoute().push<void>(context),
+                        ),
                       ),
                     ),
                   ),

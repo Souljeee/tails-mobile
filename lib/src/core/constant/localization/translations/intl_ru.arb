@@ -684,6 +684,39 @@
   "notificationsBlockedTitle": "Уведомления отключены в настройках устройства",
   "notificationsBlockedText": "Пока они выключены, Хвостики не смогут напомнить о прогулках и лекарствах.",
   "notificationsBlockedAction": "Открыть настройки",
+  "inboxTitle": "Уведомления",
+  "inboxFilterAll": "Все",
+  "inboxFilterUnread": "Непрочитанные",
+  "inboxFilterUnreadCount": "Непрочитанные · {count}",
+  "@inboxFilterUnreadCount": {
+    "description": "Чип фильтра непрочитанных уведомлений с их числом",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "inboxReadAll": "Прочитать все",
+  "inboxSectionToday": "Сегодня",
+  "inboxSectionYesterday": "Вчера",
+  "inboxSectionEarlier": "Ранее",
+  "inboxEmptyTitle": "Пока нет уведомлений",
+  "inboxEmptyMessage": "Здесь появятся напоминания о лекарствах, прививках, кормлении и других делах ваших питомцев.",
+  "inboxEmptyAction": "Настроить уведомления",
+  "inboxAllReadTitle": "Всё прочитано",
+  "inboxAllReadMessage": "Новых уведомлений пока нет. Вся история — во вкладке «Все».",
+  "inboxTimeMinutes": "{count} мин",
+  "@inboxTimeMinutes": {
+    "description": "Сколько минут назад пришло уведомление",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "inboxTimeHours": "{count} ч",
+  "@inboxTimeHours": {
+    "description": "Сколько часов назад пришло уведомление",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "inboxItemNewSemantics": "Новое",
+  "notificationsUnreadLabel": "Уведомления, непрочитанных: {count}",
+  "@notificationsUnreadLabel": {
+    "description": "Подпись колокольчика для скринридера, когда есть непрочитанные",
+    "placeholders": {"count": {"type": "int"}}
+  },
   "aboutTitle": "О приложении",
   "aboutVersion": "Версия {version} · сборка {build}",
   "@aboutVersion": {

@@ -17,6 +17,8 @@ import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
+import 'package:tails_mobile/src/feature/notifications_inbox/data/data_sources/notifications_inbox_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/notifications_inbox_repository.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/pet_color_store.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
@@ -218,6 +220,13 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       scheduleRemoteDataSource: scheduleRemoteDataSource,
     );
 
+    final notificationsInboxRepository = NotificationsInboxRepository(
+      remoteDataSource: NotificationsInboxRemoteDataSource(restClient: restClient),
+      logger: logger,
+      incomingPushes: pushNotificationsRepository.receivedNotifications,
+      authorizationStatus: authRepository.authorizationStatus,
+    );
+
     final profileRepository = ProfileRepository(
       remoteDataSource: ProfileRemoteDataSource(restClient: restClient),
       deviceInfoDataSource: const DeviceInfoDataSource(),
@@ -240,6 +249,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       scheduleRepository: scheduleRepository,
       profileRepository: profileRepository,
       pushNotificationsBloc: pushNotificationsBloc,
+      notificationsInboxRepository: notificationsInboxRepository,
     );
   }
 }

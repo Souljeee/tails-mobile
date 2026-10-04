@@ -41,6 +41,7 @@ class PushNotificationsRepository {
   final Logger _logger;
 
   final StreamController<PushNotification> _opened = StreamController.broadcast();
+  final StreamController<PushNotification> _received = StreamController.broadcast();
   final List<StreamSubscription<Object?>> _subscriptions = [];
 
   Future<bool>? _initialization;
@@ -50,6 +51,9 @@ class PushNotificationsRepository {
 
   /// Уведомления, которые пользователь открыл нажатием.
   Stream<PushNotification> get openedNotifications => _opened.stream;
+
+  /// Уведомления, пришедшие, пока приложение открыто.
+  Stream<PushNotification> get receivedNotifications => _received.stream;
 
   /// Запрашивает разрешение, регистрирует токен устройства на сервере и начинает слушать
   /// уведомления. Безопасно вызывать повторно.
@@ -167,6 +171,14 @@ class PushNotificationsRepository {
   }
 
   void _onForegroundMessage(PushMessageDto message) {
+    _received.add(
+      PushNotification(
+        title: message.title,
+        body: message.body,
+        payload: PushPayload.fromData(message.data),
+      ),
+    );
+
     // На iOS баннер в открытом приложении показывает система; на Android — только мы.
     if (_messaging.platform == _androidPlatform) {
       unawaited(_showLocally(message));

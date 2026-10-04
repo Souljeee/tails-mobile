@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
+import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/notifications_inbox_repository.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
 import 'package:tails_mobile/src/feature/push_notifications/domain/push_notifications_bloc.dart';
@@ -35,6 +36,7 @@ class DependenciesContainer {
     required this.scheduleRepository,
     required this.profileRepository,
     required this.pushNotificationsBloc,
+    required this.notificationsInboxRepository,
   });
 
   /// [Logger] instance, used to log messages.
@@ -78,6 +80,9 @@ class DependenciesContainer {
 
   /// [PushNotificationsBloc] instance, connects the device to push notifications.
   final PushNotificationsBloc pushNotificationsBloc;
+
+  /// [NotificationsInboxRepository] instance, history of notifications and the unread counter.
+  final NotificationsInboxRepository notificationsInboxRepository;
 }
 
 /// {@template testing_dependencies_container}

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tails_mobile/src/core/navigation/scaffold_with_navbar.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/auth_screen.dart';
 import 'package:tails_mobile/src/feature/auth/presentation/enter_code_screen.dart';
+import 'package:tails_mobile/src/feature/notifications_inbox/presentation/notifications_screen.dart';
 import 'package:tails_mobile/src/feature/pets/add_pet/persentation/add_pet_modal.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_details_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
@@ -34,6 +35,7 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
     TypedGoRoute<AddPetRoute>(path: '/add-pet', name: 'add-pet'),
     TypedGoRoute<EditPetRoute>(path: '/edit-pet', name: 'edit-pet'),
     TypedGoRoute<EditProfileRoute>(path: '/edit-profile', name: 'edit-profile'),
+    TypedGoRoute<NotificationsRoute>(path: '/notifications', name: 'notifications'),
     TypedGoRoute<NotificationsSettingsRoute>(
       path: '/notifications-settings',
       name: 'notifications-settings',
@@ -158,6 +160,13 @@ class EditProfileRoute extends GoRouteData with $EditProfileRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) => EditProfileScreen(profile: $extra);
+}
+
+class NotificationsRoute extends GoRouteData with $NotificationsRoute {
+  const NotificationsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const NotificationsScreen();
 }
 
 class NotificationsSettingsRoute extends GoRouteData with $NotificationsSettingsRoute {

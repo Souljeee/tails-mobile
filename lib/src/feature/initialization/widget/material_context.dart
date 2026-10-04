@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tails_mobile/src/core/constant/localization/localization.dart';
@@ -6,6 +8,7 @@ import 'package:tails_mobile/src/core/navigation/router.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_loader_overlay/loader_overlay.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/push_notifications/data/repositories/models/push_notification.dart';
 import 'package:tails_mobile/src/feature/push_notifications/presentation/push_notifications_listener.dart';
 import 'package:tails_mobile/src/feature/settings/model/app_theme.dart';
 import 'package:tails_mobile/src/feature/settings/widget/settings_scope.dart';
@@ -42,6 +45,20 @@ class _MaterialContextState extends State<MaterialContext> {
     _router ??= AppRouter.create(refreshListenable: _routerRefresh!);
   }
 
+  void _onNotificationOpened(PushNotification notification) {
+    final notificationId = notification.payload.notificationId;
+
+    // Открытое нажатием уведомление становится прочитанным в центре уведомлений.
+    if (notificationId != null) {
+      unawaited(
+        DependenciesScope.of(context).notificationsInboxRepository.markReadSilently(notificationId),
+      );
+    }
+
+    // Пока открываем «Расписание»; переход к конкретному событию/дню — позже.
+    _router?.go(const ScheduleRoute().location);
+  }
+
   @override
   void dispose() {
     _routerRefresh?.dispose();
@@ -69,8 +86,7 @@ class _MaterialContextState extends State<MaterialContext> {
       routerConfig: _router,
       builder: (context, child) => PushNotificationsListener(
         bloc: DependenciesScope.of(context).pushNotificationsBloc,
-        // Пока открываем «Расписание»; переход к конкретному событию/дню — позже.
-        onOpened: (_) => _router?.go(const ScheduleRoute().location),
+        onOpened: _onNotificationOpened,
         child: MediaQuery(
           key: MaterialContext._globalKey,
           data: mediaQueryData.copyWith(
