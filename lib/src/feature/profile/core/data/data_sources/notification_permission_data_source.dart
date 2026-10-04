@@ -7,7 +7,8 @@ class NotificationPermissionDataSource {
   /// `true`, если пользователь запретил уведомления в настройках устройства.
   ///
   /// «Ещё не спрашивали» запретом не считается: на iOS и в Android до первого запроса
-  /// `permission_handler` тоже возвращает `denied`, а приложение разрешение пока не запрашивает.
+  /// `permission_handler` возвращает `denied`. Разрешение приложение запрашивает после входа
+  /// в аккаунт (см. `PushNotificationsRepository`).
   Future<bool> isBlockedBySystem() async {
     final status = await Permission.notification.status;
 
