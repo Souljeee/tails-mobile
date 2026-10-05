@@ -1676,6 +1676,36 @@ abstract class AppLocalizations {
   /// **'Поддержка'**
   String get profileSectionSupport;
 
+  /// No description provided for @profileTheme.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оформление'**
+  String get profileTheme;
+
+  /// No description provided for @profileThemeLight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Светлое'**
+  String get profileThemeLight;
+
+  /// No description provided for @profileThemeDark.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тёмное'**
+  String get profileThemeDark;
+
+  /// No description provided for @profileThemeSystem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Системное'**
+  String get profileThemeSystem;
+
+  /// No description provided for @profileThemeSystemHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как в настройках телефона: днём светлое, ночью тёмное, если так настроено'**
+  String get profileThemeSystemHint;
+
   /// No description provided for @profileNotifications.
   ///
   /// In ru, this message translates to:

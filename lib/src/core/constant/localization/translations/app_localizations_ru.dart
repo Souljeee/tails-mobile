@@ -1156,6 +1156,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileSectionSupport => 'Поддержка';
 
   @override
+  String get profileTheme => 'Оформление';
+
+  @override
+  String get profileThemeLight => 'Светлое';
+
+  @override
+  String get profileThemeDark => 'Тёмное';
+
+  @override
+  String get profileThemeSystem => 'Системное';
+
+  @override
+  String get profileThemeSystemHint =>
+      'Как в настройках телефона: днём светлое, ночью тёмное, если так настроено';
+
+  @override
   String get profileNotifications => 'Уведомления';
 
   @override

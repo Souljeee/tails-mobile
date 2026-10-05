@@ -26,7 +26,8 @@ final class AppSettingsBloc extends Bloc<AppSettingsEvent, AppSettingsState> {
     Emitter<AppSettingsState> emit,
   ) async {
     try {
-      emit(_LoadingAppSettingsState(appSettings: state.appSettings));
+      // Новые настройки применяются сразу, не дожидаясь записи на диск.
+      emit(_LoadingAppSettingsState(appSettings: event.appSettings));
       await _appSettingsRepository.setAppSettings(event.appSettings);
       emit(_IdleAppSettingsState(appSettings: event.appSettings));
     } catch (error) {

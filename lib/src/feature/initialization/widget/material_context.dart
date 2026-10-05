@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/core/navigation/go_router_refresh_stream.dart';
 import 'package:tails_mobile/src/core/navigation/router.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_loader_overlay/loader_overlay.dart';
+import 'package:tails_mobile/src/core/ui_kit/tokens/ui_motion.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/repositories/models/push_notification.dart';
 import 'package:tails_mobile/src/feature/push_notifications/presentation/push_notifications_listener.dart';
@@ -80,6 +81,8 @@ class _MaterialContextState extends State<MaterialContext> {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: themeMode,
+      themeAnimationDuration: UiMotion.large,
+      themeAnimationCurve: Curves.easeInOut,
       locale: settings.locale,
       localizationsDelegates: Localization.localizationDelegates,
       supportedLocales: Localization.supportedLocales,

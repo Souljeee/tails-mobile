@@ -90,7 +90,8 @@ class AppSettingsPersistedEntry extends SharedPreferencesEntry<AppSettings> {
 
     AppTheme? appTheme;
 
-    if (themeMode != null && themeSeedColor != null) {
+    // Seed color is no longer written, so the theme must not depend on it.
+    if (themeMode != null) {
       appTheme = AppTheme(themeMode: const ThemeModeCodec().decode(themeMode));
     }
 

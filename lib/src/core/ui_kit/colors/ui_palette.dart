@@ -47,28 +47,25 @@ class UiPalette extends ThemeExtension<UiPalette> {
       dangerTint = const Color(0xFFF8E4E2),
       petColors = _petColors;
 
-  /// Тёмная палитра.
-  ///\
-  /// Значения временные: макеты тёмной темы ещё не переданы, поэтому нейтральные цвета
-  /// инвертированы, а акцентные подняты по яркости. Заменить, когда придёт палитра.
+  /// Тёмная палитра «Сланец» (токены дизайн-системы, тема `dark`).
   const UiPalette.dark()
-    : accent = const Color(0xFFD9825E),
-      accentPressed = const Color(0xFFC46D49),
-      accentTint = const Color(0xFF3B2A22),
-      canvas = const Color(0xFF161412),
-      surface = const Color(0xFF211F1C),
-      sunken = const Color(0xFF2A2723),
-      line = const Color(0xFF38342E),
-      controlLine = const Color(0xFF8F8578),
-      ink = const Color(0xFFF6F2EC),
-      ink2 = const Color(0xFFCFC7BC),
-      ink3 = const Color(0xFFA3998D),
-      pine = const Color(0xFF7FB5A4),
-      pineTint = const Color(0xFF22342E),
-      amber = const Color(0xFFE0A852),
-      amberTint = const Color(0xFF3A2E1A),
-      danger = const Color(0xFFF07A72),
-      dangerTint = const Color(0xFF3E1E1C),
+    : accent = const Color(0xFFB8562F),
+      accentPressed = const Color(0xFF9F4A28),
+      accentTint = const Color(0xFF352722),
+      canvas = const Color(0xFF111518),
+      surface = const Color(0xFF1A1F23),
+      sunken = const Color(0xFF242A2F),
+      line = const Color(0xFF30373D),
+      controlLine = const Color(0xFF737D85),
+      ink = const Color(0xFFF0F2F3),
+      ink2 = const Color(0xFFADB5BB),
+      ink3 = const Color(0xFF87919A),
+      pine = const Color(0xFF7FC9B0),
+      pineTint = const Color(0xFF18302B),
+      amber = const Color(0xFFE6B86E),
+      amberTint = const Color(0xFF332C1D),
+      danger = const Color(0xFFF48E86),
+      dangerTint = const Color(0xFF3A2025),
       petColors = _petColors;
 
   static const List<Color> _petColors = [

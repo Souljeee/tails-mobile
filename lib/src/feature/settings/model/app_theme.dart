@@ -13,9 +13,9 @@ final class AppTheme with Diagnosticable {
   /// The type of theme to use.
   final ThemeMode themeMode;
 
-  /// The default theme to use.
+  /// The default theme to use: follows the system setting until the user picks one.
   static const defaultTheme = AppTheme(
-    themeMode: ThemeMode.light,
+    themeMode: ThemeMode.system,
   );
 
   /// Builds a [ThemeData] based on the [themeMode]

@@ -14,6 +14,10 @@ import 'package:tails_mobile/src/feature/initialization/model/dependencies_conta
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
+import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
+import 'package:tails_mobile/src/feature/settings/data/app_settings_repository.dart';
+import 'package:tails_mobile/src/feature/settings/model/app_settings.dart';
+import 'package:tails_mobile/src/feature/settings/widget/settings_scope.dart';
 
 import 'profile_fakes.dart';
 
@@ -31,15 +35,32 @@ class FakeAuthRepository extends Fake implements AuthRepository {
   Future<void> clearSession() async => calls.add('clearSession');
 }
 
+/// Хранилище настроек в памяти: сохранённые значения видны через [saved].
+class FakeAppSettingsRepository implements AppSettingsRepository {
+  AppSettings? saved;
+
+  @override
+  Future<AppSettings?> getAppSettings() async => saved;
+
+  @override
+  Future<void> setAppSettings(AppSettings appSettings) async => saved = appSettings;
+}
+
 base class ProfileTestDependencies extends TestDependenciesContainer {
   const ProfileTestDependencies({
     required ProfileRepository profileRepository,
     required PetRepository petRepository,
+    required AppSettingsBloc appSettingsBloc,
   }) : _profileRepository = profileRepository,
-       _petRepository = petRepository;
+       _petRepository = petRepository,
+       _appSettingsBloc = appSettingsBloc;
 
   final ProfileRepository _profileRepository;
   final PetRepository _petRepository;
+  final AppSettingsBloc _appSettingsBloc;
+
+  @override
+  AppSettingsBloc get appSettingsBloc => _appSettingsBloc;
 
   @override
   ProfileRepository get profileRepository => _profileRepository;
@@ -61,12 +82,18 @@ class ProfileScreenHarness {
     FakeProfileRepository? profile,
     FakePetRepository? pets,
     FakeAuthRepository? auth,
+    FakeAppSettingsRepository? settings,
     this.stubPaths = const [],
     String screenPath = '/screen',
   }) : profile = profile ?? FakeProfileRepository(),
        pets = pets ?? FakePetRepository(),
        auth = auth ?? FakeAuthRepository(),
+       settings = settings ?? FakeAppSettingsRepository(),
        _screenPath = screenPath {
+    settingsBloc = AppSettingsBloc(
+      appSettingsRepository: this.settings,
+      initialState: const AppSettingsState.idle(),
+    );
     authBloc = AuthBloc(
       const AuthState.idle(status: AuthorizationStatus.authorized),
       authRepository: this.auth,
@@ -91,24 +118,32 @@ class ProfileScreenHarness {
   final FakeProfileRepository profile;
   final FakePetRepository pets;
   final FakeAuthRepository auth;
+  final FakeAppSettingsRepository settings;
   final List<String> stubPaths;
   final String _screenPath;
 
   late final AuthBloc authBloc;
+  late final AppSettingsBloc settingsBloc;
   late final GoRouter router;
 
   Future<void> pump(WidgetTester tester, {String? query}) async {
     await tester.pumpWidget(
       DependenciesScope(
-        dependencies: ProfileTestDependencies(profileRepository: profile, petRepository: pets),
-        child: AuthScope(
-          authBloc: authBloc,
-          child: MaterialApp.router(
-            routerConfig: router,
-            theme: UiThemeData.lightTheme,
-            locale: const Locale('ru'),
-            localizationsDelegates: Localization.localizationDelegates,
-            supportedLocales: Localization.supportedLocales,
+        dependencies: ProfileTestDependencies(
+          profileRepository: profile,
+          petRepository: pets,
+          appSettingsBloc: settingsBloc,
+        ),
+        child: SettingsScope(
+          child: AuthScope(
+            authBloc: authBloc,
+            child: MaterialApp.router(
+              routerConfig: router,
+              theme: UiThemeData.lightTheme,
+              locale: const Locale('ru'),
+              localizationsDelegates: Localization.localizationDelegates,
+              supportedLocales: Localization.supportedLocales,
+            ),
           ),
         ),
       ),
@@ -124,5 +159,6 @@ class ProfileScreenHarness {
     await tester.pumpWidget(const SizedBox());
     // `close` ждёт реальных асинхронных операций, которых нет в fake-async зоне теста.
     await tester.runAsync(authBloc.close);
+    await tester.runAsync(settingsBloc.close);
   }
 }

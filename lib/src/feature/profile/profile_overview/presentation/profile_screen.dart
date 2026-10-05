@@ -34,6 +34,7 @@ import 'package:tails_mobile/src/feature/profile/core/presentation/logout_flow.d
 import 'package:tails_mobile/src/feature/profile/core/presentation/profile_photo_sheet.dart';
 import 'package:tails_mobile/src/feature/profile/profile_overview/domain/profile_overview.dart';
 import 'package:tails_mobile/src/feature/profile/profile_overview/domain/profile_overview_bloc.dart';
+import 'package:tails_mobile/src/feature/profile/profile_overview/presentation/profile_theme_row.dart';
 
 /// Вкладка «Профиль».
 class ProfileScreen extends StatefulWidget {
@@ -254,6 +255,7 @@ class _ProfileContent extends StatelessWidget {
                     : _notificationsSummary(context, profile.notificationSettings),
                 onTap: () => const NotificationsSettingsRoute().push<void>(context),
               ),
+              const ProfileThemeRow(),
             ],
           ),
           const SizedBox(height: UiSpacing.x6),

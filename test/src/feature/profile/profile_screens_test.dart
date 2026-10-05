@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_errors/ui_fetching_error.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_segmented_control/ui_segmented_control.dart';
 import 'package:tails_mobile/src/feature/profile/about/presentation/about_screen.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/notification_settings_model.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/profile_model.dart';
@@ -159,6 +160,41 @@ void main() {
       expect(find.text('stub /feedback'), findsOneWidget);
 
       await harness.dispose(tester);
+    });
+  });
+
+  group('Выбор темы в профиле', () {
+    ProfileScreenHarness harness() => ProfileScreenHarness(
+      screen: (_, _) => const ProfileScreen(),
+      profile: FakeProfileRepository()..profile = _profile(),
+    );
+
+    ThemeMode selectedMode(WidgetTester tester) => tester
+        .widget<UiSegmentedControl<ThemeMode>>(find.byType(UiSegmentedControl<ThemeMode>))
+        .selected;
+
+    testWidgets('по умолчанию выбрано «Системное»', (tester) async {
+      final h = harness();
+
+      await h.pump(tester);
+
+      expect(selectedMode(tester), ThemeMode.system);
+
+      await h.dispose(tester);
+    });
+
+    testWidgets('выбор темы применяется и сохраняется', (tester) async {
+      final h = harness();
+
+      await h.pump(tester);
+      await tester.ensureVisible(find.text('Тёмное'));
+      await tester.tap(find.text('Тёмное'));
+      await tester.pump();
+
+      expect(selectedMode(tester), ThemeMode.dark);
+      expect(h.settings.saved?.appTheme?.themeMode, ThemeMode.dark);
+
+      await h.dispose(tester);
     });
   });
 
