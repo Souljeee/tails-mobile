@@ -225,4 +225,12 @@ final class _FakeErrorReporter implements ErrorReporter {
     if (fail) throw StateError('сервис недоступен');
     captured.add((throwable, stackTrace));
   }
+
+  @override
+  void addBreadcrumb({
+    required String message,
+    required String category,
+    BreadcrumbLevel level = BreadcrumbLevel.info,
+    Map<String, Object?>? data,
+  }) {}
 }

@@ -12,6 +12,7 @@ final class TailsLogConfig {
     required this.consoleMinLevel,
     this.consoleCategoryMinLevels = const {},
     this.reportMinLevel = TailsLogLevel.error,
+    this.breadcrumbMinLevel = TailsLogLevel.info,
     this.networkBodyMaxLength = 1000,
   });
 
@@ -45,6 +46,9 @@ final class TailsLogConfig {
 
   /// Минимальный уровень записей, которые отправляются в сервис отчётов об ошибках.
   final TailsLogLevel reportMinLevel;
+
+  /// Минимальный уровень записей, которые передаются в сервис отчётов как breadcrumbs.
+  final TailsLogLevel breadcrumbMinLevel;
 
   /// Сколько символов тела запроса или ответа попадает в запись журнала.
   final int networkBodyMaxLength;

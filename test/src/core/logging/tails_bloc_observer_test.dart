@@ -197,6 +197,14 @@ final class _CountingReporter implements ErrorReporter {
   Future<void> captureException({required Object throwable, StackTrace? stackTrace}) async {
     count++;
   }
+
+  @override
+  void addBreadcrumb({
+    required String message,
+    required String category,
+    BreadcrumbLevel level = BreadcrumbLevel.info,
+    Map<String, Object?>? data,
+  }) {}
 }
 
 final class _CounterCubit extends Cubit<int> {

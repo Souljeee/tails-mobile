@@ -9,6 +9,7 @@ import 'package:tails_mobile/src/core/logging/integrations/app_lifecycle_logger.
 import 'package:tails_mobile/src/core/logging/integrations/app_start_logger.dart';
 import 'package:tails_mobile/src/core/logging/integrations/global_error_handler.dart';
 import 'package:tails_mobile/src/core/logging/integrations/tails_bloc_observer.dart';
+import 'package:tails_mobile/src/core/logging/sinks/breadcrumb_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/sinks/console_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/sinks/error_reporter_sink.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
@@ -41,6 +42,7 @@ sealed class AppRunner {
       sinks: [
         ConsoleLogSink(config: logConfig),
         ErrorReporterSink(reporter: errorReporter, config: logConfig),
+        BreadcrumbLogSink(reporter: errorReporter, config: logConfig),
       ],
     );
 

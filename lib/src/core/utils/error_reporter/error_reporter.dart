@@ -26,7 +26,21 @@ abstract interface class ErrorReporter {
     required Object throwable,
     StackTrace? stackTrace,
   });
+
+  /// Adds a breadcrumb: a short note about what happened before an error.
+  ///
+  /// Breadcrumbs are attached to the next reported error. Implementations must
+  /// not throw and must ignore the call if the service is not initialized.
+  void addBreadcrumb({
+    required String message,
+    required String category,
+    BreadcrumbLevel level = BreadcrumbLevel.info,
+    Map<String, Object?>? data,
+  });
 }
+
+/// Importance of a breadcrumb.
+enum BreadcrumbLevel { debug, info, warning, error, fatal }
 
 /// An exception used for error logs without an exception, only a message.
 class ReportedMessageException implements Exception {
