@@ -49,6 +49,7 @@ dependencies:
   go_router: ^17.0.1
 
   # Logging
+  logger: ^2.8.0
   stack_trace: ^1.11.1
   sentry_flutter: ^8.9.0
 
