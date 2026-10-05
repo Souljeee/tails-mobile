@@ -146,7 +146,11 @@ final class TailsLogSanitizer {
   }
 
   /// Маскирует телефон, оставляя код страны и последние четыре цифры: `+7***2233`.
+  ///
+  /// Повторный вызов безопасен: уже замаскированное значение возвращается как есть.
   static String maskPhone(String value) {
+    if (value.contains('***')) return value;
+
     final digits = value.replaceAll(RegExp(r'\D'), '');
     if (digits.length < 4) return '***';
 

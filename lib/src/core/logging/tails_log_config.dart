@@ -12,10 +12,12 @@ final class TailsLogConfig {
     required this.consoleMinLevel,
     this.consoleCategoryMinLevels = const {},
     this.reportMinLevel = TailsLogLevel.error,
+    this.networkBodyMaxLength = 1000,
   });
 
   /// Debug: в консоль идёт всё.
-  const TailsLogConfig.debug() : this(consoleMinLevel: TailsLogLevel.trace);
+  const TailsLogConfig.debug()
+    : this(consoleMinLevel: TailsLogLevel.trace, networkBodyMaxLength: 2000);
 
   /// Profile: подробности `trace` в консоль не идут.
   const TailsLogConfig.profile() : this(consoleMinLevel: TailsLogLevel.debug);
@@ -43,6 +45,9 @@ final class TailsLogConfig {
 
   /// Минимальный уровень записей, которые отправляются в сервис отчётов об ошибках.
   final TailsLogLevel reportMinLevel;
+
+  /// Сколько символов тела запроса или ответа попадает в запись журнала.
+  final int networkBodyMaxLength;
 
   /// Минимальный уровень консоли для [category].
   TailsLogLevel consoleMinLevelFor(TailsLogCategory category) =>

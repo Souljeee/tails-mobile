@@ -6,6 +6,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
+import 'package:tails_mobile/src/core/logging/integrations/logging_http_client.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
@@ -250,8 +252,14 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
   }
 }
 
+LoggingHttpClient _loggingClient(http.Client inner, String label) => LoggingHttpClient(
+  inner,
+  label: label,
+  bodyMaxLength: TailsLogConfig.forBuildMode().networkBodyMaxLength,
+);
+
 Future<RestClient> _initNotAuthClient(ApplicationConfig config) async {
-  final client = http.Client();
+  final client = _loggingClient(http.Client(), 'public');
 
   final restClient = RestClientHttp(baseUrl: config.baseUrl, client: client);
 
@@ -265,14 +273,21 @@ Future<RestClient> _initRestClient(
 ) async {
   final authorizationToken = await secureTokenStorage.load();
 
-  final client = InterceptedClient(
-    interceptors: [
-      AuthInterceptor(
-        tokenStorage: secureTokenStorage,
-        refreshService: refreshService,
-        token: authorizationToken,
-      ),
-    ],
+  // Логирующая обёртка снаружи: в журнале видны и запросы, отклонённые перехватчиком.
+  // Повтор запроса после обновления токена идёт через отдельный retryClient, поэтому
+  // он тоже обёрнут.
+  final client = _loggingClient(
+    InterceptedClient(
+      interceptors: [
+        AuthInterceptor(
+          tokenStorage: secureTokenStorage,
+          refreshService: refreshService,
+          retryClient: _loggingClient(http.Client(), 'api-retry'),
+          token: authorizationToken,
+        ),
+      ],
+    ),
+    'api',
   );
 
   final restClient = RestClientHttp(baseUrl: config.baseUrl, client: client);
@@ -281,7 +296,10 @@ Future<RestClient> _initRestClient(
 }
 
 Future<RestClient> _initRefreshTokenClient(ApplicationConfig config) async {
-  return RestClientHttp(baseUrl: config.baseUrl, client: http.Client());
+  return RestClientHttp(
+    baseUrl: config.baseUrl,
+    client: _loggingClient(http.Client(), 'auth-refresh'),
+  );
 }
 
 /// {@template error_reporter_factory}

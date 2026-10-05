@@ -308,6 +308,11 @@ void main() {
       expect(TailsLogSanitizer.maskPhone('+7 900 111-22-33'), '+7***2233');
     });
 
+    test('уже замаскированное значение не портится повторной маской', () {
+      expect(TailsLogSanitizer.maskPhone('+7***2233'), '+7***2233');
+      expect(sanitizer.sanitizeData({'phoneNumber': '+7***2233'}), {'phoneNumber': '+7***2233'});
+    });
+
     test('короткие значения почти не раскрываются', () {
       expect(TailsLogSanitizer.maskPhone('123456'), '***3456');
       expect(TailsLogSanitizer.maskPhone('12'), '***');
