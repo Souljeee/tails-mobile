@@ -153,15 +153,18 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
   Future<DependenciesContainer> create() async {
     final sharedPreferences = SharedPreferencesAsync();
 
-    final packageInfo = await PackageInfo.fromPlatform();
+    final packageInfo = await _timed('package info', PackageInfo.fromPlatform);
 
-    final settingsBloc = await AppSettingsBlocFactory(sharedPreferences).create();
+    final settingsBloc = await _timed(
+      'app settings',
+      AppSettingsBlocFactory(sharedPreferences).create,
+    );
 
     const secureStorage = FlutterSecureStorage();
 
     final secureTokenStorage = SecureTokenStorage(secureStorage: secureStorage);
 
-    final authorizationToken = await secureTokenStorage.load();
+    final authorizationToken = await _timed('secure storage', secureTokenStorage.load);
 
     final resreshTokenClient = await _initRefreshTokenClient(config);
 
@@ -169,7 +172,10 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final notAuthClient = await _initNotAuthClient(config);
 
-    final restClient = await _initRestClient(config, secureTokenStorage, refreshService);
+    final restClient = await _timed(
+      'rest client',
+      () => _initRestClient(config, secureTokenStorage, refreshService),
+    );
 
     final pushNotificationsRepository = PushNotificationsRepository(
       messagingDataSource: FirebasePushMessagingDataSource(),
@@ -249,6 +255,38 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       pushNotificationsBloc: pushNotificationsBloc,
       notificationsInboxRepository: notificationsInboxRepository,
     );
+  }
+}
+
+/// Выполняет шаг инициализации и пишет, сколько он длился.
+///
+/// Если шаг упал, в журнале остаётся его имя: само исключение пишет `AppRunner`, но из него
+/// не всегда понятно, на каком шаге оно возникло. Ошибка пробрасывается дальше без изменений.
+Future<T> _timed<T>(String step, Future<T> Function() action) async {
+  final stopwatch = clock.stopwatch()..start();
+
+  try {
+    final result = await action();
+
+    TailsLogger.debug(
+      'init $step',
+      category: TailsLogCategory.app,
+      source: 'CompositionRoot',
+      data: {'durationMs': stopwatch.elapsedMilliseconds},
+    );
+
+    return result;
+  } on Object {
+    TailsLogger.error(
+      'init $step не выполнен',
+      category: TailsLogCategory.app,
+      source: 'CompositionRoot',
+      data: {'durationMs': stopwatch.elapsedMilliseconds},
+      // Само исключение отправит AppRunner.
+      report: false,
+    );
+
+    rethrow;
   }
 }
 
