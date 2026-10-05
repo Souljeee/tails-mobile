@@ -25,10 +25,13 @@ sealed class PushNotificationsEvent extends Equatable {
   };
 }
 
-final class PushNotificationsEvent$AuthorizationChanged extends PushNotificationsEvent {
+final class PushNotificationsEvent$AuthorizationChanged extends PushNotificationsEvent implements TailsLoggable {
   const PushNotificationsEvent$AuthorizationChanged({required this.status});
 
   final AuthorizationStatus status;
+
+  @override
+  Map<String, Object?> toLogData() => {'status': status.name};
 
   @override
   List<Object?> get props => [status];

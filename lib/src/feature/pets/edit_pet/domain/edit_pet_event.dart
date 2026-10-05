@@ -17,7 +17,7 @@ sealed class EditPetEvent extends Equatable {
       };
 }
 
-final class EditPetEvent$EditingRequested extends EditPetEvent {
+final class EditPetEvent$EditingRequested extends EditPetEvent implements TailsLoggable {
   final int petId;
   final EditPetModel pet;
   final File? image;
@@ -27,6 +27,9 @@ final class EditPetEvent$EditingRequested extends EditPetEvent {
     required this.pet,
     required this.image,
   });
+
+  @override
+  Map<String, Object?> toLogData() => {'petId': petId, 'hasNewImage': image != null};
 
   @override
   List<Object?> get props => [petId, pet, image];

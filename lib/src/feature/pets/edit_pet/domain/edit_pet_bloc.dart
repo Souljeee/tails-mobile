@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/logging/tails_loggable.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/edit_pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
 

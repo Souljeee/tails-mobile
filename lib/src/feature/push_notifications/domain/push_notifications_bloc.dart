@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/core/logging/tails_loggable.dart';
 import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/repositories/models/push_notification.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/repositories/push_notifications_repository.dart';

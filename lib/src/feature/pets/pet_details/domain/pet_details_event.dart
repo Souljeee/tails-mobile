@@ -17,7 +17,7 @@ sealed class PetDetailsEvent extends Equatable {
       };
 }
 
-final class PetDetailsEvent$FetchRequested extends PetDetailsEvent {
+final class PetDetailsEvent$FetchRequested extends PetDetailsEvent implements TailsLoggable {
   final int id;
 
   const PetDetailsEvent$FetchRequested({required this.id, this.silent = false, this.completer});
@@ -27,6 +27,9 @@ final class PetDetailsEvent$FetchRequested extends PetDetailsEvent {
 
   /// Завершается, когда обработка закончена (для pull-to-refresh).
   final Completer<void>? completer;
+
+  @override
+  Map<String, Object?> toLogData() => {'petId': id, 'silent': silent};
 
   @override
   List<Object?> get props => [id, silent];

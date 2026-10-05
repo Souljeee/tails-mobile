@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/core/logging/tails_loggable.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
 
 part 'auth_event.dart';

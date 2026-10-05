@@ -15,10 +15,13 @@ sealed class DeletePetEvent extends Equatable {
       };
 }
 
-final class DeletePetEvent$DeleteRequested extends DeletePetEvent {
+final class DeletePetEvent$DeleteRequested extends DeletePetEvent implements TailsLoggable {
   final int id;
   
   const DeletePetEvent$DeleteRequested({required this.id});
+
+  @override
+  Map<String, Object?> toLogData() => {'petId': id};
 
   @override
   List<Object?> get props => [id];

@@ -32,12 +32,15 @@ sealed class AuthEvent extends Equatable {
       };
 }
 
-final class AuthEvent$AuthorizationStatusUpdated extends AuthEvent {
+final class AuthEvent$AuthorizationStatusUpdated extends AuthEvent implements TailsLoggable {
   final AuthorizationStatus newStatus;
 
   const AuthEvent$AuthorizationStatusUpdated({
     required this.newStatus,
   });
+
+  @override
+  Map<String, Object?> toLogData() => {'status': newStatus.name};
 
   @override
   List<Object?> get props => [

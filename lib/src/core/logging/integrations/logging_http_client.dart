@@ -110,6 +110,7 @@ final class LoggingHttpClient extends http.BaseClient {
       source: label,
       data: {
         if (TailsLogContext.screen case final screen?) 'screen': screen,
+        if (TailsLogContext.origin case final origin?) 'bloc': origin,
         if (request.url.hasQuery) 'query': _query(request.url),
         'headers': _sanitizer.sanitizeHeaders(request.headers),
         ..._requestBody(request),

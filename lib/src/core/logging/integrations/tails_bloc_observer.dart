@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_context.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
 import 'package:tails_mobile/src/core/logging/tails_loggable.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
@@ -22,6 +23,7 @@ final class TailsBlocObserver extends BlocObserver {
   void onCreate(BlocBase<Object?> bloc) {
     super.onCreate(bloc);
 
+    TailsLogContext.markBlocCreating(_id(bloc));
     _log('создан', bloc);
   }
 
