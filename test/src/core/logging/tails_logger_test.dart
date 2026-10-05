@@ -1,6 +1,7 @@
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_sanitizer.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 
@@ -129,6 +130,30 @@ void main() {
 
       expect(reentrant.writes, 1);
       expect(sink.events.map((event) => event.message), ['внешняя']);
+    });
+
+    test('очищает сообщение, поля и ошибку до передачи получателям', () {
+      TailsLogger.error(
+        'Не удалось войти: +79001112233',
+        data: {'password': 'qwerty', 'petId': 3, 'phone': '+79001112233'},
+        error: const FormatException('Bearer abc'),
+      );
+
+      final event = sink.events.single;
+      expect(event.message, 'Не удалось войти: +7***2233');
+      expect(event.data, {'password': '[REDACTED]', 'petId': 3, 'phone': '+7***2233'});
+      expect('${event.error}', 'FormatException: Bearer [REDACTED]');
+    });
+
+    test('использует переданный санитайзер', () {
+      TailsLogger.configure(
+        sinks: [sink],
+        sanitizer: const TailsLogSanitizer(extraSensitiveKeys: {'passport'}),
+      );
+
+      TailsLogger.info('a', data: {'passport': '1234'});
+
+      expect(sink.events.single.data, {'passport': '[REDACTED]'});
     });
 
     test('reset отключает получателей', () {

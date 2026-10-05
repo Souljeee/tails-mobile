@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:clock/clock.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_sanitizer.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_sink.dart';
 
 /// Единая точка записи журнала приложения.
@@ -19,14 +20,20 @@ import 'package:tails_mobile/src/core/logging/tails_log_sink.dart';
 /// TailsLogger.error('Не удалось загрузить питомца', error: e, stackTrace: s);
 /// ```
 ///
-/// Переменные значения передавайте в `data`, а не в текст сообщения: поля проходят
-/// через санитайзер чувствительных данных, а свободный текст — нет.
+/// Переменные значения передавайте в `data`, а не в текст сообщения: поля очищаются
+/// от чувствительных данных по ключам, а свободный текст — только по шаблонам
+/// (см. [TailsLogSanitizer]).
 abstract final class TailsLogger {
   static TailsLogDispatcher _dispatcher = TailsLogDispatcher();
 
   /// Подключает получателей записей. Вызывается один раз при старте приложения.
-  static void configure({required List<TailsLogSink> sinks}) {
-    _dispatcher = TailsLogDispatcher(sinks: sinks);
+  ///
+  /// Все записи проходят через [sanitizer] до передачи получателям.
+  static void configure({
+    required List<TailsLogSink> sinks,
+    TailsLogSanitizer sanitizer = const TailsLogSanitizer(),
+  }) {
+    _dispatcher = TailsLogDispatcher(sinks: sinks, sanitizer: sanitizer);
   }
 
   /// Отключает всех получателей. Нужен тестам: `addTearDown(TailsLogger.reset)`.
@@ -132,9 +139,14 @@ abstract final class TailsLogger {
 /// Создаёт записи и раздаёт их получателям.
 final class TailsLogDispatcher {
   /// Создаёт диспетчер с заданными получателями.
-  TailsLogDispatcher({List<TailsLogSink> sinks = const []}) : _sinks = List.unmodifiable(sinks);
+  TailsLogDispatcher({
+    List<TailsLogSink> sinks = const [],
+    TailsLogSanitizer sanitizer = const TailsLogSanitizer(),
+  }) : _sinks = List.unmodifiable(sinks),
+       _sanitizer = sanitizer;
 
   final List<TailsLogSink> _sinks;
+  final TailsLogSanitizer _sanitizer;
 
   var _sequence = 0;
   var _isDispatching = false;
@@ -145,6 +157,7 @@ final class TailsLogDispatcher {
 
   /// Создаёт запись и передаёт её получателям, которым она нужна.
   ///
+  /// Сообщение, поля и ошибка очищаются от чувствительных данных до передачи получателям.
   /// Сбой одного получателя не мешает остальным и не ломает приложение. Вызов журнала
   /// из получателя во время записи игнорируется, чтобы не получить рекурсию.
   void log(
@@ -167,10 +180,10 @@ final class TailsLogDispatcher {
       time: clock.now(),
       level: level,
       category: category,
-      message: message,
+      message: _sanitizer.sanitizeText(message),
       source: source,
-      data: data == null ? const {} : Map.unmodifiable(data),
-      error: error,
+      data: data == null ? const {} : Map.unmodifiable(_sanitizer.sanitizeData(data)),
+      error: _sanitizer.sanitizeError(error),
       stackTrace: stackTrace,
       report: report,
     );
