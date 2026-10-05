@@ -1,8 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/core/logging/log_exporter.dart';
+import 'package:tails_mobile/src/core/logging/sinks/file_log_sink.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/device_info_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/profile_remote_data_source.dart';
@@ -262,6 +268,83 @@ void main() {
     test('без скриншота файлов нет', () async {
       await repository.sendFeedback(
         const FeedbackModel(topic: FeedbackTopic.question, message: 'Как это работает?'),
+      );
+
+      expect(client.last.files, isEmpty);
+    });
+
+    group('журнал работы приложения', () {
+      late Directory logDirectory;
+      late FileLogSink sink;
+
+      setUp(() async {
+        logDirectory = Directory.systemTemp.createTempSync('feedback_logs_test');
+        sink = FileLogSink(
+          directory: logDirectory,
+          config: const TailsLogConfig(consoleMinLevel: TailsLogLevel.trace),
+        );
+        TailsLogger.configure(sinks: [sink]);
+        TailsLogger.info('запись для обращения');
+        await sink.flush();
+
+        repository = ProfileRepository(
+          remoteDataSource: ProfileRemoteDataSource(restClient: client),
+          deviceInfoDataSource: _FakeDeviceInfo(),
+          notificationPermissionDataSource: permission,
+          packageInfo: PackageInfo(
+            appName: 'Хвостики',
+            packageName: 'ru.tails',
+            version: '1.2.0',
+            buildNumber: '45',
+          ),
+          logExporter: LogExporter(sink: sink),
+        );
+      });
+
+      tearDown(() {
+        TailsLogger.reset();
+        logDirectory.deleteSync(recursive: true);
+      });
+
+      test('прикладывается только по выбору пользователя', () async {
+        await repository.sendFeedback(
+          const FeedbackModel(topic: FeedbackTopic.problem, message: 'Сбой', attachLogs: true),
+        );
+
+        final file = client.last.files!.single;
+        expect(file.field, 'logs');
+        expect(file.filename, 'logs.txt.gz');
+        expect(utf8.decode(gzip.decode(file.bytes!)), contains('запись для обращения'));
+      });
+
+      test('по умолчанию журнал не отправляется', () async {
+        await repository.sendFeedback(
+          const FeedbackModel(topic: FeedbackTopic.problem, message: 'Сбой'),
+        );
+
+        expect(client.last.files, isEmpty);
+      });
+
+      test('пустой журнал не прикладывается', () async {
+        await sink.clear();
+
+        await repository.sendFeedback(
+          const FeedbackModel(topic: FeedbackTopic.problem, message: 'Сбой', attachLogs: true),
+        );
+
+        expect(client.last.files, isEmpty);
+      });
+
+      test('canAttachLogs зависит от наличия экспортёра', () {
+        expect(repository.canAttachLogs, isTrue);
+      });
+    });
+
+    test('без экспортёра приложить журнал нельзя', () async {
+      expect(repository.canAttachLogs, isFalse);
+
+      await repository.sendFeedback(
+        const FeedbackModel(topic: FeedbackTopic.problem, message: 'Сбой', attachLogs: true),
       );
 
       expect(client.last.files, isEmpty);

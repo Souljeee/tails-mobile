@@ -7,6 +7,7 @@ import 'package:rest_client/rest_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/logging/integrations/logging_http_client.dart';
+import 'package:tails_mobile/src/core/logging/log_exporter.dart';
 import 'package:tails_mobile/src/core/logging/sinks/file_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
@@ -250,6 +251,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       deviceInfoDataSource: const DeviceInfoDataSource(),
       notificationPermissionDataSource: const NotificationPermissionDataSource(),
       packageInfo: packageInfo,
+      logExporter: fileLogSink == null ? null : LogExporter(sink: fileLogSink!),
     );
 
     return DependenciesContainer(

@@ -228,6 +228,19 @@ void main() {
       expect(repository.calls, ['sendFeedback(idea, Привет)']);
     });
 
+    test('передаёт выбор «приложить журнал»', () async {
+      bloc.add(
+        const FeedbackEvent.sendRequested(
+          topic: FeedbackTopic.problem,
+          message: 'Сбой',
+          attachLogs: true,
+        ),
+      );
+      await _until(bloc.stream, (s) => s is FeedbackState$Sent);
+
+      expect(repository.calls, ['sendFeedback(problem, Сбой, logs)']);
+    });
+
     test('двойное нажатие отправляет одно обращение', () async {
       repository.feedbackGate = Completer<void>();
 

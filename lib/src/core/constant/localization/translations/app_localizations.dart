@@ -2228,6 +2228,18 @@ abstract class AppLocalizations {
   /// **' и модель телефона — так мы быстрее разберёмся.'**
   String get feedbackDeviceNoteSuffix;
 
+  /// No description provided for @feedbackLogsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приложить журнал работы приложения'**
+  String get feedbackLogsTitle;
+
+  /// No description provided for @feedbackLogsSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поможет найти причину сбоя. Пароли, токены и номера телефонов скрыты.'**
+  String get feedbackLogsSubtitle;
+
   /// No description provided for @feedbackSend.
   ///
   /// In ru, this message translates to:

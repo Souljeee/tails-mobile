@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:tails_mobile/src/core/logging/log_exporter.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/device_info_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/profile_remote_data_source.dart';
@@ -19,15 +20,18 @@ class ProfileRepository {
     required DeviceInfoDataSource deviceInfoDataSource,
     required NotificationPermissionDataSource notificationPermissionDataSource,
     required PackageInfo packageInfo,
+    LogExporter? logExporter,
   }) : _remoteDataSource = remoteDataSource,
        _deviceInfoDataSource = deviceInfoDataSource,
        _notificationPermissionDataSource = notificationPermissionDataSource,
-       _packageInfo = packageInfo;
+       _packageInfo = packageInfo,
+       _logExporter = logExporter;
 
   final ProfileRemoteDataSource _remoteDataSource;
   final DeviceInfoDataSource _deviceInfoDataSource;
   final NotificationPermissionDataSource _notificationPermissionDataSource;
   final PackageInfo _packageInfo;
+  final LogExporter? _logExporter;
 
   final _eventStreamController = StreamController<ProfileRepositoryEvent>.broadcast();
 
@@ -90,11 +94,18 @@ class ProfileRepository {
   /// Throws InvalidDeletionCodeException.
   Future<void> deleteAccount({required String code}) => _remoteDataSource.deleteAccount(code: code);
 
+  /// Можно ли приложить к обращению журнал работы приложения.
+  bool get canAttachLogs => _logExporter != null;
+
   /// Отправляет обращение, добавляя версию приложения и данные телефона.
+  ///
+  /// Журнал работы приложения добавляется, только если пользователь его выбрал
+  /// (`feedback.attachLogs`).
   ///
   /// Throws FeedbackRateLimitException.
   Future<void> sendFeedback(FeedbackModel feedback) async {
     final device = await _deviceInfoDataSource.load();
+    final logs = feedback.attachLogs ? await _logExporter?.export() : null;
 
     await _remoteDataSource.sendFeedback(
       fields: {
@@ -107,6 +118,7 @@ class ProfileRepository {
         'device_model': device.deviceModel,
       },
       screenshotPath: feedback.screenshot?.path,
+      logs: logs,
     );
   }
 

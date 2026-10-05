@@ -9,6 +9,7 @@ sealed class FeedbackEvent extends Equatable {
     required FeedbackTopic topic,
     required String message,
     File? screenshot,
+    bool attachLogs,
   }) = FeedbackEvent$SendRequested;
 
   T map<T>({required FeedbackEventMatch<T, FeedbackEvent$SendRequested> sendRequested}) =>
@@ -21,12 +22,20 @@ sealed class FeedbackEvent extends Equatable {
 }
 
 final class FeedbackEvent$SendRequested extends FeedbackEvent {
-  const FeedbackEvent$SendRequested({required this.topic, required this.message, this.screenshot});
+  const FeedbackEvent$SendRequested({
+    required this.topic,
+    required this.message,
+    this.screenshot,
+    this.attachLogs = false,
+  });
 
   final FeedbackTopic topic;
   final String message;
   final File? screenshot;
 
+  /// Приложить ли журнал работы приложения.
+  final bool attachLogs;
+
   @override
-  List<Object?> get props => [topic, message, screenshot];
+  List<Object?> get props => [topic, message, screenshot, attachLogs];
 }

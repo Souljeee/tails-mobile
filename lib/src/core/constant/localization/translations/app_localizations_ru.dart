@@ -1454,6 +1454,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feedbackDeviceNoteSuffix => ' и модель телефона — так мы быстрее разберёмся.';
 
   @override
+  String get feedbackLogsTitle => 'Приложить журнал работы приложения';
+
+  @override
+  String get feedbackLogsSubtitle =>
+      'Поможет найти причину сбоя. Пароли, токены и номера телефонов скрыты.';
+
+  @override
   String get feedbackSend => 'Отправить';
 
   @override

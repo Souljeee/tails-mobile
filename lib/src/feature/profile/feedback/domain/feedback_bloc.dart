@@ -35,7 +35,12 @@ class FeedbackBloc extends Bloc<FeedbackEvent, FeedbackState> {
       emit(const FeedbackState.sending());
 
       await _profileRepository.sendFeedback(
-        FeedbackModel(topic: event.topic, message: event.message, screenshot: event.screenshot),
+        FeedbackModel(
+          topic: event.topic,
+          message: event.message,
+          screenshot: event.screenshot,
+          attachLogs: event.attachLogs,
+        ),
       );
 
       emit(const FeedbackState.sent());

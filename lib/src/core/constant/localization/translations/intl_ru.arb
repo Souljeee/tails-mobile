@@ -769,6 +769,8 @@
   "feedbackScreenshotRemove": "Убрать скриншот",
   "feedbackDeviceNotePrefix": "Вместе с сообщением отправим версию приложения ",
   "feedbackDeviceNoteSuffix": " и модель телефона — так мы быстрее разберёмся.",
+  "feedbackLogsTitle": "Приложить журнал работы приложения",
+  "feedbackLogsSubtitle": "Поможет найти причину сбоя. Пароли, токены и номера телефонов скрыты.",
   "feedbackSend": "Отправить",
   "feedbackSent": "Спасибо! Мы получили ваше обращение.",
   "feedbackRateLimit": "Вы отправляете обращения слишком часто. Попробуйте чуть позже.",

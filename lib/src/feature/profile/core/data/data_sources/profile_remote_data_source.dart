@@ -101,6 +101,7 @@ class ProfileRemoteDataSource {
   Future<void> sendFeedback({
     required Map<String, String> fields,
     required String? screenshotPath,
+    List<int>? logs,
   }) async {
     try {
       await _restClient.multipart(
@@ -109,6 +110,8 @@ class ProfileRemoteDataSource {
         files: [
           if (screenshotPath != null)
             RestClientMultipartFile.path(field: 'screenshot', path: screenshotPath),
+          if (logs != null)
+            RestClientMultipartFile.bytes(field: 'logs', bytes: logs, filename: 'logs.txt.gz'),
         ],
       );
     } on RestClientException catch (e) {

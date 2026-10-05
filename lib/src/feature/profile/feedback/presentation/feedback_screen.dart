@@ -10,6 +10,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_compact_button/ui_compact_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_discard_guard/ui_discard_guard.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_switch_row/ui_switch_row.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
@@ -44,6 +45,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   late FeedbackTopic _topic = widget.topic;
 
   File? _screenshot;
+
+  bool _attachLogs = false;
 
   bool get _hasMessage => _messageController.text.trim().isNotEmpty;
 
@@ -84,6 +87,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         topic: _topic,
         message: _messageController.text.trim(),
         screenshot: _screenshot,
+        attachLogs: _attachLogs,
       ),
     );
   }
@@ -144,6 +148,15 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         onAttach: _attachScreenshot,
                         onRemove: () => setState(() => _screenshot = null),
                       ),
+                      if (DependenciesScope.of(context).profileRepository.canAttachLogs) ...[
+                        const SizedBox(height: UiSpacing.x4),
+                        UiSwitchRow(
+                          title: l10n.feedbackLogsTitle,
+                          subtitle: l10n.feedbackLogsSubtitle,
+                          value: _attachLogs,
+                          onChanged: (value) => setState(() => _attachLogs = value),
+                        ),
+                      ],
                       const SizedBox(height: UiSpacing.x4),
                       const _DeviceNote(),
                     ],

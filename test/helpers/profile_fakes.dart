@@ -21,6 +21,9 @@ class FakeProfileRepository extends Fake implements ProfileRepository {
   final events = StreamController<ProfileRepositoryEvent>.broadcast();
   final calls = <String>[];
 
+  @override
+  bool canAttachLogs = false;
+
   ProfileModel profile = ProfileModel(
     id: 'u1',
     phoneNumber: '79990001122',
@@ -122,7 +125,10 @@ class FakeProfileRepository extends Fake implements ProfileRepository {
 
   @override
   Future<void> sendFeedback(FeedbackModel feedback) async {
-    calls.add('sendFeedback(${feedback.topic.name}, ${feedback.message})');
+    calls.add(
+      'sendFeedback(${feedback.topic.name}, ${feedback.message}'
+      '${feedback.attachLogs ? ', logs' : ''})',
+    );
 
     await feedbackGate?.future;
 

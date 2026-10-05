@@ -321,6 +321,43 @@ void main() {
       await harness.dispose(tester);
     });
 
+    testWidgets('переключатель журнала скрыт, если журнал недоступен', (tester) async {
+      final harness = ProfileScreenHarness(
+        screen: (_, _) => const FeedbackScreen(topic: FeedbackTopic.problem),
+      );
+
+      await harness.pump(tester);
+
+      expect(find.text('Приложить журнал работы приложения'), findsNothing);
+
+      await harness.dispose(tester);
+    });
+
+    testWidgets('журнал по умолчанию выключен и прикладывается по выбору', (tester) async {
+      final harness = ProfileScreenHarness(
+        screen: (_, _) => const FeedbackScreen(topic: FeedbackTopic.problem),
+        profile: FakeProfileRepository()..canAttachLogs = true,
+      );
+
+      await harness.pump(tester);
+      await tester.enterText(find.byType(TextField), 'Сбой');
+      await tester.pump();
+
+      final toggle = find.byType(Switch);
+      expect(find.text('Приложить журнал работы приложения'), findsOneWidget);
+      expect(tester.widget<Switch>(toggle).value, isFalse);
+
+      await tester.ensureVisible(toggle);
+      await tester.tap(toggle);
+      await tester.pump();
+      await tester.tap(find.widgetWithText(UiButton, 'Отправить'));
+      await tester.pumpAndSettle();
+
+      expect(harness.profile.calls, ['sendFeedback(problem, Сбой, logs)']);
+
+      await harness.dispose(tester);
+    });
+
     testWidgets('при ограничении частоты экран остаётся открытым с объяснением', (tester) async {
       final harness = ProfileScreenHarness(
         screen: (_, _) => const FeedbackScreen(topic: FeedbackTopic.problem),
