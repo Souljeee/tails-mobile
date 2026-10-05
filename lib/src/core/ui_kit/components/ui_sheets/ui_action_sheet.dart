@@ -39,6 +39,7 @@ Future<T?> showUiActionSheet<T>({
 }) {
   return showUiBottomSheet<T>(
     context: context,
+    name: 'action-sheet',
     builder: (sheetContext) => _ActionSheet<T>(
       title: title,
       subtitle: subtitle,

@@ -21,6 +21,7 @@ Future<bool> showUiConfirmSheet({
 }) async {
   final confirmed = await showUiBottomSheet<bool>(
     context: context,
+    name: 'confirm',
     builder: (sheetContext) => _ConfirmSheet(
       title: title,
       message: message,

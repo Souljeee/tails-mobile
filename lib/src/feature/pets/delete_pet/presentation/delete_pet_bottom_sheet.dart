@@ -17,6 +17,7 @@ class DeletePetBottomSheet extends StatefulWidget {
   static Future<DeletePetStatus?> show({required BuildContext context, required int petId}) =>
       showUiBottomSheet<DeletePetStatus>(
         context: context,
+        name: 'delete-pet',
         isDismissible: false,
         builder: (_) => DeletePetBottomSheet._(petId: petId),
       );

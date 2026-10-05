@@ -17,6 +17,8 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 /// По умолчанию открывается в корневом навигаторе, то есть поверх нижней панели навигации.
 /// Содержимое не должно зависеть от InheritedWidget'ов, которые находятся ниже корня
 /// (например, от `ShellScope`).
+///
+/// [name] — имя шторки в журнале навигации (например, `confirm`); на внешний вид не влияет.
 Future<T?> showUiBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -24,6 +26,7 @@ Future<T?> showUiBottomSheet<T>({
   bool enableDrag = true,
   bool useRootNavigator = true,
   bool fullBleed = false,
+  String? name,
 }) {
   return showModalBottomSheet<T>(
     context: context,
@@ -32,6 +35,7 @@ Future<T?> showUiBottomSheet<T>({
     isDismissible: isDismissible,
     enableDrag: enableDrag,
     useRootNavigator: useRootNavigator,
+    routeSettings: name == null ? null : RouteSettings(name: name),
     backgroundColor: context.uiPalette.canvas,
     clipBehavior: Clip.antiAlias,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: UiRadius.xlTop)),

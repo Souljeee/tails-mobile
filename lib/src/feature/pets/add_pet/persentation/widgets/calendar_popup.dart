@@ -14,6 +14,7 @@ class CalendarPopup extends StatefulWidget {
   static Future<DateTime?> show({required BuildContext context, DateTime? initialDate}) =>
       showUiBottomSheet<DateTime>(
         context: context,
+        name: 'calendar',
         builder: (_) => CalendarPopup._(initialDate: initialDate),
       );
 

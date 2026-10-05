@@ -45,6 +45,7 @@ class _WeightPickerState extends State<WeightPicker> {
 
     final selected = await showUiBottomSheet<List<int>>(
       context: context,
+      name: 'weight-picker',
       builder: (_) => WeightPickerBottomSheet(initialKilograms: kg, initialGrams: grams),
     );
 

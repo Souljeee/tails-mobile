@@ -39,6 +39,7 @@ class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
 
     await showUiBottomSheet<void>(
       context: context,
+      name: 'photo-source',
       builder: (sheetContext) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

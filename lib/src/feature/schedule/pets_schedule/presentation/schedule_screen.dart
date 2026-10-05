@@ -189,6 +189,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   Future<void> _openCreateEventBottomSheet() async {
     final result = await showUiBottomSheet<CreateScheduleEventResult>(
       context: context,
+      name: 'create-event',
       // Закрытие свайпом обходит UiDiscardGuard, поэтому его отключаем.
       enableDrag: false,
       // Страница «Повторение» рисует нижнюю панель барабана от края до края.

@@ -45,6 +45,7 @@ class UiDiscardGuard extends StatelessWidget {
 Future<bool> showUiDiscardSheet(BuildContext context) async {
   final result = await showUiBottomSheet<bool>(
     context: context,
+    name: 'discard-changes',
     builder: (_) => const _DiscardSheet(),
   );
 

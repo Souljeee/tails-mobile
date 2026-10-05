@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:tails_mobile/src/core/logging/tails_log_context.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_sanitizer.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
@@ -108,6 +109,7 @@ final class LoggingHttpClient extends http.BaseClient {
       category: TailsLogCategory.network,
       source: label,
       data: {
+        if (TailsLogContext.screen case final screen?) 'screen': screen,
         if (request.url.hasQuery) 'query': _query(request.url),
         'headers': _sanitizer.sanitizeHeaders(request.headers),
         ..._requestBody(request),
