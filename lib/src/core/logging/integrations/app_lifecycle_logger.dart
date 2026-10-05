@@ -16,7 +16,10 @@ final class AppLifecycleLogger {
   /// Создаёт наблюдателя и сразу начинает слушать.
   ///
   /// [binding] нужен тестам; по умолчанию используется `WidgetsBinding.instance`.
-  AppLifecycleLogger({WidgetsBinding? binding}) {
+  ///
+  /// [onPaused] вызывается, когда приложение ушло в фон (например, чтобы сбросить журнал
+  /// на диск, пока система не завершила процесс).
+  AppLifecycleLogger({WidgetsBinding? binding, VoidCallback? onPaused}) : _onPaused = onPaused {
     final effectiveBinding = binding ?? WidgetsBinding.instance;
     _previous = effectiveBinding.lifecycleState;
     _listener = AppLifecycleListener(binding: effectiveBinding, onStateChange: _onStateChange);
@@ -24,6 +27,7 @@ final class AppLifecycleLogger {
 
   static const String _source = 'Lifecycle';
 
+  final VoidCallback? _onPaused;
   late final AppLifecycleListener _listener;
   AppLifecycleState? _previous;
 
@@ -41,5 +45,7 @@ final class AppLifecycleLogger {
       category: TailsLogCategory.app,
       source: _source,
     );
+
+    if (state == AppLifecycleState.paused) _onPaused?.call();
   }
 }

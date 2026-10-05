@@ -129,5 +129,18 @@ void main() {
       expect(sink.events, isEmpty);
       expect(logger, isNotNull);
     });
+
+    testWidgets('onPaused вызывается при уходе в фон', (tester) async {
+      var calls = 0;
+      final logger = AppLifecycleLogger(binding: tester.binding, onPaused: () => calls++);
+      addTearDown(logger.dispose);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      expect(calls, 0);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      expect(calls, 1);
+    });
   });
 }

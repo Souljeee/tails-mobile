@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/logging/integrations/app_lifecycle_logger.dart';
 import 'package:tails_mobile/src/core/logging/integrations/app_start_logger.dart';
@@ -12,9 +14,11 @@ import 'package:tails_mobile/src/core/logging/integrations/tails_bloc_observer.d
 import 'package:tails_mobile/src/core/logging/sinks/breadcrumb_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/sinks/console_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/sinks/error_reporter_sink.dart';
+import 'package:tails_mobile/src/core/logging/sinks/file_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_context.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/utils/bloc_transformer.dart';
 import 'package:tails_mobile/src/feature/initialization/logic/composition_root.dart';
@@ -38,13 +42,12 @@ sealed class AppRunner {
     TailsLogContext.startSession();
 
     final logConfig = TailsLogConfig.forBuildMode();
-    TailsLogger.configure(
-      sinks: [
-        ConsoleLogSink(config: logConfig),
-        ErrorReporterSink(reporter: errorReporter, config: logConfig),
-        BreadcrumbLogSink(reporter: errorReporter, config: logConfig),
-      ],
-    );
+    final logSinks = <TailsLogSink>[
+      ConsoleLogSink(config: logConfig),
+      ErrorReporterSink(reporter: errorReporter, config: logConfig),
+      BreadcrumbLogSink(reporter: errorReporter, config: logConfig),
+    ];
+    TailsLogger.configure(sinks: logSinks);
 
     Intl.defaultLocale = 'ru_RU';
 
@@ -60,8 +63,17 @@ sealed class AppRunner {
         Bloc.observer = const TailsBlocObserver();
         Bloc.transformer = SequentialBlocTransformer().transform;
 
+        // Файловый журнал подключается здесь: path_provider требует инициализированного движка.
+        final fileLogSink = await _createFileLogSink(logConfig);
+        if (fileLogSink != null) {
+          logSinks.add(fileLogSink);
+          TailsLogger.configure(sinks: logSinks);
+        }
+
         // Состояние приложения (свернули, вернулись) пишется в журнал всё время работы.
-        AppLifecycleLogger();
+        AppLifecycleLogger(
+          onPaused: fileLogSink == null ? null : () => unawaited(fileLogSink.flush()),
+        );
         await _logAppStarted(config);
 
         Future<void> launchApplication() async {
@@ -69,6 +81,7 @@ sealed class AppRunner {
             final compositionResult = await CompositionRoot(
               config: config,
               errorReporter: errorReporter,
+              fileLogSink: fileLogSink,
             ).compose();
 
             runApp(RootContext(compositionResult: compositionResult));
@@ -104,6 +117,25 @@ sealed class AppRunner {
       },
       GlobalErrorHandler.onZoneError,
     );
+  }
+
+  /// Создаёт файловый журнал в приватной папке приложения. Без него приложение работает.
+  static Future<FileLogSink?> _createFileLogSink(TailsLogConfig config) async {
+    try {
+      final directory = await getApplicationSupportDirectory();
+
+      return FileLogSink(directory: Directory('${directory.path}/logs'), config: config);
+    } on Object catch (e, stackTrace) {
+      TailsLogger.warning(
+        'Файловый журнал недоступен',
+        category: TailsLogCategory.app,
+        source: 'AppRunner',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
+      return null;
+    }
   }
 
   /// Пишет сведения о сборке и устройстве. Сбой не должен задерживать или ломать запуск.

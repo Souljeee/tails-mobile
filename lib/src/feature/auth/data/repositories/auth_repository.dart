@@ -10,19 +10,25 @@ class AuthRepository {
   final AuthRemoteDataSource _authRemoteDataSource;
   final TokenStorage<OAuth2Token> _tokenStorage;
   final Future<void> Function()? _beforeLogout;
+  final Future<void> Function()? _afterSessionCleared;
 
   /// {@macro auth_repository}
   ///
   /// [beforeLogout] вызывается перед выходом, пока токены ещё действуют (например, чтобы
   /// отвязать устройство от push-уведомлений). Выход выполняется в любом случае, даже если
   /// он выбросил ошибку: она пробрасывается после выхода.
+  ///
+  /// [afterSessionCleared] вызывается после очистки токенов при выходе и при [clearSession]
+  /// (например, чтобы удалить локальный журнал работы приложения). Её ошибка не мешает выходу.
   const AuthRepository({
     required AuthRemoteDataSource authRemoteDataSource,
     required TokenStorage<OAuth2Token> tokenStorage,
     Future<void> Function()? beforeLogout,
+    Future<void> Function()? afterSessionCleared,
   }) : _authRemoteDataSource = authRemoteDataSource,
        _tokenStorage = tokenStorage,
-       _beforeLogout = beforeLogout;
+       _beforeLogout = beforeLogout,
+       _afterSessionCleared = afterSessionCleared;
 
     Stream<AuthorizationStatus> get authorizationStatus => _tokenStorage.getStream().map(
         (token) =>
@@ -89,6 +95,7 @@ class AuthRepository {
         }
       } finally {
         await _tokenStorage.clear();
+        await _clearLocalData();
       }
     } on Object {
       // Пробрасывается ошибка выхода; ошибку подготовки не теряем, а пишем в журнал.
@@ -111,5 +118,16 @@ class AuthRepository {
   /// Забывает локальную сессию без обращения к серверу.
   ///
   /// Нужно, когда сервер уже сам закрыл все сессии (например, после удаления аккаунта).
-  Future<void> clearSession() => _tokenStorage.clear();
+  Future<void> clearSession() async {
+    await _tokenStorage.clear();
+    await _clearLocalData();
+  }
+
+  Future<void> _clearLocalData() async {
+    try {
+      await _afterSessionCleared?.call();
+    } on Object {
+      // Сбой очистки локальных данных не должен мешать выходу из аккаунта.
+    }
+  }
 }

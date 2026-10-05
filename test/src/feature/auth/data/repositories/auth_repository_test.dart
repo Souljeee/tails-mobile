@@ -119,4 +119,52 @@ void main() {
       expect(tokenStorage.clearCalls, 1);
     });
   });
+
+  group('afterSessionCleared', () {
+    AuthRepository build(Future<void> Function() hook) => AuthRepository(
+      authRemoteDataSource: AuthRemoteDataSource(
+        restClient: notAuthClient,
+        authorizedRestClient: authorizedClient,
+      ),
+      tokenStorage: tokenStorage,
+      afterSessionCleared: hook,
+    );
+
+    test('вызывается после очистки токенов при выходе', () async {
+      var tokenWasCleared = false;
+      repository = build(() async => tokenWasCleared = tokenStorage.token == null);
+
+      await repository.logout();
+
+      expect(tokenWasCleared, isTrue);
+    });
+
+    test('вызывается, даже если сервер недоступен', () async {
+      authorizedClient.handler = (_) => throw const ClientException(message: 'нет сети');
+      var calls = 0;
+      repository = build(() async => calls++);
+
+      await expectLater(repository.logout(), throwsA(isA<ClientException>()));
+
+      expect(calls, 1);
+    });
+
+    test('вызывается при clearSession', () async {
+      var calls = 0;
+      repository = build(() async => calls++);
+
+      await repository.clearSession();
+
+      expect(calls, 1);
+      expect(tokenStorage.token, isNull);
+    });
+
+    test('ошибка хука не мешает выйти', () async {
+      repository = build(() async => throw StateError('нет доступа к файлам'));
+
+      await repository.logout();
+
+      expect(tokenStorage.token, isNull);
+    });
+  });
 }

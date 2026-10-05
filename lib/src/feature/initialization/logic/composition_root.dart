@@ -7,6 +7,7 @@ import 'package:rest_client/rest_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/logging/integrations/logging_http_client.dart';
+import 'package:tails_mobile/src/core/logging/sinks/file_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
@@ -50,13 +51,16 @@ import 'package:tails_mobile/src/feature/settings/data/app_settings_repository.d
 /// {@endtemplate}
 final class CompositionRoot {
   /// {@macro composition_root}
-  const CompositionRoot({required this.config, required this.errorReporter});
+  const CompositionRoot({required this.config, required this.errorReporter, this.fileLogSink});
 
   /// Application configuration
   final ApplicationConfig config;
 
   /// Error tracking manager used to track errors in the application.
   final ErrorReporter errorReporter;
+
+  /// Файловый журнал; очищается при выходе из аккаунта и удалении аккаунта.
+  final FileLogSink? fileLogSink;
 
   /// Composes dependencies and returns result of composition.
   Future<CompositionResult> compose() async {
@@ -71,6 +75,7 @@ final class CompositionRoot {
     final dependencies = await DependenciesFactory(
       config: config,
       errorReporter: errorReporter,
+      fileLogSink: fileLogSink,
     ).create();
     stopwatch.stop();
     TailsLogger.info(
@@ -141,13 +146,20 @@ abstract class AsyncFactory<T> {
 /// {@endtemplate}
 class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
   /// {@macro dependencies_factory}
-  const DependenciesFactory({required this.config, required this.errorReporter});
+  const DependenciesFactory({
+    required this.config,
+    required this.errorReporter,
+    this.fileLogSink,
+  });
 
   /// Application configuration
   final ApplicationConfig config;
 
   /// Error tracking manager used to track errors in the application.
   final ErrorReporter errorReporter;
+
+  /// Файловый журнал; очищается при выходе из аккаунта и удалении аккаунта.
+  final FileLogSink? fileLogSink;
 
   @override
   Future<DependenciesContainer> create() async {
@@ -192,6 +204,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       authRemoteDataSource: authRemoteDataSource,
       tokenStorage: secureTokenStorage,
       beforeLogout: pushNotificationsRepository.unregisterDevice,
+      afterSessionCleared: fileLogSink?.clear,
     );
 
     final initialAuthorizationStatus = authorizationToken != null
