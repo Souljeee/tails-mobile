@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:bloc/bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rest_client/rest_client.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/devices_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/dtos/push_message_dto.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/push_messaging_data_source.dart';
@@ -33,7 +33,6 @@ void main() {
       messagingDataSource: messaging,
       localNotificationsDataSource: local,
       devicesRemoteDataSource: DevicesRemoteDataSource(restClient: client),
-      logger: const NoOpLogger(),
     );
   });
 
@@ -114,6 +113,49 @@ void main() {
     expect(state?.status, PushNotificationsStatus.failure);
   });
 
+  test('ошибка регистрации попадает в BlocObserver', () async {
+    final observer = _RecordingObserver();
+    final previous = Bloc.observer;
+    Bloc.observer = observer;
+    addTearDown(() => Bloc.observer = previous);
+    client.handler = (_) => throw const ClientException(message: 'нет сети');
+
+    createBloc(AuthorizationStatus.authorized);
+    await _until(bloc.stream, (s) => s.status == PushNotificationsStatus.failure);
+
+    expect(observer.errors.single, isA<ClientException>());
+  });
+
+  test('ошибка отключения попадает в BlocObserver, состояние становится idle', () async {
+    final observer = _RecordingObserver();
+    final previous = Bloc.observer;
+    Bloc.observer = observer;
+    addTearDown(() => Bloc.observer = previous);
+    createBloc(AuthorizationStatus.authorized);
+    await _until(bloc.stream, (s) => s.status == PushNotificationsStatus.connected);
+    messaging.deleteTokenError = StateError('сбой SDK');
+
+    authStatus.add(AuthorizationStatus.notAuthorized);
+    await _until(bloc.stream, (s) => s.status == PushNotificationsStatus.idle);
+
+    expect(observer.errors.single, isA<StateError>());
+  });
+
+  test('фоновая ошибка репозитория попадает в BlocObserver', () async {
+    final observer = _RecordingObserver();
+    final previous = Bloc.observer;
+    Bloc.observer = observer;
+    addTearDown(() => Bloc.observer = previous);
+    createBloc(AuthorizationStatus.authorized);
+    await _until(bloc.stream, (s) => s.status == PushNotificationsStatus.connected);
+    client.handler = (_) => throw const ClientException(message: 'нет сети');
+
+    messaging.tokenRefresh.add('token-2');
+    await pumpEventQueue();
+
+    expect(observer.errors.single, isA<ClientException>());
+  });
+
   test('нажатие на уведомление попадает в состояние', () async {
     createBloc(AuthorizationStatus.authorized);
     await _until(bloc.stream, (s) => s.status == PushNotificationsStatus.connected);
@@ -134,4 +176,14 @@ void main() {
 
     expect(second.openedCount, 2);
   });
+}
+
+final class _RecordingObserver extends BlocObserver {
+  final List<Object> errors = [];
+
+  @override
+  void onError(BlocBase<Object?> bloc, Object error, StackTrace stackTrace) {
+    errors.add(error);
+    super.onError(bloc, error, stackTrace);
+  }
 }

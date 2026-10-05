@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rest_client/rest_client.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
+import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/devices_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/dtos/push_message_dto.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/push_messaging_data_source.dart';
@@ -32,7 +32,6 @@ void main() {
       messagingDataSource: messaging,
       localNotificationsDataSource: local,
       devicesRemoteDataSource: DevicesRemoteDataSource(restClient: client),
-      logger: const NoOpLogger(),
     );
   });
 
@@ -121,6 +120,19 @@ void main() {
       expect(client.requests, hasLength(1));
     });
 
+    test('ошибка регистрации уходит в backgroundErrors', () async {
+      await repository.connectDevice();
+      final errors = <BackgroundError>[];
+      repository.backgroundErrors.listen(errors.add);
+      client.handler = (_) => throw const ClientException(message: 'нет сети');
+
+      messaging.tokenRefresh.add('token-2');
+      await pump();
+
+      expect(errors, hasLength(1));
+      expect(errors.single.error, isA<ClientException>());
+    });
+
     test('ошибка регистрации не роняет поток', () async {
       await repository.connectDevice();
       client.handler = (_) => throw const ClientException(message: 'нет сети');
@@ -138,6 +150,19 @@ void main() {
   });
 
   group('уведомления в открытом приложении', () {
+    test('ошибка показа уходит в backgroundErrors', () async {
+      await repository.connectDevice();
+      final errors = <BackgroundError>[];
+      repository.backgroundErrors.listen(errors.add);
+      local.showError = StateError('нет разрешения');
+
+      messaging.messages.add(_eventMessage);
+      await pump();
+
+      expect(errors, hasLength(1));
+      expect(errors.single.error, isA<StateError>());
+    });
+
     test('на Android показываются локально с данными пуша', () async {
       await repository.connectDevice();
 
@@ -250,11 +275,17 @@ void main() {
       expect(client.requests, isEmpty);
     });
 
-    test('не пробрасывает ошибку сервера', () async {
+    test('пробрасывает ошибку сервера и не забывает токен', () async {
       await repository.connectDevice();
       client.handler = (_) => throw const ClientException(message: 'нет сети');
 
-      await expectLater(repository.unregisterDevice(), completes);
+      await expectLater(repository.unregisterDevice(), throwsA(isA<ClientException>()));
+
+      // токен не отвязан, поэтому следующая попытка отправит запрос снова
+      client.handler = null;
+      await repository.unregisterDevice();
+
+      expect(client.requests, hasLength(3));
     });
   });
 
@@ -286,6 +317,18 @@ void main() {
       await repository.stop();
 
       expect(messaging.deleteTokenCalls, 0);
+    });
+
+    test('пробрасывает ошибку удаления токена, но подписки отменяет', () async {
+      await repository.connectDevice();
+      messaging.deleteTokenError = StateError('сбой SDK');
+
+      await expectLater(repository.stop(), throwsStateError);
+
+      messaging.tokenRefresh.add('token-2');
+      await pump();
+
+      expect(client.requests, hasLength(1));
     });
   });
 }

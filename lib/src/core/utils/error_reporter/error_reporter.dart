@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
-
 /// {@template error_reporter}
 /// An interface for reporting errors.
 ///
@@ -28,31 +26,6 @@ abstract interface class ErrorReporter {
     required Object throwable,
     StackTrace? stackTrace,
   });
-}
-
-/// {@template error_reporter_log_observer}
-/// An observer that reports logs to the error reporter if it is active.
-/// {@endtemplate}
-final class ErrorReporterLogObserver extends LogObserver {
-  /// {@macro error_reporter_log_observer}
-  const ErrorReporterLogObserver(this._errorReporter);
-
-  /// Error reporter used to report errors.
-  final ErrorReporter _errorReporter;
-
-  @override
-  void onLog(LogMessage logMessage) {
-    // If the error reporter is not initialized, do nothing
-    if (!_errorReporter.isInitialized) return;
-
-    // If the log level is error or higher, report the error
-    if (logMessage.level.index >= LogLevel.error.index) {
-      _errorReporter.captureException(
-        throwable: logMessage.error ?? ReportedMessageException(logMessage.message),
-        stackTrace: logMessage.stackTrace ?? StackTrace.current,
-      );
-    }
-  }
 }
 
 /// An exception used for error logs without an exception, only a message.

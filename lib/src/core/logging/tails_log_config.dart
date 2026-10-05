@@ -8,7 +8,11 @@ import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
 @immutable
 final class TailsLogConfig {
   /// Создаёт конфигурацию с произвольными порогами.
-  const TailsLogConfig({required this.consoleMinLevel, this.consoleCategoryMinLevels = const {}});
+  const TailsLogConfig({
+    required this.consoleMinLevel,
+    this.consoleCategoryMinLevels = const {},
+    this.reportMinLevel = TailsLogLevel.error,
+  });
 
   /// Debug: в консоль идёт всё.
   const TailsLogConfig.debug() : this(consoleMinLevel: TailsLogLevel.trace);
@@ -36,6 +40,9 @@ final class TailsLogConfig {
 
   /// Минимальный уровень для консоли по категориям; перекрывает [consoleMinLevel].
   final Map<TailsLogCategory, TailsLogLevel> consoleCategoryMinLevels;
+
+  /// Минимальный уровень записей, которые отправляются в сервис отчётов об ошибках.
+  final TailsLogLevel reportMinLevel;
 
   /// Минимальный уровень консоли для [category].
   TailsLogLevel consoleMinLevelFor(TailsLogCategory category) =>

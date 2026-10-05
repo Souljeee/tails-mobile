@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/dtos/push_message_dto.dart';
 
 /// Состояние системного разрешения на уведомления.
@@ -38,13 +38,11 @@ abstract interface class PushMessagingDataSource {
 }
 
 final class FirebasePushMessagingDataSource implements PushMessagingDataSource {
-  FirebasePushMessagingDataSource({required Logger logger}) : _logger = logger;
+  FirebasePushMessagingDataSource();
 
   /// На iOS FCM-токен доступен только после получения APNs-токена, который приходит не сразу.
   static const int _apnsTokenAttempts = 5;
   static const Duration _apnsTokenDelay = Duration(seconds: 1);
-
-  final Logger _logger;
 
   FirebaseMessaging get _messaging => FirebaseMessaging.instance;
 
@@ -79,7 +77,12 @@ final class FirebasePushMessagingDataSource implements PushMessagingDataSource {
     } on Object catch (e, s) {
       // Без GoogleService-Info.plist / google-services.json Firebase не стартует;
       // приложение должно работать и без push.
-      _logger.warn('Firebase не настроен, push-уведомления отключены', error: e, stackTrace: s);
+      TailsLogger.warning(
+        'Firebase не настроен, push-уведомления отключены',
+        source: 'FirebasePushMessagingDataSource',
+        error: e,
+        stackTrace: s,
+      );
 
       return false;
     }

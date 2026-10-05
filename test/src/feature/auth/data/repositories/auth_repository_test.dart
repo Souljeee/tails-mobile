@@ -78,6 +78,38 @@ void main() {
       expect(tokenStorage.token, isNull);
     });
 
+    test('ошибка beforeLogout не мешает выйти и пробрасывается после выхода', () async {
+      repository = AuthRepository(
+        authRemoteDataSource: AuthRemoteDataSource(
+          restClient: notAuthClient,
+          authorizedRestClient: authorizedClient,
+        ),
+        tokenStorage: tokenStorage,
+        beforeLogout: () async => throw StateError('не отвязали устройство'),
+      );
+
+      await expectLater(repository.logout(), throwsStateError);
+
+      expect(authorizedClient.last.path, '/auth/logout/');
+      expect(tokenStorage.token, isNull);
+    });
+
+    test('при ошибках и подготовки, и выхода пробрасывается ошибка выхода', () async {
+      authorizedClient.handler = (_) => throw const ClientException(message: 'нет сети');
+      repository = AuthRepository(
+        authRemoteDataSource: AuthRemoteDataSource(
+          restClient: notAuthClient,
+          authorizedRestClient: authorizedClient,
+        ),
+        tokenStorage: tokenStorage,
+        beforeLogout: () async => throw StateError('не отвязали устройство'),
+      );
+
+      await expectLater(repository.logout(), throwsA(isA<ClientException>()));
+
+      expect(tokenStorage.token, isNull);
+    });
+
     test('без сохранённого токена не ходит на сервер, но очищает хранилище', () async {
       tokenStorage.token = null;
 

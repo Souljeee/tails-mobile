@@ -6,9 +6,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/sentry_error_reporter.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/refresh_service_impl.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/secure_token_storage.dart';
@@ -47,13 +48,10 @@ import 'package:tails_mobile/src/feature/settings/data/app_settings_repository.d
 /// {@endtemplate}
 final class CompositionRoot {
   /// {@macro composition_root}
-  const CompositionRoot({required this.config, required this.logger, required this.errorReporter});
+  const CompositionRoot({required this.config, required this.errorReporter});
 
   /// Application configuration
   final ApplicationConfig config;
-
-  /// Logger used to log information during composition process.
-  final Logger logger;
 
   /// Error tracking manager used to track errors in the application.
   final ErrorReporter errorReporter;
@@ -62,15 +60,23 @@ final class CompositionRoot {
   Future<CompositionResult> compose() async {
     final stopwatch = clock.stopwatch()..start();
 
-    logger.info('Initializing dependencies...');
+    TailsLogger.info(
+      'Инициализация зависимостей',
+      category: TailsLogCategory.app,
+      source: 'CompositionRoot',
+    );
     // initialize dependencies
     final dependencies = await DependenciesFactory(
       config: config,
-      logger: logger,
       errorReporter: errorReporter,
     ).create();
     stopwatch.stop();
-    logger.info('Dependencies initialized successfully in ${stopwatch.elapsedMilliseconds} ms.');
+    TailsLogger.info(
+      'Зависимости инициализированы',
+      category: TailsLogCategory.app,
+      source: 'CompositionRoot',
+      data: {'durationMs': stopwatch.elapsedMilliseconds},
+    );
     final result = CompositionResult(
       dependencies: dependencies,
       millisecondsSpent: stopwatch.elapsedMilliseconds,
@@ -133,17 +139,10 @@ abstract class AsyncFactory<T> {
 /// {@endtemplate}
 class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
   /// {@macro dependencies_factory}
-  const DependenciesFactory({
-    required this.config,
-    required this.logger,
-    required this.errorReporter,
-  });
+  const DependenciesFactory({required this.config, required this.errorReporter});
 
   /// Application configuration
   final ApplicationConfig config;
-
-  /// Logger used to log information during composition process.
-  final Logger logger;
 
   /// Error tracking manager used to track errors in the application.
   final ErrorReporter errorReporter;
@@ -171,10 +170,9 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
     final restClient = await _initRestClient(config, secureTokenStorage, refreshService);
 
     final pushNotificationsRepository = PushNotificationsRepository(
-      messagingDataSource: FirebasePushMessagingDataSource(logger: logger),
+      messagingDataSource: FirebasePushMessagingDataSource(),
       localNotificationsDataSource: FlutterLocalNotificationsDataSource(),
       devicesRemoteDataSource: DevicesRemoteDataSource(restClient: restClient),
-      logger: logger,
     );
 
     final authRemoteDataSource = AuthRemoteDataSource(
@@ -222,7 +220,6 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
 
     final notificationsInboxRepository = NotificationsInboxRepository(
       remoteDataSource: NotificationsInboxRemoteDataSource(restClient: restClient),
-      logger: logger,
       incomingPushes: pushNotificationsRepository.receivedNotifications,
       authorizationStatus: authRepository.authorizationStatus,
     );
@@ -235,7 +232,6 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
     );
 
     return DependenciesContainer(
-      logger: logger,
       config: config,
       errorReporter: errorReporter,
       packageInfo: packageInfo,
@@ -286,20 +282,6 @@ Future<RestClient> _initRestClient(
 
 Future<RestClient> _initRefreshTokenClient(ApplicationConfig config) async {
   return RestClientHttp(baseUrl: config.baseUrl, client: http.Client());
-}
-
-/// {@template app_logger_factory}
-/// Factory that creates an instance of [AppLogger].
-/// {@endtemplate}
-class AppLoggerFactory extends Factory<AppLogger> {
-  /// {@macro app_logger_factory}
-  const AppLoggerFactory({this.observers = const []});
-
-  /// List of observers that will be notified when a log message is received.
-  final List<LogObserver> observers;
-
-  @override
-  AppLogger create() => AppLogger(observers: observers);
 }
 
 /// {@template error_reporter_factory}

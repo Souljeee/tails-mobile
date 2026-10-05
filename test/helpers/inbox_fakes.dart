@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/models/inbox_item.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/notifications_inbox_repository.dart';
 
@@ -45,6 +46,7 @@ class FakeNotificationsInboxRepository implements NotificationsInboxRepository {
 
   final unreadController = StreamController<int>.broadcast();
   final incomingController = StreamController<void>.broadcast();
+  final errorsController = StreamController<BackgroundError>.broadcast();
 
   int get _unread => items.where((item) => !item.isRead).length;
 
@@ -56,6 +58,9 @@ class FakeNotificationsInboxRepository implements NotificationsInboxRepository {
 
   @override
   Stream<void> get incoming => incomingController.stream;
+
+  @override
+  Stream<BackgroundError> get errors => errorsController.stream;
 
   @override
   Future<InboxPage> getPage({String? cursor, bool unreadOnly = false}) async {
@@ -126,5 +131,6 @@ class FakeNotificationsInboxRepository implements NotificationsInboxRepository {
   Future<void> dispose() async {
     await unreadController.close();
     await incomingController.close();
+    await errorsController.close();
   }
 }

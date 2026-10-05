@@ -1,4 +1,5 @@
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_remote_data_source.dart';
 
 /// {@template auth_repository}
@@ -13,8 +14,8 @@ class AuthRepository {
   /// {@macro auth_repository}
   ///
   /// [beforeLogout] вызывается перед выходом, пока токены ещё действуют (например, чтобы
-  /// отвязать устройство от push-уведомлений). Он не должен выбрасывать ошибки: выход
-  /// выполняется в любом случае.
+  /// отвязать устройство от push-уведомлений). Выход выполняется в любом случае, даже если
+  /// он выбросил ошибку: она пробрасывается после выхода.
   const AuthRepository({
     required AuthRemoteDataSource authRemoteDataSource,
     required TokenStorage<OAuth2Token> tokenStorage,
@@ -64,20 +65,46 @@ class AuthRepository {
   ///
   /// Сначала просит сервер отозвать refresh-токен, но локальные токены очищаются в любом
   /// случае: пользователь, нажавший «Выйти», не должен остаться в приложении из-за сбоя сети.
-  /// Ошибка отзыва на сервере пробрасывается после очистки.
+  /// Ошибка отзыва на сервере пробрасывается после очистки. Ошибка [_beforeLogout] тоже:
+  /// её запоминаем, выполняем выход до конца и пробрасываем в конце.
   ///
   /// Throws RestClientException if the server request fails.
   Future<void> logout() async {
-    await _beforeLogout?.call();
-
-    final token = await _tokenStorage.load();
+    Object? beforeLogoutError;
+    StackTrace? beforeLogoutStackTrace;
 
     try {
-      if (token != null) {
-        await _authRemoteDataSource.logout(refreshToken: token.refreshToken);
+      await _beforeLogout?.call();
+    } on Object catch (e, s) {
+      beforeLogoutError = e;
+      beforeLogoutStackTrace = s;
+    }
+
+    try {
+      final token = await _tokenStorage.load();
+
+      try {
+        if (token != null) {
+          await _authRemoteDataSource.logout(refreshToken: token.refreshToken);
+        }
+      } finally {
+        await _tokenStorage.clear();
       }
-    } finally {
-      await _tokenStorage.clear();
+    } on Object {
+      // Пробрасывается ошибка выхода; ошибку подготовки не теряем, а пишем в журнал.
+      if (beforeLogoutError != null) {
+        TailsLogger.warning(
+          'Подготовка к выходу завершилась ошибкой',
+          source: 'AuthRepository',
+          error: beforeLogoutError,
+          stackTrace: beforeLogoutStackTrace,
+        );
+      }
+      rethrow;
+    }
+
+    if (beforeLogoutError != null) {
+      Error.throwWithStackTrace(beforeLogoutError, beforeLogoutStackTrace!);
     }
   }
 

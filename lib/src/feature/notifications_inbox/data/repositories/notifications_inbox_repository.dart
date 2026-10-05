@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:rest_client/rest_client.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
+import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/data_sources/dtos/inbox_item_dto.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/data_sources/notifications_inbox_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/models/inbox_item.dart';
@@ -16,21 +16,19 @@ import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_
 class NotificationsInboxRepository {
   NotificationsInboxRepository({
     required NotificationsInboxRemoteDataSource remoteDataSource,
-    required Logger logger,
     Stream<Object?> incomingPushes = const Stream.empty(),
     Stream<AuthorizationStatus> authorizationStatus = const Stream.empty(),
-  }) : _remote = remoteDataSource,
-       _logger = logger {
+  }) : _remote = remoteDataSource {
     _subscriptions
       ..add(incomingPushes.listen((_) => _onIncomingPush()))
       ..add(authorizationStatus.listen(_onAuthorizationChanged));
   }
 
   final NotificationsInboxRemoteDataSource _remote;
-  final Logger _logger;
 
   final StreamController<int> _unreadController = StreamController<int>.broadcast();
   final StreamController<void> _incomingController = StreamController<void>.broadcast();
+  final StreamController<BackgroundError> _errorsController = StreamController.broadcast();
   final List<StreamSubscription<Object?>> _subscriptions = [];
 
   int? _unreadCount;
@@ -43,6 +41,10 @@ class NotificationsInboxRepository {
 
   /// В открытом приложении пришёл push: список мог измениться.
   Stream<void> get incoming => _incomingController.stream;
+
+  /// Ошибки фоновых операций ([markReadSilently], обновление числа по push), которые
+  /// некому пробросить вызывающему коду.
+  Stream<BackgroundError> get errors => _errorsController.stream;
 
   /// Страница уведомлений; [cursor] — `nextCursor` предыдущей страницы.
   ///
@@ -81,13 +83,13 @@ class NotificationsInboxRepository {
   /// Отмечает все уведомления прочитанными.
   Future<void> markAllRead() async => _setUnreadCount(await _remote.markAllRead());
 
-  /// То же, что [markRead], но ошибка только пишется в лог: для нажатия на push, где
-  /// пользователь уже перешёл дальше и показать ошибку некому.
+  /// То же, что [markRead], но ошибка не пробрасывается, а уходит в [errors]: для нажатия
+  /// на push, где пользователь уже перешёл дальше и показать ошибку некому.
   Future<void> markReadSilently(String id) async {
     try {
       await markRead(id);
     } on Object catch (e, s) {
-      _logger.warn('Не удалось отметить уведомление прочитанным', error: e, stackTrace: s);
+      _errorsController.add((error: e, stackTrace: s));
     }
   }
 
@@ -99,6 +101,7 @@ class NotificationsInboxRepository {
 
     await _unreadController.close();
     await _incomingController.close();
+    await _errorsController.close();
   }
 
   void _onIncomingPush() {
@@ -110,7 +113,7 @@ class NotificationsInboxRepository {
     try {
       await refreshUnreadCount();
     } on Object catch (e, s) {
-      _logger.warn('Не удалось обновить число непрочитанных', error: e, stackTrace: s);
+      _errorsController.add((error: e, stackTrace: s));
     }
   }
 

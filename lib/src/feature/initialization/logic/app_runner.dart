@@ -1,15 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
-import 'package:tails_mobile/src/core/utils/app_bloc_observer.dart';
+import 'package:tails_mobile/src/core/logging/integrations/global_error_handler.dart';
+import 'package:tails_mobile/src/core/logging/integrations/tails_bloc_observer.dart';
+import 'package:tails_mobile/src/core/logging/sinks/console_log_sink.dart';
+import 'package:tails_mobile/src/core/logging/sinks/error_reporter_sink.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/utils/bloc_transformer.dart';
-import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
-import 'package:tails_mobile/src/core/utils/logger/printing_log_observer.dart';
 import 'package:tails_mobile/src/feature/initialization/logic/composition_root.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/initialization_failed_app.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/root_context.dart';
@@ -26,12 +28,13 @@ sealed class AppRunner {
     const config = ApplicationConfig();
     final errorReporter = await const ErrorReporterFactory(config).create();
 
-    final logger = AppLoggerFactory(
-      observers: [
-        ErrorReporterLogObserver(errorReporter),
-        if (!kReleaseMode) const PrintingLogObserver(logLevel: LogLevel.trace),
+    final logConfig = TailsLogConfig.forBuildMode();
+    TailsLogger.configure(
+      sinks: [
+        ConsoleLogSink(config: logConfig),
+        ErrorReporterSink(reporter: errorReporter, config: logConfig),
       ],
-    ).create();
+    );
 
     Intl.defaultLocale = 'ru_RU';
 
@@ -41,24 +44,28 @@ sealed class AppRunner {
         WidgetsFlutterBinding.ensureInitialized();
 
         // Configure global error interception
-        FlutterError.onError = logger.logFlutterError;
-        WidgetsBinding.instance.platformDispatcher.onError = logger.logPlatformDispatcherError;
+        GlobalErrorHandler.install();
 
         // Setup bloc observer and transformer
-        Bloc.observer = AppBlocObserver(logger);
+        Bloc.observer = const TailsBlocObserver();
         Bloc.transformer = SequentialBlocTransformer().transform;
 
         Future<void> launchApplication() async {
           try {
             final compositionResult = await CompositionRoot(
               config: config,
-              logger: logger,
               errorReporter: errorReporter,
             ).compose();
 
             runApp(RootContext(compositionResult: compositionResult));
           } on Object catch (e, stackTrace) {
-            logger.error('Initialization failed', error: e, stackTrace: stackTrace);
+            TailsLogger.fatal(
+              'Не удалось инициализировать приложение',
+              category: TailsLogCategory.app,
+              source: 'AppRunner',
+              error: e,
+              stackTrace: stackTrace,
+            );
             runApp(
               InitializationFailedApp(
                 error: e,
@@ -72,7 +79,7 @@ sealed class AppRunner {
         // Launch the application
         await launchApplication();
       },
-      logger.logZoneError,
+      GlobalErrorHandler.onZoneError,
     );
   }
 }

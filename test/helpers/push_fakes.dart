@@ -16,6 +16,9 @@ class FakePushMessagingDataSource implements PushMessagingDataSource {
   String? token = 'token-1';
   PushMessageDto? initialMessage;
 
+  /// Если задан, [deleteToken] завершается этой ошибкой.
+  Object? deleteTokenError;
+
   int initializeCalls = 0;
   int requestPermissionCalls = 0;
   int deleteTokenCalls = 0;
@@ -43,7 +46,14 @@ class FakePushMessagingDataSource implements PushMessagingDataSource {
   Future<String?> getToken() async => token;
 
   @override
-  Future<void> deleteToken() async => deleteTokenCalls++;
+  Future<void> deleteToken() async {
+    deleteTokenCalls++;
+
+    if (deleteTokenError != null) {
+      // ignore: only_throw_errors
+      throw deleteTokenError!;
+    }
+  }
 
   @override
   Stream<String> get onTokenRefresh => tokenRefresh.stream;
@@ -76,6 +86,9 @@ class FakeLocalNotificationsDataSource implements LocalNotificationsDataSource {
   final List<ShownNotification> shown = [];
   final taps = StreamController<Map<String, String>>.broadcast();
 
+  /// Если задан, [show] завершается этой ошибкой.
+  Object? showError;
+
   @override
   Future<void> initialize() async => initializeCalls++;
 
@@ -85,7 +98,14 @@ class FakeLocalNotificationsDataSource implements LocalNotificationsDataSource {
     required String? title,
     required String? body,
     required Map<String, String> payload,
-  }) async => shown.add((id: id, title: title, body: body, payload: payload));
+  }) async {
+    if (showError != null) {
+      // ignore: only_throw_errors
+      throw showError!;
+    }
+
+    shown.add((id: id, title: title, body: body, payload: payload));
+  }
 
   @override
   Stream<Map<String, String>> get onTap => taps.stream;

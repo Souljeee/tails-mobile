@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
+import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/devices_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/dtos/push_message_dto.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/local_notifications_data_source.dart';
@@ -27,21 +28,20 @@ class PushNotificationsRepository {
     required PushMessagingDataSource messagingDataSource,
     required LocalNotificationsDataSource localNotificationsDataSource,
     required DevicesRemoteDataSource devicesRemoteDataSource,
-    required Logger logger,
   }) : _messaging = messagingDataSource,
        _localNotifications = localNotificationsDataSource,
-       _devices = devicesRemoteDataSource,
-       _logger = logger;
+       _devices = devicesRemoteDataSource;
 
   static const String _androidPlatform = 'android';
+  static const String _logSource = 'PushNotificationsRepository';
 
   final PushMessagingDataSource _messaging;
   final LocalNotificationsDataSource _localNotifications;
   final DevicesRemoteDataSource _devices;
-  final Logger _logger;
 
   final StreamController<PushNotification> _opened = StreamController.broadcast();
   final StreamController<PushNotification> _received = StreamController.broadcast();
+  final StreamController<BackgroundError> _backgroundErrors = StreamController.broadcast();
   final List<StreamSubscription<Object?>> _subscriptions = [];
 
   Future<bool>? _initialization;
@@ -54,6 +54,10 @@ class PushNotificationsRepository {
 
   /// Уведомления, пришедшие, пока приложение открыто.
   Stream<PushNotification> get receivedNotifications => _received.stream;
+
+  /// Ошибки фоновых операций (обновление токена, показ уведомления), которые некому
+  /// пробросить вызывающему коду.
+  Stream<BackgroundError> get backgroundErrors => _backgroundErrors.stream;
 
   /// Запрашивает разрешение, регистрирует токен устройства на сервере и начинает слушать
   /// уведомления. Безопасно вызывать повторно.
@@ -72,7 +76,7 @@ class PushNotificationsRepository {
 
     if (token == null) {
       // Токен придёт через onTokenRefresh, когда появится APNs-токен.
-      _logger.warn('FCM-токен пока недоступен');
+      TailsLogger.warning('FCM-токен пока недоступен', source: _logSource);
 
       return PushConnectionStatus.unavailable;
     }
@@ -85,7 +89,10 @@ class PushNotificationsRepository {
   }
 
   /// Отвязывает устройство на сервере. Нужен действующий JWT, поэтому вызывается до выхода из
-  /// аккаунта. Ошибки не пробрасываются: выход не должен зависеть от push.
+  /// аккаунта.
+  ///
+  /// Throws RestClientException, если сервер не принял запрос. `AuthRepository.logout`
+  /// в этом случае всё равно завершает выход.
   Future<void> unregisterDevice() async {
     final token = _registeredToken;
 
@@ -93,16 +100,14 @@ class PushNotificationsRepository {
       return;
     }
 
-    try {
-      await _devices.unregister(token: token);
-      _registeredToken = null;
-    } on Object catch (e, s) {
-      _logger.warn('Не удалось отвязать устройство от push-уведомлений', error: e, stackTrace: s);
-    }
+    await _devices.unregister(token: token);
+    _registeredToken = null;
   }
 
   /// Прекращает слушать уведомления и удаляет токен на устройстве: после выхода или удаления
   /// аккаунта следующий пользователь получит новый токен. Сеть не используется.
+  ///
+  /// Подписки отменяются в любом случае; ошибку удаления токена пробрасывает.
   Future<void> stop() async {
     for (final subscription in _subscriptions) {
       await subscription.cancel();
@@ -114,11 +119,7 @@ class PushNotificationsRepository {
       return;
     }
 
-    try {
-      await _messaging.deleteToken();
-    } on Object catch (e, s) {
-      _logger.warn('Не удалось удалить FCM-токен устройства', error: e, stackTrace: s);
-    }
+    await _messaging.deleteToken();
   }
 
   Future<bool> _initialize() async {
@@ -165,8 +166,8 @@ class PushNotificationsRepository {
     try {
       await _register(token);
     } on Object catch (e, s) {
-      // Некому показать ошибку: токен зарегистрируется при следующем запуске.
-      _logger.error('Не удалось зарегистрировать обновлённый FCM-токен', error: e, stackTrace: s);
+      // Вызывающего кода нет: токен зарегистрируется при следующем запуске.
+      _backgroundErrors.add((error: e, stackTrace: s));
     }
   }
 
@@ -196,7 +197,7 @@ class PushNotificationsRepository {
         payload: message.data,
       );
     } on Object catch (e, s) {
-      _logger.error('Не удалось показать уведомление', error: e, stackTrace: s);
+      _backgroundErrors.add((error: e, stackTrace: s));
     }
   }
 

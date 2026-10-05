@@ -4,7 +4,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:tails_mobile/src/core/utils/analytics/analytics_reporter.dart';
 import 'package:tails_mobile/src/core/utils/analytics/firebase_analytics_reporter.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
 
 @GenerateNiceMocks([MockSpec<FirebaseAnalytics>()])
 import 'firebase_analytics_reporter_test.mocks.dart';
@@ -15,10 +14,7 @@ void main() {
 
   setUp(() {
     mockAnalytics = MockFirebaseAnalytics();
-    reporter = FirebaseAnalyticsReporter(
-      analytics: mockAnalytics,
-      logger: const NoOpLogger(),
-    );
+    reporter = FirebaseAnalyticsReporter(analytics: mockAnalytics);
   });
 
   group('FirebaseAnalyticsReporter', () {

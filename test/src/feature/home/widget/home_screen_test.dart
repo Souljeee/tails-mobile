@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
 import 'package:tails_mobile/src/feature/home/widget/home_screen.dart';
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
 import '../../../../helpers/test_widget_controller.dart';
@@ -28,7 +27,4 @@ void main() {
 base class HomeScreenDependenciesContainer extends TestDependenciesContainer {
   /// {@macro home_screen_dependencies_container}
   const HomeScreenDependenciesContainer();
-
-  @override
-  Logger get logger => const NoOpLogger();
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/repositories/models/push_notification.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/repositories/push_notifications_repository.dart';
 
@@ -36,6 +37,11 @@ class PushNotificationsBloc extends Bloc<PushNotificationsEvent, PushNotificatio
           (notification) =>
               add(PushNotificationsEvent.notificationOpened(notification: notification)),
         ),
+      )
+      ..add(
+        repository.backgroundErrors.listen(
+          (BackgroundError failure) => addError(failure.error, failure.stackTrace),
+        ),
       );
 
     add(PushNotificationsEvent.authorizationChanged(status: initialAuthorizationStatus));
@@ -49,7 +55,11 @@ class PushNotificationsBloc extends Bloc<PushNotificationsEvent, PushNotificatio
     Emitter<PushNotificationsState> emit,
   ) async {
     if (event.status != AuthorizationStatus.authorized) {
-      await _repository.stop();
+      try {
+        await _repository.stop();
+      } on Object catch (e, s) {
+        addError(e, s);
+      }
 
       emit(state.copyWith(status: PushNotificationsStatus.idle));
 

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/notifications_inbox_repository.dart';
 
 part 'notifications_unread_event.dart';
@@ -22,10 +23,14 @@ class NotificationsUnreadBloc extends Bloc<NotificationsUnreadEvent, Notificatio
     _subscription = inboxRepository.unreadCount.listen(
       (count) => add(NotificationsUnreadEvent.countChanged(count: count)),
     );
+    _errorsSubscription = inboxRepository.errors.listen(
+      (BackgroundError failure) => addError(failure.error, failure.stackTrace),
+    );
   }
 
   final NotificationsInboxRepository _inboxRepository;
   late final StreamSubscription<int> _subscription;
+  late final StreamSubscription<BackgroundError> _errorsSubscription;
 
   Future<void> _onRefreshRequested(
     NotificationsUnreadEvent$RefreshRequested event,
@@ -49,6 +54,7 @@ class NotificationsUnreadBloc extends Bloc<NotificationsUnreadEvent, Notificatio
   @override
   Future<void> close() async {
     await _subscription.cancel();
+    await _errorsSubscription.cancel();
 
     return super.close();
   }

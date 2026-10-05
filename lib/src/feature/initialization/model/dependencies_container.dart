@@ -2,7 +2,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
@@ -22,7 +21,6 @@ import 'package:tails_mobile/src/feature/settings/bloc/app_settings_bloc.dart';
 class DependenciesContainer {
   /// {@macro dependencies_container}
   const DependenciesContainer({
-    required this.logger,
     required this.config,
     required this.appSettingsBloc,
     required this.errorReporter,
@@ -38,9 +36,6 @@ class DependenciesContainer {
     required this.pushNotificationsBloc,
     required this.notificationsInboxRepository,
   });
-
-  /// [Logger] instance, used to log messages.
-  final Logger logger;
 
   /// [ApplicationConfig] instance, contains configuration of the application.
   final ApplicationConfig config;

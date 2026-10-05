@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rest_client/rest_client.dart';
-import 'package:tails_mobile/src/core/utils/logger/logger.dart';
+import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/data_sources/notifications_inbox_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/models/inbox_item.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/notifications_inbox_repository.dart';
@@ -60,7 +60,6 @@ void main() {
     auth = StreamController<AuthorizationStatus>.broadcast();
     repository = NotificationsInboxRepository(
       remoteDataSource: NotificationsInboxRemoteDataSource(restClient: client),
-      logger: const NoOpLogger(),
       incomingPushes: pushes.stream,
       authorizationStatus: auth.stream,
     );
@@ -144,12 +143,17 @@ void main() {
       expect(repository.currentUnreadCount, 0);
     });
 
-    test('markReadSilently не пробрасывает ошибку', () async {
+    test('markReadSilently не пробрасывает ошибку, а отдаёт её в errors', () async {
+      final errors = <BackgroundError>[];
+      repository.errors.listen(errors.add);
       client.handler = (_) => throw const ClientException(message: 'нет сети');
 
       await repository.markReadSilently('n-1');
+      await pumpEventQueue();
 
       expect(client.requests, hasLength(1));
+      expect(errors, hasLength(1));
+      expect(errors.single.error, isA<ClientException>());
     });
 
     test('markRead пробрасывает ошибку', () {
