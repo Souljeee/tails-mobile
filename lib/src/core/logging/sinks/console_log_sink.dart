@@ -17,7 +17,7 @@ final class ConsoleLogSink implements TailsLogSink {
   /// это `debugPrint`, а в тестах можно подставить свой приёмник.
   ConsoleLogSink({
     required TailsLogConfig config,
-    TailsLogFormatter formatter = const TailsLogFormatter(),
+    TailsLogFormatter formatter = const TailsLogFormatter.console(),
     void Function(String line)? writeLine,
   }) : _config = config,
        _logger = pkg.Logger(

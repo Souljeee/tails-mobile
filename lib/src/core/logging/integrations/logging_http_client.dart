@@ -240,7 +240,49 @@ final class LoggingHttpClient extends http.BaseClient {
 
     if (encoded.length <= bodyMaxLength) return sanitized;
 
+    // Большой JSON сокращаем по структуре, а не по символам: остаётся валидный JSON, который
+    // можно показать читаемо (первые элементы списков, начало длинных строк).
+    if (sanitized is Map || sanitized is List) {
+      final shrunk = _shrink(sanitized);
+      if (shrunk != null) return shrunk;
+    }
+
     return '${encoded.substring(0, bodyMaxLength)}…[обрезано ${encoded.length - bodyMaxLength} симв.]';
+  }
+
+  /// Подбирает самое мягкое сокращение, при котором JSON укладывается в [bodyMaxLength].
+  Object? _shrink(Object? value) {
+    for (final (items, textLength) in const [(10, 200), (5, 100), (3, 60), (2, 30), (1, 20)]) {
+      final reduced = _reduce(value, items, textLength);
+      if (jsonEncode(reduced).length <= bodyMaxLength) return reduced;
+    }
+
+    return null;
+  }
+
+  Object? _reduce(Object? value, int items, int textLength) {
+    switch (value) {
+      case final Map<Object?, Object?> map:
+        final entries = map.entries.toList();
+        final reduced = <String, Object?>{
+          for (final entry in entries.take(items * 4))
+            '${entry.key}': _reduce(entry.value, items, textLength),
+        };
+        if (entries.length > items * 4) reduced['…'] = 'ещё ${entries.length - items * 4} ключей';
+
+        return reduced;
+      case final List<Object?> list:
+        final reduced = <Object?>[
+          for (final item in list.take(items)) _reduce(item, items, textLength),
+        ];
+        if (list.length > items) reduced.add('… ещё ${list.length - items}');
+
+        return reduced;
+      case final String text when text.length > textLength:
+        return '${text.substring(0, textLength)}…[+${text.length - textLength}]';
+      default:
+        return value;
+    }
   }
 
   static String _size(int bytes) {

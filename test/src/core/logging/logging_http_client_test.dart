@@ -151,14 +151,46 @@ void main() {
       expect(event.report, isFalse);
     });
 
-    test('обрезает длинное тело после очистки', () async {
-      final client = clientFor((_) async => json({'text': 'x' * 500}), bodyMaxLength: 50);
+    test('обрезает длинный текст, а не JSON, по символам', () async {
+      final client = clientFor(
+        (_) async => http.Response('z' * 500, 200, headers: {'content-type': 'text/plain'}),
+        bodyMaxLength: 50,
+      );
 
       await client.get(Uri.parse('https://api.test/long/'));
 
       final body = sink.events[1].data['body']! as String;
-      expect(body, startsWith('{"text":"xxxx'));
+      expect(body, startsWith('zzzz'));
       expect(body, contains('…[обрезано'));
+    });
+
+    test('большой JSON сокращается по структуре и остаётся валидным', () async {
+      final client = clientFor(
+        (_) async => json([
+          for (var i = 0; i < 20; i++) {'id': i, 'name': 'Бакс' * 40},
+        ]),
+        bodyMaxLength: 400,
+      );
+
+      await client.get(Uri.parse('https://api.test/list/'));
+
+      final body = sink.events[1].data['body']! as List<Object?>;
+      expect(jsonEncode(body).length, lessThanOrEqualTo(400));
+      expect((body.first! as Map<String, Object?>)['id'], 0);
+      expect(body.last, matches(RegExp(r'^… ещё \d+$')));
+      expect(
+        (body.first! as Map<String, Object?>)['name']! as String,
+        matches(RegExp(r'…\[\+\d+\]$')),
+      );
+    });
+
+    test('JSON, который не помещается даже после сокращения, обрезается текстом', () async {
+      final client = clientFor((_) async => json({'text': 'x' * 500}), bodyMaxLength: 8);
+
+      await client.get(Uri.parse('https://api.test/tiny/'));
+
+      expect(sink.events[1].data['body'], isA<String>());
+      expect(sink.events[1].data['body']! as String, contains('…[обрезано'));
     });
 
     test('секрет не раскрывается обрезанным фрагментом', () async {
