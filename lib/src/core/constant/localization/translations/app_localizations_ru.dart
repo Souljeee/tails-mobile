@@ -260,7 +260,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fetchingErrorTitle => 'Не удалось загрузить данные';
 
   @override
-  String get fetchingErrorMessage => 'Похоже, что-то пошло не так.';
+  String get fetchingErrorMessage =>
+      'Похоже, что-то пошло не так. Проверьте подключение к интернету и попробуйте снова.';
 
   @override
   String get fetchingErrorRetry => 'Повторить';

@@ -18,8 +18,7 @@ class InboxEmptyView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return Align(
-      alignment: Alignment.topCenter,
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

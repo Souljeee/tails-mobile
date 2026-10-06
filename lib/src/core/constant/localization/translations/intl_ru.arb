@@ -108,7 +108,7 @@
   "schedulePreviousMonth": "Предыдущий месяц",
   "scheduleNextMonth": "Следующий месяц",
   "fetchingErrorTitle": "Не удалось загрузить данные",
-  "fetchingErrorMessage": "Похоже, что-то пошло не так.",
+  "fetchingErrorMessage": "Похоже, что-то пошло не так. Проверьте подключение к интернету и попробуйте снова.",
   "fetchingErrorRetry": "Повторить",
   "eventTypeDeworming": "Дегельминтизация",
   "eventTypeYearlyVaccination": "Годовая вакцинация",

@@ -20,31 +20,40 @@ class UiEmptyState extends StatelessWidget {
   final String title;
   final String? message;
 
-  /// Иллюстрация 300 pt, например `SvgPicture.asset(...)`.
+  /// Иллюстрация (до 300 pt по большей стороне), например `SvgPicture.asset(...)`.
   final Widget? illustration;
   final String? actionLabel;
   final VoidCallback? onAction;
+
+  /// Максимальный размер иллюстрации; пропорции картинки сохраняются.
+  static const double _illustrationMaxSize = 300;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.uiPalette;
     final fonts = context.uiFonts;
 
-    // Прижато к верху с небольшим отступом: по центру экрана блок уезжал бы вниз к навбару.
-    return Align(
-      alignment: Alignment.topCenter,
+    // Увеличенный нижний отступ чуть приподнимает блок над геометрическим центром:
+    // снизу экрана плавающий навбар, и по оптическому центру блок выглядит ровнее.
+    return Center(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
           UiSpacing.x8,
-          UiSpacing.x2,
-          UiSpacing.x8,
           UiSpacing.x6,
+          UiSpacing.x8,
+          UiSpacing.x12,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (illustration != null) ...[
-              SizedBox.square(dimension: 300, child: illustration),
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: _illustrationMaxSize,
+                  maxHeight: _illustrationMaxSize,
+                ),
+                child: illustration,
+              ),
               const SizedBox(height: UiSpacing.x4),
             ],
             Text(

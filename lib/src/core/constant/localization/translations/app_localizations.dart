@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @fetchingErrorMessage.
   ///
   /// In ru, this message translates to:
-  /// **'Похоже, что-то пошло не так.'**
+  /// **'Похоже, что-то пошло не так. Проверьте подключение к интернету и попробуйте снова.'**
   String get fetchingErrorMessage;
 
   /// No description provided for @fetchingErrorRetry.
