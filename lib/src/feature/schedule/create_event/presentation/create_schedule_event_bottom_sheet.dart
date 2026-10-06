@@ -22,6 +22,7 @@ import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
@@ -407,7 +408,11 @@ class _PetChips extends StatelessWidget {
                 label: pet.name,
                 selected: selectedPetId == pet.id,
                 onTap: () => onPetSelected(pet.id),
-                leading: UiPetAvatar(imageUrl: pet.image, size: 24),
+                leading: UiPetAvatar(
+                  imageUrl: pet.image,
+                  placeholderAsset: pet.petType.emptyAvatarAsset,
+                  size: 24,
+                ),
               ),
           ],
         ),

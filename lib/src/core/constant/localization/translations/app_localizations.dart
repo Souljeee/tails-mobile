@@ -461,13 +461,13 @@ abstract class AppLocalizations {
   /// No description provided for @fetchingErrorTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Ошибка загрузки'**
+  /// **'Не удалось загрузить данные'**
   String get fetchingErrorTitle;
 
   /// No description provided for @fetchingErrorMessage.
   ///
   /// In ru, this message translates to:
-  /// **'Повторите позднее'**
+  /// **'Похоже, что-то пошло не так.'**
   String get fetchingErrorMessage;
 
   /// No description provided for @fetchingErrorRetry.
@@ -677,13 +677,13 @@ abstract class AppLocalizations {
   /// No description provided for @petsEmptyTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Список ваших питомцев пуст'**
+  /// **'Здесь пока нет ваших питомцев'**
   String get petsEmptyTitle;
 
   /// No description provided for @petsEmptyMessage.
   ///
   /// In ru, this message translates to:
-  /// **'Расскажите нам о ваших любимцах'**
+  /// **'Добавьте своего первого питомца, чтобы хранить важную информацию, планировать события и получать напоминания.'**
   String get petsEmptyMessage;
 
   /// No description provided for @notificationsLabel.
@@ -2003,7 +2003,7 @@ abstract class AppLocalizations {
   /// No description provided for @inboxEmptyMessage.
   ///
   /// In ru, this message translates to:
-  /// **'Здесь появятся напоминания о лекарствах, прививках, кормлении и других делах ваших питомцев.'**
+  /// **'Здесь будут появляться важные напоминания, новости и обновления о ваших питомцах.'**
   String get inboxEmptyMessage;
 
   /// No description provided for @inboxEmptyAction.

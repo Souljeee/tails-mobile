@@ -12,6 +12,7 @@ import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/m
 import 'package:tails_mobile/src/feature/notifications_inbox/domain/inbox_sections.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/domain/inbox_time_format.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
 /// Группа уведомлений: заголовок («Сегодня», «Август») и карточка со строками.
 class InboxSectionView extends StatelessWidget {
@@ -127,6 +128,7 @@ class _Leading extends StatelessWidget {
 
     return UiInboxPetAvatar(
       imageUrl: pet.image,
+      placeholderAsset: pet.petType.emptyAvatarAsset,
       ringColor: context.uiPalette.petColor(pet.colorIndex),
       typeIcon: eventIcon ?? Icons.pets,
     );

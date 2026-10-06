@@ -257,10 +257,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get scheduleNextMonth => 'Следующий месяц';
 
   @override
-  String get fetchingErrorTitle => 'Ошибка загрузки';
+  String get fetchingErrorTitle => 'Не удалось загрузить данные';
 
   @override
-  String get fetchingErrorMessage => 'Повторите позднее';
+  String get fetchingErrorMessage => 'Похоже, что-то пошло не так.';
 
   @override
   String get fetchingErrorRetry => 'Повторить';
@@ -386,10 +386,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get petsEmptyTitle => 'Список ваших питомцев пуст';
+  String get petsEmptyTitle => 'Здесь пока нет ваших питомцев';
 
   @override
-  String get petsEmptyMessage => 'Расскажите нам о ваших любимцах';
+  String get petsEmptyMessage =>
+      'Добавьте своего первого питомца, чтобы хранить важную информацию, планировать события и получать напоминания.';
 
   @override
   String get notificationsLabel => 'Уведомления';
@@ -1329,7 +1330,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get inboxEmptyMessage =>
-      'Здесь появятся напоминания о лекарствах, прививках, кормлении и других делах ваших питомцев.';
+      'Здесь будут появляться важные напоминания, новости и обновления о ваших питомцах.';
 
   @override
   String get inboxEmptyAction => 'Настроить уведомления';

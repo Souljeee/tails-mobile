@@ -27,6 +27,7 @@ import 'package:tails_mobile/src/core/utils/phone_format.dart';
 import 'package:tails_mobile/src/core/utils/photo_picking.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/notification_settings_model.dart';
 import 'package:tails_mobile/src/feature/profile/core/enums/feedback_topic.dart';
 import 'package:tails_mobile/src/feature/profile/core/enums/notification_category.dart';
@@ -340,6 +341,7 @@ class _PetsSummaryCard extends StatelessWidget {
                       left: i * (_avatarSize - _overlap),
                       child: UiPetAvatar(
                         imageUrl: shown[i].image,
+                        placeholderAsset: shown[i].petType.emptyAvatarAsset,
                         size: _avatarSize,
                         borderColor: palette.surface,
                       ),

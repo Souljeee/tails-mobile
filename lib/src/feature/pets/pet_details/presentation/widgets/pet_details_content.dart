@@ -1,9 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_grouped_list/ui_grouped_list.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_photo/ui_pet_photo.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_tag/ui_pet_tag.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_section_header/ui_section_header.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_stat_strip/ui_stat_strip.dart';
@@ -84,14 +84,10 @@ class _PetDetailsContentState extends State<PetDetailsContent> {
               child: child!,
             );
           },
-          child: CachedNetworkImage(
+          child: UiPetPhoto(
             imageUrl: widget.pet.image,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => ColoredBox(color: palette.sunken),
-            errorWidget: (context, url, error) => ColoredBox(
-              color: palette.sunken,
-              child: Icon(Icons.pets, size: 64, color: palette.ink3),
-            ),
+            placeholderAsset: widget.pet.petType.emptyAvatarAsset,
+            iconSize: 64,
           ),
         ),
         RefreshIndicator.adaptive(
@@ -216,6 +212,7 @@ class _PetDetailsSheet extends StatelessWidget {
               key: ValueKey('${event.id}_${event.date}_${event.time}'),
               event: event,
               petImage: pet.image,
+              petType: pet.petType,
               petColor: palette.petColor(pet.colorIndex),
             ),
             const SizedBox(height: UiSpacing.x3),

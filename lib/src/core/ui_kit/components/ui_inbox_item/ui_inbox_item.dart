@@ -125,10 +125,14 @@ class UiInboxPetAvatar extends StatelessWidget {
     required this.imageUrl,
     required this.ringColor,
     required this.typeIcon,
+    this.placeholderAsset,
     super.key,
   });
 
   final String? imageUrl;
+
+  /// Путь к картинке-заглушке питомца без фото.
+  final String? placeholderAsset;
 
   /// Цвет питомца (`UiPalette.petColor`).
   final Color ringColor;
@@ -150,6 +154,7 @@ class UiInboxPetAvatar extends StatelessWidget {
       children: [
         UiPetAvatar(
           imageUrl: imageUrl,
+          placeholderAsset: placeholderAsset,
           size: UiInboxItem.leadingSize - _ringWidth * 2,
           borderColor: ringColor,
         ),

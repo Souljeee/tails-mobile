@@ -16,7 +16,8 @@ class PetDetailsDto extends Equatable {
   final PetSexEnum gender;
   final DateTime birthday;
   final String color;
-  final String image;
+  /// Фото питомца; `null` или пустая строка, если пользователь его не загружал.
+  final String? image;
   @JsonKey(fromJson: _weightFromJson)
   final double weight;
   final DateTime createdAt;
@@ -31,7 +32,7 @@ class PetDetailsDto extends Equatable {
     required this.gender,
     required this.birthday,
     required this.color,
-    required this.image,
+    this.image,
     required this.weight,
     required this.createdAt,
     required this.updatedAt,

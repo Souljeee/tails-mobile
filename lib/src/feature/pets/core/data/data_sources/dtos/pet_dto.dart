@@ -15,7 +15,8 @@ class PetDto extends Equatable {
   final String gender;
   final DateTime birthday;
   final String color;
-  final String image;
+  /// Фото питомца; `null` или пустая строка, если пользователь его не загружал.
+  final String? image;
 
   /// Вес в кг. Backend отдаёт поле не для всех версий API, поэтому оно необязательное.
   @JsonKey(fromJson: _weightFromJson)
@@ -31,7 +32,7 @@ class PetDto extends Equatable {
     required this.gender,
     required this.birthday,
     required this.color,
-    required this.image,
+    this.image,
     required this.createdAt,
     required this.updatedAt,
     this.weight,

@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_card/ui_card.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_badge/ui_icon_badge.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_photo/ui_pet_photo.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_tag/ui_pet_tag.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
@@ -57,14 +57,9 @@ class PetOverviewCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(top: UiRadius.lgTop),
                 child: AspectRatio(
                   aspectRatio: _photoAspectRatio,
-                  child: CachedNetworkImage(
+                  child: UiPetPhoto(
                     imageUrl: pet.image,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => ColoredBox(color: palette.sunken),
-                    errorWidget: (context, url, error) => ColoredBox(
-                      color: palette.sunken,
-                      child: Icon(Icons.pets, size: 48, color: palette.ink3),
-                    ),
+                    placeholderAsset: pet.petType.emptyAvatarAsset,
                   ),
                 ),
               ),

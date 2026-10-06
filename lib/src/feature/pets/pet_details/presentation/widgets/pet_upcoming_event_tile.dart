@@ -6,6 +6,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_ba
 import 'package:tails_mobile/src/core/utils/extensions/enums_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/utils/event_day_label.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/mark_done/mark_done_bloc.dart';
@@ -15,12 +16,14 @@ class PetUpcomingEventTile extends StatefulWidget {
   const PetUpcomingEventTile({
     required this.event,
     required this.petImage,
+    required this.petType,
     required this.petColor,
     super.key,
   });
 
   final ScheduleEventModel event;
-  final String petImage;
+  final String? petImage;
+  final PetTypeEnum petType;
   final Color petColor;
 
   @override
@@ -86,7 +89,10 @@ class _PetUpcomingEventTileState extends State<PetUpcomingEventTile> {
         subtitle: '$when · ${event.type.getLocalizedName(l10n)}',
         typeIcon: event.type.icon,
         stripeColor: widget.petColor,
-        leading: UiPetAvatar(imageUrl: widget.petImage),
+        leading: UiPetAvatar(
+          imageUrl: widget.petImage,
+          placeholderAsset: widget.petType.emptyAvatarAsset,
+        ),
         isDone: _done,
         onToggle: _toggle,
       ),

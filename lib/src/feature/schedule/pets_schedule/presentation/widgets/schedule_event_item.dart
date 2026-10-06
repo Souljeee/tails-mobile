@@ -9,6 +9,7 @@ import 'package:tails_mobile/src/core/utils/extensions/enums_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/mark_done/mark_done_bloc.dart';
 
@@ -96,7 +97,10 @@ class _ScheduleEventItemState extends State<ScheduleEventItem> {
               subtitle: subtitle,
               typeIcon: event.type.icon,
               stripeColor: widget.petColor,
-              leading: UiPetAvatar(imageUrl: widget.pet?.image),
+              leading: UiPetAvatar(
+                imageUrl: widget.pet?.image,
+                placeholderAsset: widget.pet?.petType.emptyAvatarAsset,
+              ),
               isDone: event.done,
               onToggle: _toggle,
             ),

@@ -5,6 +5,7 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 
 typedef OnSelectedPetsChanged = void Function(int? selectedPetId);
 
@@ -57,7 +58,11 @@ class PetsChipList extends StatelessWidget {
             label: pet.name,
             selected: selectedPetId == pet.id,
             onTap: () => onSelectedPetsChanged(pet.id),
-            leading: UiPetAvatar(imageUrl: pet.image, size: _avatarSize),
+            leading: UiPetAvatar(
+              imageUrl: pet.image,
+              placeholderAsset: pet.petType.emptyAvatarAsset,
+              size: _avatarSize,
+            ),
           );
         },
       ),

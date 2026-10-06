@@ -20,7 +20,7 @@ class UiEmptyState extends StatelessWidget {
   final String title;
   final String? message;
 
-  /// Иллюстрация 150 pt, например `SvgPicture.asset(...)`.
+  /// Иллюстрация 300 pt, например `SvgPicture.asset(...)`.
   final Widget? illustration;
   final String? actionLabel;
   final VoidCallback? onAction;
@@ -30,14 +30,21 @@ class UiEmptyState extends StatelessWidget {
     final palette = context.uiPalette;
     final fonts = context.uiFonts;
 
-    return Center(
+    // Прижато к верху с небольшим отступом: по центру экрана блок уезжал бы вниз к навбару.
+    return Align(
+      alignment: Alignment.topCenter,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x8, vertical: UiSpacing.x6),
+        padding: const EdgeInsets.fromLTRB(
+          UiSpacing.x8,
+          UiSpacing.x2,
+          UiSpacing.x8,
+          UiSpacing.x6,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (illustration != null) ...[
-              SizedBox.square(dimension: 150, child: illustration),
+              SizedBox.square(dimension: 300, child: illustration),
               const SizedBox(height: UiSpacing.x4),
             ],
             Text(

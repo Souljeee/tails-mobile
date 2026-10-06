@@ -10,7 +10,8 @@ class PetModel extends Equatable {
   final String gender;
   final DateTime birthday;
   final String color;
-  final String image;
+  /// Фото питомца; `null` или пустая строка, если фото нет.
+  final String? image;
 
   /// Вес в кг; `null`, если backend его не вернул.
   final double? weight;
@@ -28,7 +29,7 @@ class PetModel extends Equatable {
     required this.gender,
     required this.birthday,
     required this.color,
-    required this.image,
+    this.image,
     required this.createdAt,
     required this.updatedAt,
     this.weight,

@@ -18,18 +18,13 @@ class InboxEmptyView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return Center(
+    return Align(
+      alignment: Alignment.topCenter,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           UiEmptyState(
-            illustration: const Center(
-              child: UiIconBadge(
-                icon: Icons.notifications_none,
-                size: _tileSize,
-                iconSize: _tileIconSize,
-              ),
-            ),
+            illustration: context.uiImages.emptyNotifications.image(),
             title: l10n.inboxEmptyTitle,
             message: l10n.inboxEmptyMessage,
           ),
