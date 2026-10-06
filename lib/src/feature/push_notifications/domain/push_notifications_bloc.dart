@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:rest_client/rest_client.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/logging/tails_loggable.dart';
 import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/repositories/models/push_notification.dart';
@@ -50,6 +53,7 @@ class PushNotificationsBloc extends Bloc<PushNotificationsEvent, PushNotificatio
 
   final PushNotificationsRepository _repository;
   final List<StreamSubscription<Object?>> _subscriptions = [];
+  String? _lastReportedPermission;
 
   Future<void> _onAuthorizationChanged(
     PushNotificationsEvent$AuthorizationChanged event,
@@ -72,6 +76,8 @@ class PushNotificationsBloc extends Bloc<PushNotificationsEvent, PushNotificatio
 
       final connection = await _repository.connectDevice();
 
+      _reportPermission(connection);
+
       emit(state.copyWith(status: _statusOf(connection)));
     } catch (e, s) {
       addError(e, s);
@@ -84,7 +90,25 @@ class PushNotificationsBloc extends Bloc<PushNotificationsEvent, PushNotificatio
     PushNotificationsEvent$NotificationOpened event,
     Emitter<PushNotificationsState> emit,
   ) async {
+    TailsAnalytics.log(
+      TailsAnalyticsEvents.pushOpened(type: event.notification.payload.type.analyticsName),
+    );
+
     emit(state.copyWith(lastOpened: event.notification, openedCount: state.openedCount + 1));
+  }
+
+  /// Результат запроса разрешения; повторяющийся результат не отправляется заново.
+  void _reportPermission(PushConnectionStatus connection) {
+    final status = switch (connection) {
+      PushConnectionStatus.connected => 'granted',
+      PushConnectionStatus.permissionDenied => 'denied',
+      PushConnectionStatus.unavailable => null,
+    };
+    if (status == null || status == _lastReportedPermission) return;
+
+    _lastReportedPermission = status;
+    TailsAnalytics.log(TailsAnalyticsEvents.pushPermissionResult(status: status));
+    TailsAnalytics.setUserProperty(TailsAnalyticsUserProperty.pushStatus, status);
   }
 
   PushNotificationsStatus _statusOf(PushConnectionStatus connection) => switch (connection) {

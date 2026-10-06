@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_config.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
 import 'package:tails_mobile/src/core/logging/integrations/app_lifecycle_logger.dart';
 import 'package:tails_mobile/src/core/logging/integrations/app_start_logger.dart';
@@ -51,72 +53,72 @@ sealed class AppRunner {
 
     Intl.defaultLocale = 'ru_RU';
 
-    await runZonedGuarded(
-      () async {
-        // Ensure Flutter is initialized
-        WidgetsFlutterBinding.ensureInitialized();
+    await runZonedGuarded(() async {
+      // Ensure Flutter is initialized
+      WidgetsFlutterBinding.ensureInitialized();
 
-        // Configure global error interception
-        GlobalErrorHandler.install();
+      // Configure global error interception
+      GlobalErrorHandler.install();
 
-        // Setup bloc observer and transformer
-        Bloc.observer = const TailsBlocObserver();
-        Bloc.transformer = SequentialBlocTransformer().transform;
+      // Setup bloc observer and transformer
+      Bloc.observer = const TailsBlocObserver();
+      Bloc.transformer = SequentialBlocTransformer().transform;
 
-        // Файловый журнал подключается здесь: path_provider требует инициализированного движка.
-        final fileLogSink = await _createFileLogSink(logConfig);
-        if (fileLogSink != null) {
-          logSinks.add(fileLogSink);
-          TailsLogger.configure(sinks: logSinks);
-        }
+      // Файловый журнал подключается здесь: path_provider требует инициализированного движка.
+      final fileLogSink = await _createFileLogSink(logConfig);
+      if (fileLogSink != null) {
+        logSinks.add(fileLogSink);
+        TailsLogger.configure(sinks: logSinks);
+      }
 
-        // Состояние приложения (свернули, вернулись) пишется в журнал всё время работы.
-        AppLifecycleLogger(
-          onPaused: fileLogSink == null ? null : () => unawaited(fileLogSink.flush()),
-        );
-        await _logAppStarted(config);
+      // Аналитика: сбой сервисов не должен мешать запуску.
+      TailsAnalytics.configure(sinks: await const TailsAnalyticsSinkFactory(config).create());
 
-        Future<void> launchApplication() async {
-          try {
-            final compositionResult = await CompositionRoot(
-              config: config,
-              errorReporter: errorReporter,
-              fileLogSink: fileLogSink,
-            ).compose();
+      // Состояние приложения (свернули, вернулись) пишется в журнал всё время работы.
+      AppLifecycleLogger(
+        onPaused: fileLogSink == null ? null : () => unawaited(fileLogSink.flush()),
+      );
+      await _logAppStarted(config);
 
-            runApp(RootContext(compositionResult: compositionResult));
+      Future<void> launchApplication() async {
+        try {
+          final compositionResult = await CompositionRoot(
+            config: config,
+            errorReporter: errorReporter,
+            fileLogSink: fileLogSink,
+          ).compose();
 
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => TailsLogger.info(
-                'Первый кадр отрисован',
-                category: TailsLogCategory.app,
-                source: 'AppRunner',
-                data: {'sinceStartMs': startupStopwatch.elapsedMilliseconds},
-              ),
-            );
-          } on Object catch (e, stackTrace) {
-            TailsLogger.fatal(
-              'Не удалось инициализировать приложение',
+          runApp(RootContext(compositionResult: compositionResult));
+
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => TailsLogger.info(
+              'Первый кадр отрисован',
               category: TailsLogCategory.app,
               source: 'AppRunner',
+              data: {'sinceStartMs': startupStopwatch.elapsedMilliseconds},
+            ),
+          );
+        } on Object catch (e, stackTrace) {
+          TailsLogger.fatal(
+            'Не удалось инициализировать приложение',
+            category: TailsLogCategory.app,
+            source: 'AppRunner',
+            error: e,
+            stackTrace: stackTrace,
+          );
+          runApp(
+            InitializationFailedApp(
               error: e,
               stackTrace: stackTrace,
-            );
-            runApp(
-              InitializationFailedApp(
-                error: e,
-                stackTrace: stackTrace,
-                onRetryInitialization: launchApplication,
-              ),
-            );
-          }
+              onRetryInitialization: launchApplication,
+            ),
+          );
         }
+      }
 
-        // Launch the application
-        await launchApplication();
-      },
-      GlobalErrorHandler.onZoneError,
-    );
+      // Launch the application
+      await launchApplication();
+    }, GlobalErrorHandler.onZoneError);
   }
 
   /// Создаёт файловый журнал в приватной папке приложения. Без него приложение работает.

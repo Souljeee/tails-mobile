@@ -3,6 +3,9 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/analytics_reason_mapper.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/feedback_model.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
 import 'package:tails_mobile/src/feature/profile/core/enums/feedback_topic.dart';
@@ -43,13 +46,17 @@ class FeedbackBloc extends Bloc<FeedbackEvent, FeedbackState> {
         ),
       );
 
+      TailsAnalytics.log(TailsAnalyticsEvents.feedbackSent(category: event.topic.apiValue));
+
       emit(const FeedbackState.sent());
     } on FeedbackRateLimitException catch (e, s) {
       addError(e, s);
+      TailsAnalytics.log(TailsAnalyticsEvents.feedbackFailed(AnalyticsReason.rateLimited));
 
       emit(const FeedbackState.failure(isRateLimited: true));
     } catch (e, s) {
       addError(e, s);
+      TailsAnalytics.log(TailsAnalyticsEvents.feedbackFailed(analyticsReasonOf(e)));
 
       emit(const FeedbackState.failure());
     }

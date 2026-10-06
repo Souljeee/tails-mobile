@@ -4,6 +4,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
@@ -238,8 +240,16 @@ class _EditPetModalState extends State<EditPetModal> {
 
     return ValueListenableBuilder<EditPetFormData>(
       valueListenable: _formData,
-      builder: (context, formData, child) =>
-          UiDiscardGuard(hasChanges: _hasChanges(formData), child: child!),
+      builder: (context, formData, child) => UiDiscardGuard(
+        hasChanges: _hasChanges(formData),
+        onDiscarded: () => TailsAnalytics.log(
+          TailsAnalyticsEvents.formDiscarded(
+            form: 'edit_pet',
+            filledFields: _changedFields(formData).length,
+          ),
+        ),
+        child: child!,
+      ),
       child: Scaffold(
         backgroundColor: context.uiPalette.canvas,
         body: SafeArea(
@@ -330,6 +340,7 @@ class _EditPetModalState extends State<EditPetModal> {
                                           hasCastration: formData.castration,
                                         ),
                                         image: _formData.value.image,
+                                        changedFields: _changedFields(formData),
                                       ),
                                     );
                                   },
@@ -373,7 +384,10 @@ class _EditPetModalState extends State<EditPetModal> {
     }
   }
 
-  bool _hasChanges(EditPetFormData formData) {
+  bool _hasChanges(EditPetFormData formData) => _changedFields(formData).isNotEmpty;
+
+  /// Имена изменённых полей (для аналитики): закрытый словарь без значений.
+  List<String> _changedFields(EditPetFormData formData) {
     String norm(String? s) => (s ?? '').trim();
 
     bool sameDate(DateTime a, DateTime b) =>
@@ -387,15 +401,17 @@ class _EditPetModalState extends State<EditPetModal> {
     final currentWeight = formData.weight;
     final weightChanged = currentWeight != null && (currentWeight - initialWeight).abs() > 1e-9;
 
-    return norm(formData.name) != norm(widget.pet.name) ||
-        formData.petType != widget.pet.petType ||
-        formData.breedId != widget.pet.breed.id ||
-        norm(formData.color) != norm(widget.pet.color) ||
-        weightChanged ||
-        formData.gender != widget.pet.gender ||
-        birthdayChanged ||
-        formData.castration != widget.pet.hasCastration ||
-        // Важно: иначе смена фото сама по себе не активирует кнопку
-        formData.image != null;
+    return [
+      if (norm(formData.name) != norm(widget.pet.name)) 'name',
+      if (formData.petType != widget.pet.petType) 'pet_type',
+      if (formData.breedId != widget.pet.breed.id) 'breed',
+      if (norm(formData.color) != norm(widget.pet.color)) 'color',
+      if (weightChanged) 'weight',
+      if (formData.gender != widget.pet.gender) 'gender',
+      if (birthdayChanged) 'birthday',
+      if (formData.castration != widget.pet.hasCastration) 'castration',
+      // Важно: иначе смена фото сама по себе не активирует кнопку
+      if (formData.image != null) 'photo',
+    ];
   }
 }

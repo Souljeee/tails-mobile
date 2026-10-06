@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/analytics_reason_mapper.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
 import 'package:tails_mobile/src/feature/profile/core/exceptions/profile_exceptions.dart';
@@ -32,6 +35,8 @@ class DeleteAccountBloc extends Bloc<DeleteAccountEvent, DeleteAccountState> {
     DeleteAccountEvent$Started event,
     Emitter<DeleteAccountState> emit,
   ) async {
+    TailsAnalytics.log(TailsAnalyticsEvents.accountDeleteStarted);
+
     try {
       final pets = await _petRepository.getPets();
 
@@ -81,8 +86,16 @@ class DeleteAccountBloc extends Bloc<DeleteAccountEvent, DeleteAccountState> {
 
       await _profileRepository.deleteAccount(code: event.code);
 
+      TailsAnalytics.log(
+        TailsAnalyticsEvents.accountDeleted(
+          petsCount: _petRepository.knownPetsCount ?? state.petNames.length,
+        ),
+      );
+
       emit(state.copyWith(status: DeleteAccountStatus.deleted));
     } on InvalidDeletionCodeException catch (e) {
+      TailsAnalytics.log(TailsAnalyticsEvents.accountDeleteFailed(AnalyticsReason.invalidCode));
+
       emit(
         state.copyWith(
           status: DeleteAccountStatus.failure,
@@ -92,6 +105,7 @@ class DeleteAccountBloc extends Bloc<DeleteAccountEvent, DeleteAccountState> {
       );
     } catch (e, s) {
       addError(e, s);
+      TailsAnalytics.log(TailsAnalyticsEvents.accountDeleteFailed(analyticsReasonOf(e)));
 
       emit(
         state.copyWith(status: DeleteAccountStatus.failure, failure: DeleteAccountFailure.generic),

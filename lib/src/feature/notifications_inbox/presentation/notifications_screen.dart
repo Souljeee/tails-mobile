@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tails_mobile/src/core/analytics/integrations/analytics_impression.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_errors/ui_fetching_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_notice_banner/ui_notice_banner.dart';
@@ -178,11 +182,21 @@ class _InboxContentState extends State<_InboxContent> {
                   UiSpacing.x5,
                   UiSpacing.x2,
                 ),
-                child: UiNoticeBanner(
-                  title: l10n.notificationsBlockedTitle,
-                  text: l10n.notificationsBlockedText,
-                  actionLabel: l10n.notificationsBlockedAction,
-                  onAction: () => _bloc.add(const NotificationsInboxEvent.openSettingsRequested()),
+                child: AnalyticsImpression(
+                  onShown: () {
+                    TailsAnalytics.log(TailsAnalyticsEvents.notificationsDisabledBannerShown);
+                    TailsAnalytics.setUserProperty(
+                      TailsAnalyticsUserProperty.pushStatus,
+                      'system_blocked',
+                    );
+                  },
+                  child: UiNoticeBanner(
+                    title: l10n.notificationsBlockedTitle,
+                    text: l10n.notificationsBlockedText,
+                    actionLabel: l10n.notificationsBlockedAction,
+                    onAction: () =>
+                        _bloc.add(const NotificationsInboxEvent.openSettingsRequested()),
+                  ),
                 ),
               ),
             ),

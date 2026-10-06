@@ -8,6 +8,7 @@ import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/utils/event_day_label.dart';
+import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/mark_done/mark_done_bloc.dart';
 
@@ -55,6 +56,9 @@ class _PetUpcomingEventTileState extends State<PetUpcomingEventTile> {
         date: widget.event.date,
         time: widget.event.time,
         timeZoneOffset: widget.event.timeZoneOffset,
+        analyticsEventType: ScheduleAnalytics.eventType(widget.event.type),
+        analyticsIsRecurring: widget.event.recurrence != null,
+        analyticsFrom: 'pet_details',
       ),
     );
   }

@@ -13,15 +13,24 @@ import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 /// «Закрыть без сохранения?». Программное `Navigator.pop` (например, после успешного
 /// сохранения) вопрос не вызывает.
 class UiDiscardGuard extends StatelessWidget {
-  const UiDiscardGuard({required this.hasChanges, required this.child, super.key});
+  const UiDiscardGuard({
+    required this.hasChanges,
+    required this.child,
+    this.onDiscarded,
+    super.key,
+  });
 
   final bool hasChanges;
   final Widget child;
+
+  /// Вызывается, когда пользователь подтвердил закрытие без сохранения (для аналитики).
+  final VoidCallback? onDiscarded;
 
   Future<void> _onPopBlocked(BuildContext context) async {
     final discard = await showUiDiscardSheet(context);
 
     if (discard && context.mounted) {
+      onDiscarded?.call();
       Navigator.of(context).pop();
     }
   }

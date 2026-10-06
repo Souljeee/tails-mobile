@@ -183,7 +183,10 @@ class _RetryButtonState extends State<_RetryButton> {
           onTap: isEnabled
               ? () {
                   _sendCodeBloc.add(
-                    SendCodeEvent.sendCodeRequested(phoneNumber: widget.phoneNumber),
+                    SendCodeEvent.sendCodeRequested(
+                      phoneNumber: widget.phoneNumber,
+                      isResend: true,
+                    ),
                   );
                   _codeTimerBloc.add(const CodeTimerEvent.started());
                 }

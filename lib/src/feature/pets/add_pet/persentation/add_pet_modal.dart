@@ -4,6 +4,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
@@ -60,6 +62,16 @@ class AddPetFormData extends Equatable {
       gender != PetSexEnum.male ||
       (castration ?? false);
 
+  /// Сколько полей заполнено (для аналитики `form_discarded`).
+  int get filledFieldsCount => [
+    name?.trim().isNotEmpty ?? false,
+    color?.trim().isNotEmpty ?? false,
+    breedId != null,
+    weight != null,
+    birthday != null,
+    image != null,
+  ].where((filled) => filled).length;
+
   bool get isValid =>
       name != null &&
       breedId != null &&
@@ -113,6 +125,9 @@ class AddPetModal extends StatefulWidget {
 }
 
 class _AddPetModalState extends State<AddPetModal> {
+  /// Выбрана порода «Метис или не знаю»; нужно только аналитике.
+  bool _isMixedBreed = false;
+
   final ValueNotifier<AddPetFormData> _formData = ValueNotifier(
     const AddPetFormData(castration: false, petType: PetTypeEnum.cat, gender: PetSexEnum.male),
   );
@@ -155,6 +170,8 @@ class _AddPetModalState extends State<AddPetModal> {
   }
 
   void _onBreedSelected(BreedModel breed) {
+    _isMixedBreed = breed.isMixed;
+    TailsAnalytics.log(TailsAnalyticsEvents.petBreedSelected);
     _formData.value = _formData.value.copyWith(breedId: CopyWithWrapper.value(breed.id));
   }
 
@@ -230,8 +247,16 @@ class _AddPetModalState extends State<AddPetModal> {
 
     return ValueListenableBuilder<AddPetFormData>(
       valueListenable: _formData,
-      builder: (context, formData, child) =>
-          UiDiscardGuard(hasChanges: formData.hasChanges, child: child!),
+      builder: (context, formData, child) => UiDiscardGuard(
+        hasChanges: formData.hasChanges,
+        onDiscarded: () => TailsAnalytics.log(
+          TailsAnalyticsEvents.formDiscarded(
+            form: 'add_pet',
+            filledFields: formData.filledFieldsCount,
+          ),
+        ),
+        child: child!,
+      ),
       child: Scaffold(
         backgroundColor: context.uiPalette.canvas,
         body: SafeArea(
@@ -313,6 +338,7 @@ class _AddPetModalState extends State<AddPetModal> {
                                   birthday: formData.birthday!,
                                   castration: formData.castration!,
                                   image: formData.image,
+                                  isMixedBreed: _isMixedBreed,
                                 ),
                               );
                             },

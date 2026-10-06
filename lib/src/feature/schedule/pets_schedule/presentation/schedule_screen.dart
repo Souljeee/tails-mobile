@@ -4,6 +4,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
@@ -187,6 +189,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   }
 
   Future<void> _openCreateEventBottomSheet() async {
+    TailsAnalytics.log(TailsAnalyticsEvents.eventCreateStarted(AnalyticsSource.navbarPlus));
+
     final result = await showUiBottomSheet<CreateScheduleEventResult>(
       context: context,
       name: 'create-event',
@@ -265,12 +269,15 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       return;
     }
 
+    TailsAnalytics.log(TailsAnalyticsEvents.scheduleFilterChanged('pet'));
     setState(() => _selectedPetId = request.petId);
 
     _reloadSchedule();
   }
 
   void _onPetChanged(int? petId) {
+    TailsAnalytics.log(TailsAnalyticsEvents.scheduleFilterChanged(petId == null ? 'all' : 'pet'));
+
     setState(() {
       _selectedPetId = petId;
     });
@@ -358,6 +365,9 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                           selectedDate: _selectedDate,
                           controller: _monthController,
                           onDateTap: (date) {
+                            TailsAnalytics.log(
+                              TailsAnalyticsEvents.calendarDateSelected(isToday: date == _today),
+                            );
                             setState(() {
                               _selectedDate = date;
                             });

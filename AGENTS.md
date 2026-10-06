@@ -79,6 +79,20 @@
   `TailsLogger.reset`. Для нового логирования добавь тест на запись; для нового чувствительного
   ключа — тест санитайзера.
 
+## Аналитика
+
+Подробности и каталог событий — в [docs/analytics.md](docs/analytics.md).
+
+- Все события отправляются только через `TailsAnalytics.log(TailsAnalyticsEvents.…)`. Пакеты
+  `appmetrica_plugin` и `firebase_analytics` вне `core/analytics/sinks/` не импортируй.
+- Новое событие добавляй в каталог `TailsAnalyticsEvents` и в `docs/analytics.md`. Отправляй его
+  после успеха операции; для ошибки — `*_failed` с причиной `analyticsReasonOf(e)`.
+- В параметрах — только закрытые значения и корзины. Никаких телефонов, имён, названий питомцев,
+  текстов событий и обращений, кодов, токенов.
+- Не дублируй то, что делают `AnalyticsScreenTracker` (экраны) и `UiDiscardGuard.onDiscarded`.
+- В тестах подключай `RecordingAnalyticsSink` через `TailsAnalytics.configure`, в `tearDown`
+  вызывай `TailsAnalytics.reset`.
+
 ## Проверка результата
 
 После изменения Dart-кода запусти проверки, соразмерные изменению:

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_grouped_list/ui_grouped_list.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_nav_row/ui_nav_row.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_section_header/ui_section_header.dart';
@@ -17,7 +19,7 @@ class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   /// Открывает документ во встроенном браузере (Safari View Controller / Custom Tabs). Пока ссылка не задана — сообщает, что документа нет.
-  Future<void> _openDocument(BuildContext context, String url) async {
+  Future<void> _openDocument(BuildContext context, String url, {required String document}) async {
     final l10n = context.l10n;
 
     if (url.isEmpty) {
@@ -25,6 +27,8 @@ class AboutScreen extends StatelessWidget {
 
       return;
     }
+
+    TailsAnalytics.log(TailsAnalyticsEvents.legalLinkOpened(document));
 
     var opened = false;
 
@@ -96,12 +100,13 @@ class AboutScreen extends StatelessWidget {
                         UiNavRow(
                           icon: Icons.description_outlined,
                           title: l10n.aboutTerms,
-                          onTap: () => _openDocument(context, config.termsUrl),
+                          onTap: () => _openDocument(context, config.termsUrl, document: 'terms'),
                         ),
                         UiNavRow(
                           icon: Icons.verified_user_outlined,
                           title: l10n.aboutPrivacy,
-                          onTap: () => _openDocument(context, config.privacyUrl),
+                          onTap: () =>
+                              _openDocument(context, config.privacyUrl, document: 'privacy'),
                         ),
                       ],
                     ),

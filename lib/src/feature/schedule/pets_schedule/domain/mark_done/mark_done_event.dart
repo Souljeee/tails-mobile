@@ -11,6 +11,9 @@ sealed class MarkDoneEvent extends Equatable {
     required bool value,
     String? time,
     int? timeZoneOffset,
+    String? analyticsEventType,
+    bool analyticsIsRecurring,
+    String analyticsFrom,
   }) = MarkDoneEvent$MarkDoneRequested;
 
   T map<T>({required MarkDoneEventMatch<T, MarkDoneEvent$MarkDoneRequested> markDoneRequested}) =>
@@ -28,14 +31,31 @@ final class MarkDoneEvent$MarkDoneRequested extends MarkDoneEvent {
   final String? time;
   final int? timeZoneOffset;
 
+  /// Тип события (`vet_visit`), признак повторения и экран-источник. Нужны только аналитике.
+  final String? analyticsEventType;
+  final bool analyticsIsRecurring;
+  final String analyticsFrom;
+
   const MarkDoneEvent$MarkDoneRequested({
     required this.value,
     required this.eventId,
     required this.date,
     this.time,
     this.timeZoneOffset,
+    this.analyticsEventType,
+    this.analyticsIsRecurring = false,
+    this.analyticsFrom = 'calendar',
   });
 
   @override
-  List<Object?> get props => [value, eventId, date, time, timeZoneOffset];
+  List<Object?> get props => [
+    value,
+    eventId,
+    date,
+    time,
+    timeZoneOffset,
+    analyticsEventType,
+    analyticsIsRecurring,
+    analyticsFrom,
+  ];
 }

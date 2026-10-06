@@ -2,6 +2,11 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/analytics_reason_mapper.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
+import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
 
@@ -15,9 +20,7 @@ class CreateEventBloc extends Bloc<CreateEventEvent, CreateEventState> {
     : _scheduleRepository = scheduleRepository,
       super(const CreateEventState.initial()) {
     on<CreateEventEvent>(
-      (event, emit) => event.map(
-        createRequested: (event) => _onCreateRequested(event, emit),
-      ),
+      (event, emit) => event.map(createRequested: (event) => _onCreateRequested(event, emit)),
     );
   }
 
@@ -30,12 +33,18 @@ class CreateEventBloc extends Bloc<CreateEventEvent, CreateEventState> {
 
       await _scheduleRepository.createEvent(model: event.model);
 
+      TailsAnalytics.log(ScheduleAnalytics.eventCreated(event.model));
+      if (event.model.isRecurring) {
+        TailsAnalytics.setUserProperty(TailsAnalyticsUserProperty.hasRecurringEvents, true);
+      }
+
       emit(const CreateEventState.success());
     } catch (e, s) {
       addError(e, s);
+      TailsAnalytics.log(TailsAnalyticsEvents.eventCreateFailed(analyticsReasonOf(e)));
 
       emit(const CreateEventState.error());
-    }finally {
+    } finally {
       emit(const CreateEventState.initial());
     }
   }

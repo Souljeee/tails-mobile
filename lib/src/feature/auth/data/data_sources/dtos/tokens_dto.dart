@@ -10,11 +10,20 @@ class TokensDto extends Equatable {
   final int accessExpires;
   final int refreshExpires;
 
+  /// Признак первой успешной верификации номера. Есть только в ответе `verify-code`;
+  /// `null`, если бэкенд (старая версия) его не вернул.
+  final bool? isNewUser;
+
+  /// Внутренний идентификатор пользователя. Есть только в ответе `verify-code`.
+  final String? userId;
+
   const TokensDto({
     required this.access,
     required this.refresh,
     required this.accessExpires,
     required this.refreshExpires,
+    this.isNewUser,
+    this.userId,
   });
 
   factory TokensDto.fromJson(Map<String, dynamic> json) => _$TokensDtoFromJson(json);
@@ -22,10 +31,5 @@ class TokensDto extends Equatable {
   Map<String, dynamic> toJson() => _$TokensDtoToJson(this);
 
   @override
-  List<Object?> get props => [
-        access,
-        refresh,
-        accessExpires,
-        refreshExpires,
-      ];
+  List<Object?> get props => [access, refresh, accessExpires, refreshExpires, isNewUser, userId];
 }

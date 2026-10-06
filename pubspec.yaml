@@ -86,6 +86,7 @@ dependencies:
   cached_network_image: ^3.4.1
   url_launcher: ^6.3.2
   device_info_plus: ^12.4.0
+  appmetrica_plugin: ^3.4.0
 
 dev_dependencies:
   # Testing

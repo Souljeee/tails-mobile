@@ -2,6 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tails_mobile/src/core/analytics/integrations/analytics_impression.dart';
+import 'package:tails_mobile/src/core/analytics/integrations/analytics_navigation.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_empty_state/ui_empty_state.dart';
@@ -44,6 +48,7 @@ class _PetsScreenState extends State<PetsScreen> with ShellActionMixin<PetsScree
 
   @override
   void onShellAction() {
+    TailsAnalytics.log(TailsAnalyticsEvents.petAddStarted(AnalyticsSource.navbarPlus));
     const AddPetRoute().push<void>(context);
   }
 
@@ -240,10 +245,14 @@ class _PetsEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return UiEmptyState(
-      illustration: context.uiImages.emptyPets.image(),
-      title: context.l10n.petsEmptyTitle,
-      message: context.l10n.petsEmptyMessage,
+    return AnalyticsImpression(
+      onShown: () =>
+          TailsAnalytics.log(TailsAnalyticsEvents.emptyStateShown(screen: AnalyticsContext.screen)),
+      child: UiEmptyState(
+        illustration: context.uiImages.emptyPets.image(),
+        title: context.l10n.petsEmptyTitle,
+        message: context.l10n.petsEmptyMessage,
+      ),
     );
   }
 }
