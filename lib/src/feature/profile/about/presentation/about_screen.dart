@@ -127,31 +127,23 @@ class AboutScreen extends StatelessWidget {
   }
 }
 
-/// Временный знак приложения: монограмма «Х» на акценте. Заменить утверждённым значком.
+/// Знак приложения: утверждённая иконка со скруглением и тенью из токенов UI kit.
 class _AppMark extends StatelessWidget {
   const _AppMark();
 
+  static const double _size = 96;
+
   @override
   Widget build(BuildContext context) {
-    final palette = context.uiPalette;
-
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: palette.accent,
+      decoration: const BoxDecoration(borderRadius: UiRadius.lgAll, boxShadow: UiShadows.e1),
+      child: ClipRRect(
         borderRadius: UiRadius.lgAll,
-        boxShadow: UiShadows.e1,
-      ),
-      child: SizedBox.square(
-        dimension: 96,
-        child: Center(
-          child: Text(
-            'Х',
-            style: context.uiFonts.displayM.copyWith(
-              color: palette.surface,
-              fontSize: 56,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+        child: context.uiImages.appIcon.image(
+          width: _size,
+          height: _size,
+          fit: BoxFit.cover,
+          excludeFromSemantics: true,
         ),
       ),
     );
