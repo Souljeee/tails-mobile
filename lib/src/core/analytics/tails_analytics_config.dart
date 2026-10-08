@@ -40,7 +40,15 @@ final class TailsAnalyticsSinkFactory {
 
   Future<TailsAnalyticsSink?> _createAppMetrica() async {
     final apiKey = config.appMetricaApiKey;
-    if (apiKey.isEmpty) return null;
+    if (apiKey.isEmpty) {
+      TailsLogger.warning(
+        'AppMetrica отключена: не задан APPMETRICA_API_KEY (передайте через --dart-define)',
+        category: TailsLogCategory.app,
+        source: 'TailsAnalytics',
+      );
+
+      return null;
+    }
 
     await PluginAppMetricaClient.activate(apiKey: apiKey, logs: !kReleaseMode);
 
