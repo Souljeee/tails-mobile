@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tails_mobile/src/core/analytics/integrations/analytics_impression.dart';
+import 'package:tails_mobile/src/core/analytics/integrations/analytics_navigation.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_empty_state/ui_empty_state.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_badge/ui_icon_badge.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_text_link/ui_text_link.dart';
@@ -18,17 +22,20 @@ class InboxEmptyView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          UiEmptyState(
-            illustration: context.uiImages.emptyNotifications.image(),
-            title: l10n.inboxEmptyTitle,
-            message: l10n.inboxEmptyMessage,
-          ),
-          UiTextLink(label: l10n.inboxEmptyAction, onTap: onOpenSettings),
-        ],
+    return AnalyticsImpression(
+      onShown: _logShown,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            UiEmptyState(
+              illustration: context.uiImages.emptyNotifications.image(),
+              title: l10n.inboxEmptyTitle,
+              message: l10n.inboxEmptyMessage,
+            ),
+            UiTextLink(label: l10n.inboxEmptyAction, onTap: onOpenSettings),
+          ],
+        ),
       ),
     );
   }
@@ -43,18 +50,24 @@ class InboxAllReadView extends StatelessWidget {
     final l10n = context.l10n;
     final palette = context.uiPalette;
 
-    return UiEmptyState(
-      illustration: Center(
-        child: UiIconBadge(
-          icon: Icons.check,
-          size: _tileSize,
-          iconSize: _tileIconSize,
-          foregroundColor: palette.pine,
-          backgroundColor: palette.pineTint,
+    return AnalyticsImpression(
+      onShown: _logShown,
+      child: UiEmptyState(
+        illustration: Center(
+          child: UiIconBadge(
+            icon: Icons.check,
+            size: _tileSize,
+            iconSize: _tileIconSize,
+            foregroundColor: palette.pine,
+            backgroundColor: palette.pineTint,
+          ),
         ),
+        title: l10n.inboxAllReadTitle,
+        message: l10n.inboxAllReadMessage,
       ),
-      title: l10n.inboxAllReadTitle,
-      message: l10n.inboxAllReadMessage,
     );
   }
 }
+
+void _logShown() =>
+    TailsAnalytics.log(TailsAnalyticsEvents.emptyStateShown(screen: AnalyticsContext.screen));

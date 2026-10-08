@@ -86,6 +86,7 @@ dependencies:
   cached_network_image: ^3.4.1
   url_launcher: ^6.3.2
   device_info_plus: ^12.4.0
+  appmetrica_plugin: ^3.4.0
 
 dev_dependencies:
   # Testing
@@ -147,28 +148,30 @@ flutter_gen:
       class_name: UiAssets
 
 flutter_launcher_icons:
-  #  image_path: "assets/images/icon-128x128.png"
-  image_path_android: "assets/images/icon-1024x1024.png"
-  image_path_ios: "assets/images/icon-1024x1024.png"
-  android: true # can specify file name here e.g. "ic_launcher"
-  ios: true # can specify file name here e.g. "My-Launcher-Icon"
-  # adaptive_icon_background: "assets/images/christmas-background.png" # only available for Android 8.0 devices and above
-  # adaptive_icon_foreground: "assets/images/icon-foreground-432x432.png" # only available for Android 8.0 devices and above
+  # Исходники иконки лежат в assets/app_icon (не входят в flutter assets, в сборку не попадают).
+  # Генерация: fvm dart run flutter_launcher_icons
+  android: true
+  ios: true
   min_sdk_android: 21 # android min sdk min:16, default 21
+
+  # Android: обычная иконка для API < 26 и адаптивная иконка (фон + передний план + монохром).
+  image_path_android: "assets/app_icon/icon_master_1024.png"
+  adaptive_icon_background: "#FAF5EF"
+  adaptive_icon_foreground: "assets/app_icon/android_foreground.png"
+  adaptive_icon_foreground_inset: 0 # безопасная зона уже заложена в foreground (432 px)
+  adaptive_icon_monochrome: "assets/app_icon/android_monochrome.png"
+
+  # iOS: светлая, тёмная (прозрачный фон) и tinted (оттенки серого) иконки.
+  image_path_ios: "assets/app_icon/ios_default_1024.png"
+  image_path_ios_dark_transparent: "assets/app_icon/ios_dark_1024.png"
+  image_path_ios_tinted_grayscale: "assets/app_icon/ios_tinted_1024.png"
   remove_alpha_ios: true
-  background_color_ios: "#ffffff"
+  background_color_ios: "#FAF5EF"
 
+  # В проекте нет платформ web, windows и macos.
   web:
-    generate: true
-    image_path: "assets/images/icon-1024x1024.png"
-    # background_color: "#hexcode"
-    # theme_color: "#hexcode"
-
+    generate: false
   windows:
-    generate: true
-    image_path: "assets/images/icon-1024x1024.png"
-    icon_size: 48 # min:48, max:256, default: 48
-
+    generate: false
   macos:
-    generate: true
-    image_path: "assets/images/icon-1024x1024.png"
+    generate: false

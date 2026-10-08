@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/models/inbox_item.dart';
 import 'package:tails_mobile/src/feature/notifications_inbox/data/repositories/notifications_inbox_repository.dart';
@@ -62,6 +64,8 @@ class NotificationsInboxBloc extends Bloc<NotificationsInboxEvent, Notifications
     NotificationsInboxEvent$Started event,
     Emitter<NotificationsInboxState> emit,
   ) async {
+    TailsAnalytics.log(TailsAnalyticsEvents.inboxOpened);
+
     emit(state.copyWith(status: NotificationsInboxStatus.loading));
 
     // Питомцы и системное разрешение нужны только для оформления: сбой не мешает списку.
@@ -98,6 +102,8 @@ class NotificationsInboxBloc extends Bloc<NotificationsInboxEvent, Notifications
     if (event.filter == state.filter) {
       return;
     }
+
+    TailsAnalytics.log(TailsAnalyticsEvents.inboxFilterChanged(event.filter.name));
 
     emit(
       state.copyWith(
@@ -162,6 +168,17 @@ class NotificationsInboxBloc extends Bloc<NotificationsInboxEvent, Notifications
   ) async {
     final index = state.items.indexWhereId(event.id);
 
+    if (index >= 0) {
+      final item = state.items[index];
+      TailsAnalytics.log(
+        TailsAnalyticsEvents.inboxItemOpened(
+          type: item.eventType == null
+              ? 'announcement'
+              : TailsAnalyticsEvents.snake(item.eventType!.name),
+        ),
+      );
+    }
+
     if (index < 0 || state.items[index].isRead) {
       return;
     }
@@ -202,6 +219,8 @@ class NotificationsInboxBloc extends Bloc<NotificationsInboxEvent, Notifications
     if (state.unreadCount == 0) {
       return;
     }
+
+    TailsAnalytics.log(TailsAnalyticsEvents.inboxReadAll);
 
     final previous = state;
     final isUnreadFilter = state.filter == NotificationsInboxFilter.unread;
@@ -246,7 +265,11 @@ class NotificationsInboxBloc extends Bloc<NotificationsInboxEvent, Notifications
   Future<void> _onOpenSettingsRequested(
     NotificationsInboxEvent$OpenSettingsRequested event,
     Emitter<NotificationsInboxState> emit,
-  ) => _profileRepository.openSystemSettings();
+  ) {
+    TailsAnalytics.log(TailsAnalyticsEvents.notificationsOpenSystemSettings);
+
+    return _profileRepository.openSystemSettings();
+  }
 
   Future<void> _onUnreadCountChanged(
     NotificationsInboxEvent$UnreadCountChanged event,

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/add_pet_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/breed_dto.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/data_sources/dtos/edit_pet_dto.dart';
@@ -24,6 +26,13 @@ class PetRepository {
 
   Stream<PetsRepositoryEventsEvent> get eventStream => _eventStreamController.stream;
 
+  int? _knownPetsCount;
+
+  /// Сколько питомцев было известно после последней загрузки списка или изменения.
+  ///
+  /// Нужно только аналитике (`is_first_pet`, `pets_count`); `null`, пока список не загружали.
+  int? get knownPetsCount => _knownPetsCount;
+
   PetRepository({required PetsRemoteDataSource petsRemoteDataSource, PetColorStore? petColorStore})
     : _petsRemoteDataSource = petsRemoteDataSource,
       _petColorStore = petColorStore;
@@ -32,6 +41,8 @@ class PetRepository {
     final pets = await _petsRemoteDataSource.getPets();
 
     final colors = await _petColorStore?.sync(pets.map((pet) => pet.id));
+
+    _reportPetsProperties(pets);
 
     return pets.map((pet) => pet.toModel(colorIndex: colors?[pet.id] ?? 0)).toList();
   }
@@ -47,6 +58,7 @@ class PetRepository {
   Future<void> addPet({required AddPetModel model, required File? image}) async {
     await _petsRemoteDataSource.addPet(dto: model.toDto(), imagePath: image?.path);
 
+    _changeKnownCount(1);
     _eventStreamController.add(const PetsRepositoryEventsEvent.petsAdded());
   }
 
@@ -65,7 +77,31 @@ class PetRepository {
   Future<void> deletePet({required int id}) async {
     await _petsRemoteDataSource.deletePet(id: id);
 
+    _changeKnownCount(-1);
     _eventStreamController.add(const PetsRepositoryEventsEvent.petDeleted());
+  }
+
+  void _changeKnownCount(int delta) {
+    final known = _knownPetsCount;
+    if (known == null) return;
+
+    _knownPetsCount = (known + delta).clamp(0, 1 << 20);
+    TailsAnalytics.setUserProperty(TailsAnalyticsUserProperty.petsCount, _knownPetsCount!);
+  }
+
+  /// Обновляет свойства пользователя в аналитике по свежему списку питомцев.
+  void _reportPetsProperties(List<PetDto> pets) {
+    _knownPetsCount = pets.length;
+
+    TailsAnalytics.setUserProperty(TailsAnalyticsUserProperty.petsCount, pets.length);
+    TailsAnalytics.setUserProperty(
+      TailsAnalyticsUserProperty.dogsCount,
+      pets.where((pet) => pet.petType == PetTypeEnum.dog).length,
+    );
+    TailsAnalytics.setUserProperty(
+      TailsAnalyticsUserProperty.catsCount,
+      pets.where((pet) => pet.petType == PetTypeEnum.cat).length,
+    );
   }
 }
 

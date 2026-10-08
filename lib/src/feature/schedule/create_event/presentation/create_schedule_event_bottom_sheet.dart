@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
@@ -23,6 +25,7 @@ import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
@@ -141,7 +144,13 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
           _timeController,
           _notesController,
         ]),
-        builder: (context, child) => UiDiscardGuard(hasChanges: _hasChanges, child: child!),
+        builder: (context, child) => UiDiscardGuard(
+          hasChanges: _hasChanges,
+          onDiscarded: () => TailsAnalytics.log(
+            TailsAnalyticsEvents.formDiscarded(form: 'create_event', filledFields: _filledFields),
+          ),
+          child: child!,
+        ),
         child: SafeArea(
           top: false,
           minimum: _contentPadding,
@@ -203,7 +212,10 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
               const SizedBox(height: UiSpacing.x4),
               _RecurrenceSelector(
                 recurrence: _recurrence,
-                onTap: () => _isRecurrenceOpen.value = true,
+                onTap: () {
+                  TailsAnalytics.log(TailsAnalyticsEvents.recurrenceOpened);
+                  _isRecurrenceOpen.value = true;
+                },
               ),
               const SizedBox(height: UiSpacing.x4),
               UiTextField(
@@ -264,6 +276,9 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   void _applyRecurrence(RecurrenceDraft? draft) {
     _isRecurrenceOpen.value = false;
     _recurrence.value = draft;
+    if (draft != null) {
+      TailsAnalytics.log(ScheduleAnalytics.recurrenceSaved(draft.toModel()));
+    }
 
     // Время события берётся из первого времени «в течение дня» (его можно поменять на экране
     // повторения), поэтому поле «Время» следует за ним.
@@ -272,6 +287,15 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       _timeController.text = time;
     }
   }
+
+  /// Сколько полей заполнено (для аналитики `form_discarded`).
+  int get _filledFields => [
+    _eventTitleController.text.trim().isNotEmpty,
+    _timeController.text.trim().isNotEmpty,
+    _notesController.text.trim().isNotEmpty,
+    _selectedType.value != null,
+    _recurrence.value != null,
+  ].where((filled) => filled).length;
 
   /// Пользователь что-то ввёл или изменил: заранее выбранные питомец и дата не считаются.
   bool get _hasChanges =>

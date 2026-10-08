@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
 
 part 'mark_done_event.dart';
@@ -32,6 +34,19 @@ class MarkDoneBloc extends Bloc<MarkDoneEvent, MarkDoneState> {
         time: event.time,
         timeZoneOffset: event.timeZoneOffset,
       );
+
+      final eventType = event.analyticsEventType;
+      if (eventType != null) {
+        TailsAnalytics.log(
+          event.value
+              ? TailsAnalyticsEvents.eventMarkedDone(
+                  eventType: eventType,
+                  isRecurring: event.analyticsIsRecurring,
+                  from: event.analyticsFrom,
+                )
+              : TailsAnalyticsEvents.eventMarkedUndone(eventType: eventType),
+        );
+      }
 
       emit(const MarkDoneState.success());
     } catch (e, s) {

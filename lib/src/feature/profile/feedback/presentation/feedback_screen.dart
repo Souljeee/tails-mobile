@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/constant/localization/translations/app_localizations.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
@@ -98,6 +100,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
     return UiDiscardGuard(
       hasChanges: _hasMessage || _screenshot != null,
+      onDiscarded: () => TailsAnalytics.log(
+        TailsAnalyticsEvents.formDiscarded(
+          form: 'feedback',
+          filledFields: [_hasMessage, _screenshot != null].where((v) => v).length,
+        ),
+      ),
       child: Scaffold(
         backgroundColor: context.uiPalette.canvas,
         body: SafeArea(

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_nav_row/ui_nav_row.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_segmented_control/ui_segmented_control.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
@@ -51,6 +54,9 @@ class ProfileThemeRow extends StatelessWidget {
     if (mode == current && settings.appTheme != null) {
       return;
     }
+
+    TailsAnalytics.log(TailsAnalyticsEvents.appSettingChanged(setting: 'theme', value: mode.name));
+    TailsAnalytics.setUserProperty(TailsAnalyticsUserProperty.appTheme, mode.name);
 
     SettingsScope.of(context, listen: false).add(
       AppSettingsEvent.updateAppSettings(

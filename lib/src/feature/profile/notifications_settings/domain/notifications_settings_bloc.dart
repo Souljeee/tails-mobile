@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/notification_settings_model.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
 import 'package:tails_mobile/src/feature/profile/core/enums/notification_category.dart';
@@ -86,6 +88,13 @@ class NotificationsSettingsBloc
         enabled: event.enabled,
       );
 
+      TailsAnalytics.log(
+        TailsAnalyticsEvents.notificationSettingChanged(
+          setting: category.apiKey,
+          enabled: event.enabled,
+        ),
+      );
+
       emit(
         state.copyWith(
           // Остальные категории могли измениться параллельно: берём ответ сервера целиком,
@@ -114,6 +123,8 @@ class NotificationsSettingsBloc
     NotificationsSettingsEvent$OpenSettingsRequested event,
     Emitter<NotificationsSettingsState> emit,
   ) async {
+    TailsAnalytics.log(TailsAnalyticsEvents.notificationsOpenSystemSettings);
+
     try {
       await _profileRepository.openSystemSettings();
     } catch (e, s) {

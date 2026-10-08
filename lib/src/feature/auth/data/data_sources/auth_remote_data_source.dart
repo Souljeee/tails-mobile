@@ -1,5 +1,6 @@
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/dtos/tokens_dto.dart';
+import 'package:tails_mobile/src/feature/auth/data/data_sources/dtos/verify_code_result.dart';
 import 'package:tails_mobile/src/feature/auth/exceptions/account_blocked_exception.dart';
 import 'package:tails_mobile/src/feature/auth/exceptions/code_sending_timer_exceptions.dart';
 import 'package:tails_mobile/src/feature/auth/exceptions/invalid_code_exception.dart';
@@ -16,10 +17,7 @@ class AuthRemoteDataSource {
   final RestClient authorizedRestClient;
 
   /// {@macro auth_remote_data_source}
-  const AuthRemoteDataSource({
-    required this.restClient,
-    required this.authorizedRestClient,
-  });
+  const AuthRemoteDataSource({required this.restClient, required this.authorizedRestClient});
 
   /// Бекенд может отдавать expires как секунды или миллисекунды с эпохи.
   /// Нормализуем к миллисекундам при создании токена.
@@ -36,12 +34,7 @@ class AuthRemoteDataSource {
   /// Returns void if the code is sent successfully.
   Future<void> sendCode({required String phoneNumber}) async {
     try {
-      await restClient.post(
-        '/auth/send-code/',
-        body: {
-          'phone_number': phoneNumber,
-        },
-      );
+      await restClient.post('/auth/send-code/', body: {'phone_number': phoneNumber});
     } on RestClientException catch (e) {
       if (e.statusCode == 400) {
         throw InvalidPhoneNumberFormatException(phoneNumber: phoneNumber);
@@ -64,18 +57,12 @@ class AuthRemoteDataSource {
   /// phoneNumber - The user's phone number to verify the code for.
   /// code - The code to verify.
   ///
-  /// Returns TokensDto if the code is verified successfully.
-  Future<OAuth2Token> verifyCode({
-    required String phoneNumber,
-    required String code,
-  }) async {
+  /// Returns [VerifyCodeResult] (токены и сведения о пользователе), если код подтверждён.
+  Future<VerifyCodeResult> verifyCode({required String phoneNumber, required String code}) async {
     try {
       final response = await restClient.post(
         '/auth/verify-code/',
-        body: {
-          'phone_number': phoneNumber,
-          'code': code,
-        },
+        body: {'phone_number': phoneNumber, 'code': code},
       );
 
       if (response == null) {
@@ -91,18 +78,19 @@ class AuthRemoteDataSource {
 
       final token = TokensDto.fromJson(Map<String, dynamic>.from(response));
 
-      return OAuth2Token(
-        accessToken: token.access,
-        refreshToken: token.refresh,
-        accessExpires: _toEpochMillis(token.accessExpires),
-        refreshExpires: _toEpochMillis(token.refreshExpires),
+      return VerifyCodeResult(
+        token: OAuth2Token(
+          accessToken: token.access,
+          refreshToken: token.refresh,
+          accessExpires: _toEpochMillis(token.accessExpires),
+          refreshExpires: _toEpochMillis(token.refreshExpires),
+        ),
+        isNewUser: token.isNewUser,
+        userId: token.userId,
       );
     } on RestClientException catch (e) {
       if (e.statusCode == 400) {
-        throw InvalidCodeException(
-          code: code,
-          phoneNumber: phoneNumber,
-        );
+        throw InvalidCodeException(code: code, phoneNumber: phoneNumber);
       }
 
       if (e.statusCode == 403) {
@@ -119,9 +107,6 @@ class AuthRemoteDataSource {
   ///
   /// Throws RestClientException if the request fails.
   Future<void> logout({required String refreshToken}) async {
-    await authorizedRestClient.post(
-      '/auth/logout/',
-      body: {'refresh': refreshToken},
-    );
+    await authorizedRestClient.post('/auth/logout/', body: {'refresh': refreshToken});
   }
 }

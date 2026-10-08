@@ -13,6 +13,14 @@ enum PushNotificationType {
 
   unknown;
 
+  /// Значение параметра `type` в событиях аналитики.
+  String get analyticsName => switch (this) {
+    standard => 'standard',
+    reminder => 'reminder',
+    finalReminder => 'final',
+    unknown => 'unknown',
+  };
+
   static PushNotificationType fromWire(String? value) => switch (value) {
     'standard' => standard,
     'reminder' => reminder,

@@ -146,6 +146,9 @@ class FakePetRepository extends Fake implements PetRepository {
   Exception? error;
 
   @override
+  int? knownPetsCount;
+
+  @override
   Stream<PetsRepositoryEventsEvent> get eventStream => events.stream;
 
   @override

@@ -5,6 +5,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
@@ -130,6 +132,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         name: _nameChanged ? _nameController.text.trim() : null,
         avatar: _newAvatar,
         removeAvatar: _removeAvatar,
+        hadAvatar: widget.profile.hasAvatar,
       ),
     );
   }
@@ -141,6 +144,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return UiDiscardGuard(
       hasChanges: _hasChanges,
+      onDiscarded: () => TailsAnalytics.log(
+        TailsAnalyticsEvents.formDiscarded(
+          form: 'edit_profile',
+          filledFields: [_nameChanged, _newAvatar != null, _removeAvatar].where((v) => v).length,
+        ),
+      ),
       child: Scaffold(
         backgroundColor: palette.canvas,
         body: SafeArea(

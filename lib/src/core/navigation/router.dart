@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:tails_mobile/src/core/analytics/integrations/analytics_navigation.dart';
 import 'package:tails_mobile/src/core/logging/integrations/navigation_logger.dart';
 import 'package:tails_mobile/src/core/navigation/go_router_refresh_stream.dart';
 import 'package:tails_mobile/src/core/navigation/guards/authorization_guards.dart';
@@ -17,11 +18,12 @@ class AppRouter {
         RedirectIfNotAuthorizedGuard(),
         RedirectIfAuthorizedGuard(),
       }),
-      observers: [NavigationObserver()],
+      observers: [NavigationObserver(), AnalyticsSheetObserver()],
     );
 
     // Роутер живёт всё время работы приложения, поэтому логгер не освобождается.
     NavigationLogger(router).start();
+    AnalyticsScreenTracker(router).start();
 
     return router;
   }

@@ -1,6 +1,7 @@
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/auth/data/data_sources/dtos/verify_code_result.dart';
 
 /// {@template auth_repository}
 /// A repository that fetches auth data from the remote source.
@@ -30,10 +31,9 @@ class AuthRepository {
        _beforeLogout = beforeLogout,
        _afterSessionCleared = afterSessionCleared;
 
-    Stream<AuthorizationStatus> get authorizationStatus => _tokenStorage.getStream().map(
-        (token) =>
-            token != null ? AuthorizationStatus.authorized : AuthorizationStatus.notAuthorized,
-      );
+  Stream<AuthorizationStatus> get authorizationStatus => _tokenStorage.getStream().map(
+    (token) => token != null ? AuthorizationStatus.authorized : AuthorizationStatus.notAuthorized,
+  );
 
   /// Method to send a code to the user's phone number.
   ///
@@ -55,16 +55,15 @@ class AuthRepository {
   ///
   /// code - The code to verify.
   /// phoneNumber - The user's phone number to verify the code for.
-  Future<void> verifyCode({
-    required String code,
-    required String phoneNumber,
-  }) async {
-    final token = await _authRemoteDataSource.verifyCode(
-      code: code,
-      phoneNumber: phoneNumber,
-    );
+  ///
+  /// Сохраняет токены и возвращает результат, чтобы вызывающий мог узнать,
+  /// новый ли это пользователь (для аналитики).
+  Future<VerifyCodeResult> verifyCode({required String code, required String phoneNumber}) async {
+    final result = await _authRemoteDataSource.verifyCode(code: code, phoneNumber: phoneNumber);
 
-    await _tokenStorage.save(token);
+    await _tokenStorage.save(result.token);
+
+    return result;
   }
 
   /// Выход из аккаунта.

@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/logging/tails_loggable.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/edit_pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
@@ -30,12 +32,19 @@ class EditPetBloc extends Bloc<EditPetEvent, EditPetState> {
 
       await _petRepository.editPet(id: event.petId, model: event.pet, image: event.image);
 
+      TailsAnalytics.log(
+        TailsAnalyticsEvents.petUpdated(
+          changed: event.changedFields.join(','),
+          petType: event.pet.petType?.name ?? 'unknown',
+        ),
+      );
+
       emit(const EditPetState.success());
     } catch (e, s) {
       addError(e, s);
 
       emit(const EditPetState.error());
-    }finally {
+    } finally {
       emit(const EditPetState.initial());
     }
   }

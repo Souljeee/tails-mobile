@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
 import 'package:tails_mobile/src/core/constant/enums/pagination_status_enum.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
@@ -43,6 +45,12 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
         endDate: event.endDate,
         petId: event.petId,
       );
+
+      // Окно данных ограничено, поэтому отсутствие повторов ничего не доказывает:
+      // свойство только включается.
+      if (scheduleEvents.values.any((day) => day.any((item) => item.recurrence != null))) {
+        TailsAnalytics.setUserProperty(TailsAnalyticsUserProperty.hasRecurringEvents, true);
+      }
 
       emit(ScheduleState.success(scheduleEvents: scheduleEvents));
     } catch (e, s) {

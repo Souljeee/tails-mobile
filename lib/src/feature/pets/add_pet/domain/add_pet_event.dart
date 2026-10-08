@@ -15,11 +15,10 @@ sealed class AddPetEvent extends Equatable {
     required DateTime birthday,
     required bool castration,
     required File? image,
+    bool isMixedBreed,
   }) = AddPetEvent$AddingRequested;
 
-  T map<T>({
-    required AddPetEventMatch<T, AddPetEvent$AddingRequested> addingRequested,
-  }) =>
+  T map<T>({required AddPetEventMatch<T, AddPetEvent$AddingRequested> addingRequested}) =>
       switch (this) {
         final AddPetEvent$AddingRequested event => addingRequested(event),
       };
@@ -36,6 +35,9 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
   final bool castration;
   final File? image;
 
+  /// Выбрана порода «Метис или не знаю». Нужно только аналитике.
+  final bool isMixedBreed;
+
   const AddPetEvent$AddingRequested({
     required this.name,
     required this.petType,
@@ -46,18 +48,20 @@ final class AddPetEvent$AddingRequested extends AddPetEvent {
     required this.birthday,
     required this.castration,
     this.image,
+    this.isMixedBreed = false,
   });
 
   @override
   List<Object?> get props => [
-        name,
-        petType,
-        breedId,
-        color,
-        weight,
-        gender,
-        birthday,
-        castration,
-        image,
-      ];
+    name,
+    petType,
+    breedId,
+    color,
+    weight,
+    gender,
+    birthday,
+    castration,
+    image,
+    isMixedBreed,
+  ];
 }

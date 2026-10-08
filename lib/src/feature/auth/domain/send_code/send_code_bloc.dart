@@ -1,6 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:tails_mobile/src/core/analytics/analytics_reason_mapper.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
+import 'package:tails_mobile/src/feature/auth/exceptions/code_sending_timer_exceptions.dart';
 
 part 'send_code_event.dart';
 part 'send_code_state.dart';
@@ -8,14 +12,11 @@ part 'send_code_state.dart';
 class SendCodeBloc extends Bloc<SendCodeEvent, SendCodeState> {
   final AuthRepository _authRepository;
 
-  SendCodeBloc({
-    required AuthRepository authRepository,
-  })  : _authRepository = authRepository,
-        super(const SendCodeState.initial()) {
+  SendCodeBloc({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(const SendCodeState.initial()) {
     on<SendCodeEvent>(
-      (event, emit) => event.map(
-        sendCodeRequested: (event) => _onSendCodeRequested(event, emit),
-      ),
+      (event, emit) => event.map(sendCodeRequested: (event) => _onSendCodeRequested(event, emit)),
     );
   }
 
@@ -28,6 +29,8 @@ class SendCodeBloc extends Bloc<SendCodeEvent, SendCodeState> {
 
       await _authRepository.sendCode(phoneNumber: event.phoneNumber);
 
+      TailsAnalytics.log(TailsAnalyticsEvents.loginCodeRequested(isResend: event.isResend));
+
       emit(const SendCodeState.success());
 
       // Возвращаемся в начальное состояние после небольшой задержки
@@ -35,6 +38,11 @@ class SendCodeBloc extends Bloc<SendCodeEvent, SendCodeState> {
       emit(const SendCodeState.initial());
     } catch (e, s) {
       addError(e, s);
+      TailsAnalytics.log(
+        TailsAnalyticsEvents.loginCodeRequestFailed(
+          e is CodeSendingTimerException ? AnalyticsReason.rateLimited : analyticsReasonOf(e),
+        ),
+      );
 
       emit(const SendCodeState.error());
 

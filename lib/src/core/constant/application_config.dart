@@ -24,6 +24,9 @@ class ApplicationConfig {
   /// The base URL.
   String get baseUrl => const String.fromEnvironment('BASE_URL').trim();
 
+  /// Ключ приложения AppMetrica. Пусто — AppMetrica не подключается.
+  String get appMetricaApiKey => const String.fromEnvironment('APPMETRICA_API_KEY').trim();
+
   /// Whether Sentry is enabled.
   bool get enableSentry => sentryDsn.isNotEmpty;
 

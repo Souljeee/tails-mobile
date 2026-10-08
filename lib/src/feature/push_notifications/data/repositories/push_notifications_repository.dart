@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
+import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/utils/background_error.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/devices_remote_data_source.dart';
@@ -172,13 +174,13 @@ class PushNotificationsRepository {
   }
 
   void _onForegroundMessage(PushMessageDto message) {
-    _received.add(
-      PushNotification(
-        title: message.title,
-        body: message.body,
-        payload: PushPayload.fromData(message.data),
-      ),
+    final payload = PushPayload.fromData(message.data);
+
+    TailsAnalytics.log(
+      TailsAnalyticsEvents.pushReceivedForeground(type: payload.type.analyticsName),
     );
+
+    _received.add(PushNotification(title: message.title, body: message.body, payload: payload));
 
     // На iOS баннер в открытом приложении показывает система; на Android — только мы.
     if (_messaging.platform == _androidPlatform) {
