@@ -11,6 +11,8 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_sheets/ui_confirm_she
 
 import '../../../helpers/ui_test_app.dart';
 
+void _noop() {}
+
 void main() {
   group('UiNavRow', () {
     testWidgets('показывает значение и шеврон и реагирует на нажатие', (tester) async {
@@ -33,6 +35,28 @@ void main() {
 
       await tester.tap(find.text('Уведомления'));
       expect(taps, 1);
+    });
+
+    testWidgets('короткое значение не отнимает у заголовка половину строки', (tester) async {
+      await tester.pumpWidget(
+        uiTestApp(
+          const SizedBox(
+            width: 320,
+            child: UiNavRow(
+              icon: Icons.info_outline,
+              title: 'О приложении',
+              value: '0.0.1',
+              onTap: _noop,
+            ),
+          ),
+        ),
+      );
+
+      final titleHeight = tester.getSize(find.text('О приложении')).height;
+      final valueHeight = tester.getSize(find.text('0.0.1')).height;
+
+      // Заголовок остался в одну строку: его высота не больше высоты значения с запасом.
+      expect(titleHeight, lessThan(valueHeight * 1.6));
     });
 
     testWidgets('без onTap шеврона нет', (tester) async {

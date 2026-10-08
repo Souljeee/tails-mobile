@@ -49,6 +49,9 @@ class UiNavRow extends StatelessWidget {
   /// Ширина плитки и отступа до текста, для `UiGroupedList.dividerIndent`.
   static const double leadingWidth = badgeSize + UiSpacing.x3;
 
+  /// Максимальная ширина значения справа; длиннее обрезается многоточием.
+  static const double valueMaxWidth = 160;
+
   final IconData icon;
   final String title;
   final String? subtitle;
@@ -115,7 +118,10 @@ class UiNavRow extends StatelessWidget {
             ),
             if (value != null) ...[
               const SizedBox(width: UiSpacing.x2),
-              Flexible(
+              // Значение не делит место с заголовком поровну: оно занимает своё содержимое
+              // (не шире valueMaxWidth), остальное отдаётся заголовку.
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: valueMaxWidth),
                 child: Text(
                   value!,
                   maxLines: 1,
