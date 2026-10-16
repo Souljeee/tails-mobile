@@ -2629,6 +2629,30 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Повторить'**
   String get eventActionRetry;
+
+  /// No description provided for @eventStatusCancelled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменено'**
+  String get eventStatusCancelled;
+
+  /// No description provided for @eventToggleDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметить выполненным'**
+  String get eventToggleDone;
+
+  /// No description provided for @eventToggleUndone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снять отметку о выполнении'**
+  String get eventToggleUndone;
+
+  /// No description provided for @eventOpenDetails.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть детали'**
+  String get eventOpenDetails;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -12,6 +12,7 @@ import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_status.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/mark_done/mark_done_bloc.dart';
 
 /// Строка события дня: слева время, справа карточка [UiEventTile].
@@ -104,7 +105,15 @@ class _ScheduleEventItemState extends State<ScheduleEventItem> {
                 imageUrl: widget.pet?.image,
                 placeholderAsset: widget.pet?.petType.emptyAvatarAsset,
               ),
-              isDone: event.done,
+              status: switch (event.status) {
+                ScheduleEventStatus.scheduled => UiEventTileStatus.scheduled,
+                ScheduleEventStatus.done => UiEventTileStatus.done,
+                ScheduleEventStatus.cancelled => UiEventTileStatus.cancelled,
+              },
+              isRecurring: event.recurrence != null,
+              cancelledLabel: l10n.eventStatusCancelled,
+              toggleLabel: event.done ? l10n.eventToggleUndone : l10n.eventToggleDone,
+              detailsLabel: l10n.eventOpenDetails,
               onToggle: _toggle,
             ),
           ),

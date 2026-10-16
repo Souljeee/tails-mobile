@@ -55,7 +55,8 @@ void main() {
       subtitle: 'Завтра, 17:05 · Прогулка · Мистерио',
       stripeColor: Colors.green,
       leading: const SizedBox.square(dimension: 40),
-      isDone: false,
+      status: UiEventTileStatus.scheduled,
+      isRecurring: true,
       onToggle: () {},
     ),
     'UiStatStrip': () => const UiStatStrip(

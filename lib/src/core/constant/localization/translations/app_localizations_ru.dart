@@ -1693,4 +1693,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get eventActionRetry => 'Повторить';
+
+  @override
+  String get eventStatusCancelled => 'Отменено';
+
+  @override
+  String get eventToggleDone => 'Отметить выполненным';
+
+  @override
+  String get eventToggleUndone => 'Снять отметку о выполнении';
+
+  @override
+  String get eventOpenDetails => 'Открыть детали';
 }

@@ -12,13 +12,28 @@ class UiCheckbox extends StatelessWidget {
   final bool isChecked;
   final VoidCallback? onTap;
 
-  const UiCheckbox({required this.isChecked, this.onTap, super.key});
+  /// Контур пустого кружка акцентным цветом (отдельная зона отметки на карточке события).
+  final bool accentOutline;
+
+  /// Подпись для скринридера («Отметить выполненным»).
+  final String? semanticsLabel;
+
+  const UiCheckbox({
+    required this.isChecked,
+    this.onTap,
+    this.accentOutline = false,
+    this.semanticsLabel,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     final palette = context.uiPalette;
 
+    final outline = accentOutline ? palette.accent : palette.controlLine;
+
     return Semantics(
+      label: semanticsLabel,
       checked: isChecked,
       button: true,
       onTap: onTap,
@@ -36,7 +51,7 @@ class UiCheckbox extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isChecked ? palette.pine : Colors.transparent,
                 shape: BoxShape.circle,
-                border: Border.all(color: isChecked ? palette.pine : palette.controlLine, width: 2),
+                border: Border.all(color: isChecked ? palette.pine : outline, width: 2),
               ),
               child: AnimatedSwitcher(
                 duration: UiMotion.base,

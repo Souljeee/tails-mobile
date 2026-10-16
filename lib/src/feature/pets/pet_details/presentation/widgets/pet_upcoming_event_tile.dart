@@ -97,7 +97,10 @@ class _PetUpcomingEventTileState extends State<PetUpcomingEventTile> {
           imageUrl: widget.petImage,
           placeholderAsset: widget.petType.emptyAvatarAsset,
         ),
-        isDone: _done,
+        status: _done ? UiEventTileStatus.done : UiEventTileStatus.scheduled,
+        isRecurring: event.recurrence != null,
+        toggleLabel: _done ? l10n.eventToggleUndone : l10n.eventToggleDone,
+        detailsLabel: l10n.eventOpenDetails,
         onToggle: _toggle,
       ),
     );

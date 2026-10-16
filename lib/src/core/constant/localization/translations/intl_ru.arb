@@ -868,5 +868,9 @@
   "eventCancelUndo": "Вернуть",
   "eventCancelFailed": "Не удалось отменить",
   "eventRestoreFailed": "Не удалось вернуть событие",
-  "eventActionRetry": "Повторить"
+  "eventActionRetry": "Повторить",
+  "eventStatusCancelled": "Отменено",
+  "eventToggleDone": "Отметить выполненным",
+  "eventToggleUndone": "Снять отметку о выполнении",
+  "eventOpenDetails": "Открыть детали"
 }
