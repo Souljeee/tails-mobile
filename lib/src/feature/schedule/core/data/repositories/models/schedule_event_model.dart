@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_occurrence_ref.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_status.dart';
 
@@ -25,6 +26,9 @@ class ScheduleEventModel extends Equatable {
   final DateTime? doneAt;
   final RecurrenceModel? recurrence;
 
+  /// `null` — у события напоминание не задано (читается как «в момент события»).
+  final EventReminder? reminder;
+
   const ScheduleEventModel({
     required this.id,
     required this.petId,
@@ -38,6 +42,7 @@ class ScheduleEventModel extends Equatable {
     this.recurrence,
     this.cancelled = false,
     this.doneAt,
+    this.reminder,
   });
 
   /// Состояние вхождения; отмена главнее отметки (на сервере они не сочетаются).
@@ -64,6 +69,7 @@ class ScheduleEventModel extends Equatable {
     CopyWithWrapper<RecurrenceModel?>? recurrence,
     CopyWithWrapper<bool>? cancelled,
     CopyWithWrapper<DateTime?>? doneAt,
+    CopyWithWrapper<EventReminder?>? reminder,
   }) => ScheduleEventModel(
     id: id?.value ?? this.id,
     petId: petId?.value ?? this.petId,
@@ -77,6 +83,7 @@ class ScheduleEventModel extends Equatable {
     recurrence: recurrence?.value ?? this.recurrence,
     cancelled: cancelled?.value ?? this.cancelled,
     doneAt: doneAt == null ? this.doneAt : doneAt.value,
+    reminder: reminder == null ? this.reminder : reminder.value,
   );
 
   @override
@@ -93,5 +100,6 @@ class ScheduleEventModel extends Equatable {
     recurrence,
     cancelled,
     doneAt,
+    reminder,
   ];
 }

@@ -25,6 +25,7 @@ void main() {
       'type': 'custom',
       'is_recurring': false,
       'recurrence': null,
+      'reminders': null,
     });
   });
 
@@ -41,5 +42,22 @@ void main() {
     );
 
     expect(dto.toJson()['time'], isNull);
+  });
+
+  test('serializes reminders list', () {
+    CreateEventDto dto(List<int>? reminders) => CreateEventDto(
+      title: 'Ветеринар',
+      description: null,
+      time: '10:00',
+      timezoneOffset: 180,
+      date: DateTime(2026, 9, 26),
+      petId: 11,
+      type: ScheduleEventTypeEnum.custom,
+      isRecurring: false,
+      reminders: reminders,
+    );
+
+    expect(dto([]).toJson()['reminders'], <int>[]);
+    expect(dto([30]).toJson()['reminders'], [30]);
   });
 }

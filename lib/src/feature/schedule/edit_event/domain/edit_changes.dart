@@ -1,16 +1,17 @@
 import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/domain/event_type_rules.dart';
 
 /// Поля формы, которые пользователь мог изменить при редактировании.
-enum EditedField { title, description, type, time, date, pet, recurrence }
+enum EditedField { title, description, type, time, date, pet, recurrence, reminder }
 
 /// Что изменено в форме относительно редактируемого вхождения.
 ///
-/// «Только эта дата» принимает лишь [overridable] поля: название, описание, тип и время. Если
+/// «Только эта дата» принимает лишь [overridable] поля: название, описание, тип, время и напоминание. Если
 /// тронуты дата, питомец или повторение, остаётся область «эта дата и все следующие».
 class EditChanges extends Equatable {
   const EditChanges(this.fields);
@@ -34,6 +35,10 @@ class EditChanges extends Equatable {
       if (!_sameDay(original.date, edited.date)) EditedField.date,
       if (original.petId != edited.petId) EditedField.pet,
       if (original.recurrence != edited.recurrence) EditedField.recurrence,
+      // Старое событие без напоминания читается как «в момент события».
+      if ((original.reminder ?? EventReminder.atEvent) !=
+          (edited.reminder ?? EventReminder.atEvent))
+        EditedField.reminder,
     });
   }
 
@@ -43,6 +48,7 @@ class EditChanges extends Equatable {
     EditedField.description,
     EditedField.type,
     EditedField.time,
+    EditedField.reminder,
   };
 
   final Set<EditedField> fields;

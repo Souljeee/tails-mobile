@@ -29,6 +29,9 @@ class ScheduleEventDto extends Equatable {
   final DateTime? doneAt;
   final RecurrenceDto? recurrence;
 
+  /// Старые события и версии сервера: `null` — напоминание не задано.
+  final List<int>? reminders;
+
   const ScheduleEventDto({
     required this.id,
     required this.petId,
@@ -42,6 +45,7 @@ class ScheduleEventDto extends Equatable {
     this.recurrence,
     this.cancelled = false,
     this.doneAt,
+    this.reminders,
   });
 
   factory ScheduleEventDto.fromJson(Map<String, dynamic> json) => _$ScheduleEventDtoFromJson(json);
@@ -62,5 +66,6 @@ class ScheduleEventDto extends Equatable {
     recurrence,
     cancelled,
     doneAt,
+    reminders,
   ];
 }

@@ -21,6 +21,9 @@ class CreateEventDto extends Equatable {
   final bool isRecurring;
   final RecurrenceDto? recurrence;
 
+  /// Минуты до события: `[]` — не напоминать, `null` — не задано.
+  final List<int>? reminders;
+
   const CreateEventDto({
     required this.petId,
     required this.title,
@@ -31,6 +34,7 @@ class CreateEventDto extends Equatable {
     required this.type,
     required this.isRecurring,
     this.recurrence,
+    this.reminders,
   });
 
   factory CreateEventDto.fromJson(Map<String, dynamic> json) => _$CreateEventDtoFromJson(json);
@@ -47,6 +51,7 @@ class CreateEventDto extends Equatable {
     type,
     isRecurring,
     recurrence,
+    reminders,
     timezoneOffset,
   ];
 }

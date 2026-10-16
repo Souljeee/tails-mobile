@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
+import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/edit_occurrence_result.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
@@ -49,6 +50,9 @@ class EditEventBloc extends Bloc<EditEventEvent, EditEventState> {
               : null,
           type: event.changes.fields.contains(EditedField.type) ? model.type : null,
           time: event.changes.fields.contains(EditedField.time) ? model.time : null,
+          reminder: event.changes.fields.contains(EditedField.reminder)
+              ? CopyWithWrapper.value(model.reminder)
+              : null,
         ),
         OccurrenceScope.future => await _scheduleRepository.editOccurrenceAndFollowing(
           occurrence.ref,

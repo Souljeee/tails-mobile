@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
@@ -26,6 +27,7 @@ void main() {
     DateTime? date,
     int petId = 1,
     RecurrenceModel? recurrence = const RecurrenceModel(period: RecurrencePeriod.day),
+    EventReminder? reminder,
   }) => CreateEventModel(
     title: title,
     description: description,
@@ -35,6 +37,7 @@ void main() {
     type: ScheduleEventTypeEnum.dailyPills,
     isRecurring: recurrence != null,
     recurrence: recurrence,
+    reminder: reminder,
   );
 
   EditChanges compare(CreateEventModel edited) =>
@@ -77,5 +80,24 @@ void main() {
 
     expect(EditChanges.withRemainingCount(rule, past: 3)?.end, const RecurrenceEnd.afterCount(7));
     expect(EditChanges.withRemainingCount(rule, past: 20)?.end, const RecurrenceEnd.afterCount(1));
+  });
+
+  group('напоминание', () {
+    test('старое событие без напоминания равно «в момент события»', () {
+      expect(compare(form(reminder: EventReminder.atEvent)).isEmpty, isTrue);
+      expect(compare(form()).isEmpty, isTrue);
+    });
+
+    test('смена напоминания — правка, доступная для одной даты', () {
+      final changes = compare(form(reminder: const EventReminder.before(30)));
+
+      expect(changes.fields, {EditedField.reminder});
+      expect(changes.allowsSingleOccurrence, isTrue);
+      expect(changes.changesSchedule, isFalse);
+    });
+
+    test('«не напоминать» отличается от «в момент события»', () {
+      expect(compare(form(reminder: const EventReminder.none())).fields, {EditedField.reminder});
+    });
   });
 }

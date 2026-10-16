@@ -1,29 +1,36 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/series_stats_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/schedule_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_occurrence_ref.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_status.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/series_stats.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
 
-ScheduleEventDto _dto({String id = 'e1', bool cancelled = false, DateTime? doneAt}) =>
-    ScheduleEventDto(
-      id: id,
-      petId: 1,
-      title: 'Таблетки',
-      type: ScheduleEventTypeEnum.dailyPills,
-      done: doneAt != null,
-      cancelled: cancelled,
-      doneAt: doneAt,
-      date: DateTime(2026, 10, 8),
-      time: '05:00:00',
-      timeZoneOffset: 180,
-    );
+ScheduleEventDto _dto({
+  String id = 'e1',
+  bool cancelled = false,
+  DateTime? doneAt,
+  List<int>? reminders,
+}) => ScheduleEventDto(
+  id: id,
+  petId: 1,
+  title: 'Таблетки',
+  type: ScheduleEventTypeEnum.dailyPills,
+  done: doneAt != null,
+  cancelled: cancelled,
+  doneAt: doneAt,
+  date: DateTime(2026, 10, 8),
+  time: '05:00:00',
+  timeZoneOffset: 180,
+  reminders: reminders,
+);
 
 class _FakeDataSource implements ScheduleRemoteDataSource {
   final calls = <String>[];
@@ -80,7 +87,7 @@ class _FakeDataSource implements ScheduleRemoteDataSource {
     lastScope = scope;
     lastEvent = event;
 
-    return (event: _dto(), createdEvent: createdEvent);
+    return (event: _dto(reminders: event['reminders'] as List<int>?), createdEvent: createdEvent);
   }
 
   @override
@@ -253,5 +260,57 @@ void main() {
     expect(stats(0).isLastOccurrence, isTrue);
     expect(stats(2).isLastOccurrence, isFalse);
     expect(stats(null).isLastOccurrence, isFalse);
+  });
+
+  group('напоминание', () {
+    test('только эта дата: напоминание уходит списком', () async {
+      final result = await repository.editOccurrenceFields(
+        ref,
+        reminder: const CopyWithWrapper.value(EventReminder.before(30)),
+      );
+
+      expect(dataSource.lastEvent, {
+        'reminders': [30],
+      });
+      expect(result.event.reminder, const EventReminder.before(30));
+    });
+
+    test('«не напоминать» уходит пустым списком, сброс — null', () async {
+      await repository.editOccurrenceFields(
+        ref,
+        reminder: const CopyWithWrapper.value(EventReminder.none()),
+      );
+      expect(dataSource.lastEvent, {'reminders': <int>[]});
+
+      await repository.editOccurrenceFields(
+        ref,
+        reminder: const CopyWithWrapper<EventReminder?>.value(null),
+      );
+      expect(dataSource.lastEvent, {'reminders': null});
+    });
+
+    test('без reminder поле не отправляется', () async {
+      await repository.editOccurrenceFields(ref, title: 'Новое');
+
+      expect(dataSource.lastEvent, {'title': 'Новое'});
+    });
+
+    test('эта дата и следующие: напоминание формы уходит в запрос', () async {
+      await repository.editOccurrenceAndFollowing(
+        ref,
+        CreateEventModel(
+          title: 'T',
+          description: null,
+          time: '08:00',
+          date: DateTime(2026, 10, 8),
+          petId: 1,
+          type: ScheduleEventTypeEnum.custom,
+          isRecurring: false,
+          reminder: const EventReminder.before(1440),
+        ),
+      );
+
+      expect(dataSource.lastEvent?['reminders'], [1440]);
+    });
   });
 }

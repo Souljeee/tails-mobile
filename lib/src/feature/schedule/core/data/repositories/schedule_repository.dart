@@ -1,3 +1,4 @@
+import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/create_event_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/series_stats_dto.dart';
@@ -7,6 +8,7 @@ import 'package:tails_mobile/src/feature/schedule/core/data/mappers/recurrence_m
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/edit_occurrence_result.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_occurrence_ref.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/series_stats.dart';
@@ -121,6 +123,7 @@ class ScheduleRepository {
     String? description,
     ScheduleEventTypeEnum? type,
     String? time,
+    CopyWithWrapper<EventReminder?>? reminder,
   }) async {
     final offset = _offsetOf(ref);
     final fields = <String, dynamic>{
@@ -128,6 +131,8 @@ class ScheduleRepository {
       'description': ?description,
       'type': ?type?.name,
       if (time != null) 'time': EventTimeConverter.localToUtc(time, offsetMinutes: offset),
+      // `null` в запросе сбрасывает напоминание вхождения до напоминания серии.
+      if (reminder != null) 'reminders': reminder.value?.toWire(),
     };
 
     return _edit(ref, OccurrenceScope.one, fields);
@@ -197,6 +202,7 @@ extension on ScheduleEventDto {
       cancelled: cancelled,
       doneAt: doneAt?.toLocal(),
       recurrence: recurrence?.toModel(offsetMinutes: offset),
+      reminder: EventReminder.fromWire(reminders),
     );
   }
 }
@@ -216,6 +222,7 @@ extension on CreateEventModel {
       type: type,
       isRecurring: isRecurring,
       recurrence: recurrence?.toDto(offsetMinutes: offset),
+      reminders: reminder?.toWire(),
     );
   }
 }

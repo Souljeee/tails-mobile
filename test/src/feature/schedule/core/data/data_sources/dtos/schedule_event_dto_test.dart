@@ -23,4 +23,19 @@ void main() {
 
     expect(dto.type, ScheduleEventTypeEnum.custom);
   });
+
+  test('reminders: отсутствие поля — null, список разбирается', () {
+    expect(ScheduleEventDto.fromJson(_json('walking')).reminders, isNull);
+    expect(
+      ScheduleEventDto.fromJson({..._json('walking'), 'reminders': const <int>[]}).reminders,
+      isEmpty,
+    );
+    expect(
+      ScheduleEventDto.fromJson({
+        ..._json('walking'),
+        'reminders': const [60],
+      }).reminders,
+      [60],
+    );
+  });
 }
