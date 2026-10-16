@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +33,10 @@ import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/series_stats.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/domain/create_event_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/domain/event_title_rules.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/domain/event_type_rules.dart';
@@ -39,6 +44,10 @@ import 'package:tails_mobile/src/feature/schedule/create_event/presentation/uio/
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/event_type_field.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/event_type_page.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/time_picker_carousel_popup.dart';
+import 'package:tails_mobile/src/feature/schedule/edit_event/domain/edit_changes.dart';
+import 'package:tails_mobile/src/feature/schedule/edit_event/domain/edit_event_bloc.dart';
+import 'package:tails_mobile/src/feature/schedule/edit_event/presentation/edit_scope_page.dart';
+import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/event_actions/cancelled_dates_reset.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_calculator.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_draft.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_summary.dart';
@@ -48,7 +57,7 @@ import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/utils/
 enum CreateScheduleEventResult { success, error }
 
 /// Страница шторки: форма либо одна из вторых страниц.
-enum _SheetPage { form, eventType, recurrence }
+enum _SheetPage { form, eventType, recurrence, editScope }
 
 /// Откуда взято повторение события.
 enum _RecurrenceSource {
@@ -68,10 +77,14 @@ class CreateScheduleEventBottomSheet extends StatefulWidget {
   final List<PetModel> pets;
   final int? selectedPetId;
 
+  /// Редактируемое вхождение: форма открывается заполненной в режиме «Редактирование».
+  final ScheduleEventModel? editing;
+
   const CreateScheduleEventBottomSheet({
     required this.date,
     required this.pets,
     this.selectedPetId,
+    this.editing,
     super.key,
   });
 
@@ -92,8 +105,27 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     scheduleRepository: DependenciesScope.of(context).scheduleRepository,
   );
 
+  late final EditEventBloc _editBloc = EditEventBloc(
+    scheduleRepository: DependenciesScope.of(context).scheduleRepository,
+  );
+
+  /// Сводка серии для страницы выбора области (остаток, отменённые даты).
+  final ValueNotifier<SeriesStats?> _editStats = ValueNotifier(null);
+  final ValueNotifier<bool> _editStatsFailed = ValueNotifier(false);
+  final ValueNotifier<OccurrenceScope> _editScope = ValueNotifier(OccurrenceScope.one);
+  int _editStatsRequest = 0;
+
+  /// Форма, сохраняемая после выбора области, и её отличия от вхождения.
+  CreateEventModel? _pendingModel;
+  EditChanges _pendingChanges = const EditChanges({});
+
+  /// Время, с которым открыта форма редактирования.
+  String? _initialTime;
+
+  bool get _isEditing => widget.editing != null;
+
   late final ValueNotifier<CreateEventUio> _createEventUio = ValueNotifier(
-    CreateEventUio(date: widget.date, petId: widget.selectedPetId),
+    CreateEventUio(date: widget.date, petId: widget.selectedPetId ?? widget.editing?.petId),
   );
 
   /// Выбранный тип события; пока он не выбран, событие создать нельзя.
@@ -137,11 +169,40 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     _dateController.addListener(_rebaseRecurrence);
     _timeController.addListener(_rebaseRecurrence);
     _notesController.addListener(_onNotesChanged);
+
+    if (_isEditing) {
+      _prefillForEditing(widget.editing!);
+    }
+  }
+
+  /// Заполняет форму редактируемым вхождением. Тип выбирается без подстановки названия,
+  /// повторение считается настроенным пользователем и по типу не меняется.
+  void _prefillForEditing(ScheduleEventModel event) {
+    final rule = event.recurrence;
+    final slots = rule != null && rule.period == RecurrencePeriod.day
+        ? rule.times
+        : const <LocalTime>[];
+    final time = slots.length > 1 ? slots.first.format() : LocalTime.tryParse(event.time)?.format();
+
+    _initialTime = time;
+    _selectedType.value = EventTypeRules.pickerType(event.type);
+    _eventTitleController.text = event.title;
+    _notesController.text = event.description ?? '';
+    _timeController.text = time ?? '';
+    _recurrenceSource.value = _RecurrenceSource.user;
+
+    if (rule != null) {
+      _recurrence.value = RecurrenceDraft.fromModel(rule, eventDate: event.date, eventTime: time);
+    }
   }
 
   @override
   void dispose() {
     _createEventBloc.close();
+    _editBloc.close();
+    _editStats.dispose();
+    _editStatsFailed.dispose();
+    _editScope.dispose();
     _createEventUio.dispose();
     _selectedType.dispose();
     _recurrence.dispose();
@@ -162,137 +223,174 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return ValueListenableBuilder(
-      valueListenable: _page,
-      builder: (context, page, form) => switch (page) {
-        _SheetPage.form => form!,
-        _SheetPage.eventType => EventTypePage(
-          selected: _selectedType.value,
-          onSelected: _onTypeSelected,
-          onBack: _showForm,
-        ),
-        _SheetPage.recurrence => RecurrencePage(
-          initial: _recurrence.value ?? _initialRecurrenceDraft(),
-          onBack: _showForm,
-          onApply: _applyRecurrence,
-        ),
+    return BlocListener<EditEventBloc, EditEventState>(
+      bloc: _editBloc,
+      listener: (context, state) {
+        switch (state) {
+          case EditEventState$Success():
+            Navigator.of(context).pop(CreateScheduleEventResult.success);
+          case EditEventState$Error():
+            Navigator.of(context).pop(CreateScheduleEventResult.error);
+          case EditEventState$Idle():
+          case EditEventState$Loading():
+            break;
+        }
       },
-      child: ListenableBuilder(
-        listenable: Listenable.merge([
-          _createEventUio,
-          _recurrence,
-          _selectedType,
-          _eventTitleController,
-          _timeController,
-          _notesController,
-        ]),
-        builder: (context, child) => UiDiscardGuard(
-          hasChanges: _hasChanges,
-          onDiscarded: () => TailsAnalytics.log(
-            TailsAnalyticsEvents.formDiscarded(form: 'create_event', filledFields: _filledFields),
+      child: ValueListenableBuilder(
+        valueListenable: _page,
+        builder: (context, page, form) => switch (page) {
+          _SheetPage.form => form!,
+          _SheetPage.eventType => EventTypePage(
+            selected: _selectedType.value,
+            onSelected: _onTypeSelected,
+            onBack: _showForm,
           ),
-          child: child!,
-        ),
-        child: SafeArea(
-          top: false,
-          minimum: _contentPadding,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              UiSheetHeader(title: l10n.createEventTitle, cancelLabel: l10n.cancel),
-              const SizedBox(height: UiSpacing.x4),
-              _FieldLabel(label: l10n.createEventForWhom),
-              ListenableBuilder(
-                listenable: Listenable.merge([_createEventUio, _showErrors]),
-                builder: (context, child) {
-                  final uio = _createEventUio.value;
+          _SheetPage.recurrence => RecurrencePage(
+            initial: _recurrence.value ?? _initialRecurrenceDraft(),
+            onBack: _showForm,
+            onApply: _applyRecurrence,
+          ),
+          _SheetPage.editScope => _EditScopeHost(
+            bloc: _editBloc,
+            stats: _editStats,
+            statsFailed: _editStatsFailed,
+            scope: _editScope,
+            date: widget.editing!.date,
+            model: _pendingModel,
+            changes: _pendingChanges,
+            onSave: _saveEdit,
+            onRetry: _loadEditStats,
+            onBack: _showForm,
+          ),
+        },
+        child: ListenableBuilder(
+          listenable: Listenable.merge([
+            _createEventUio,
+            _recurrence,
+            _selectedType,
+            _eventTitleController,
+            _timeController,
+            _notesController,
+          ]),
+          builder: (context, child) => UiDiscardGuard(
+            hasChanges: _hasChanges,
+            onDiscarded: () => TailsAnalytics.log(
+              TailsAnalyticsEvents.formDiscarded(
+                form: _isEditing ? 'edit_event' : 'create_event',
+                filledFields: _filledFields,
+              ),
+            ),
+            child: child!,
+          ),
+          child: SafeArea(
+            top: false,
+            minimum: _contentPadding,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                UiSheetHeader(
+                  title: _isEditing ? l10n.eventEditTitle : l10n.createEventTitle,
+                  cancelLabel: l10n.cancel,
+                ),
+                const SizedBox(height: UiSpacing.x4),
+                _FieldLabel(label: l10n.createEventForWhom),
+                ListenableBuilder(
+                  listenable: Listenable.merge([_createEventUio, _showErrors]),
+                  builder: (context, child) {
+                    final uio = _createEventUio.value;
 
-                  return _PetChips(
-                    pets: widget.pets,
-                    selectedPetId: uio.petId,
-                    onPetSelected: _onPetIdSelected,
-                    errorText: _showErrors.value && uio.petId == null
-                        ? l10n.createEventErrorPet
-                        : null,
-                  );
-                },
-              ),
-              const SizedBox(height: UiSpacing.x4),
-              _FieldLabel(label: l10n.createEventTypeLabel),
-              ValueListenableBuilder(
-                valueListenable: _selectedType,
-                builder: (context, selected, child) =>
-                    EventTypeField(selected: selected, onTap: _openEventType),
-              ),
-              const SizedBox(height: UiSpacing.x4),
-              ListenableBuilder(
-                listenable: Listenable.merge([_eventTitleController, _showErrors, _selectedType]),
-                builder: (context, child) {
-                  final isTitleMissing = _eventTitleController.text.trim().isEmpty;
+                    return _PetChips(
+                      pets: widget.pets,
+                      selectedPetId: uio.petId,
+                      onPetSelected: _onPetIdSelected,
+                      errorText: _showErrors.value && uio.petId == null
+                          ? l10n.createEventErrorPet
+                          : null,
+                    );
+                  },
+                ),
+                const SizedBox(height: UiSpacing.x4),
+                _FieldLabel(label: l10n.createEventTypeLabel),
+                ValueListenableBuilder(
+                  valueListenable: _selectedType,
+                  builder: (context, selected, child) =>
+                      EventTypeField(selected: selected, onTap: _openEventType),
+                ),
+                const SizedBox(height: UiSpacing.x4),
+                ListenableBuilder(
+                  listenable: Listenable.merge([_eventTitleController, _showErrors, _selectedType]),
+                  builder: (context, child) {
+                    final isTitleMissing = _eventTitleController.text.trim().isEmpty;
 
-                  return UiTextField(
-                    controller: _eventTitleController,
-                    focusNode: _titleFocusNode,
-                    labelText: l10n.createEventNameLabel,
-                    placeholderText: l10n.createEventNamePlaceholder,
-                    errorText: _showErrors.value && isTitleMissing
-                        ? l10n.createEventErrorTitle
-                        : null,
-                    helperText: _titleHint(l10n),
-                  );
-                },
-              ),
-              ValueListenableBuilder(
-                valueListenable: _titleSuggestion,
-                builder: (context, suggestion, child) => suggestion == null
-                    ? const SizedBox.shrink()
-                    : _TitleSuggestion(name: suggestion, onReplace: _replaceTitle),
-              ),
-              const SizedBox(height: UiSpacing.x4),
-              _DateTimeFields(
-                initialDate: widget.date,
-                dateController: _dateController,
-                timeController: _timeController,
-              ),
-              const SizedBox(height: UiSpacing.x4),
-              _RecurrenceSelector(
-                recurrence: _recurrence,
-                source: _recurrenceSource,
-                onTap: () {
-                  TailsAnalytics.log(TailsAnalyticsEvents.recurrenceOpened);
-                  _page.value = _SheetPage.recurrence;
-                },
-              ),
-              const SizedBox(height: UiSpacing.x4),
-              UiTextField(
-                controller: _notesController,
-                labelText: l10n.createEventNotesLabel,
-                placeholderText: l10n.createEventNotesPlaceholder,
-                maxLines: 4,
-              ),
-              const SizedBox(height: UiSpacing.x5),
-              BlocConsumer<CreateEventBloc, CreateEventState>(
-                bloc: _createEventBloc,
-                listener: (context, state) {
-                  state.mapOrNull(
-                    success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
-                    error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
-                  );
-                },
-                builder: (context, state) {
-                  return ValueListenableBuilder(
-                    valueListenable: _selectedType,
-                    builder: (context, type, child) => UiButton.main(
-                      label: l10n.createEventSubmit,
-                      // Пока тип не выбран, событие создать нельзя.
-                      onPressed: type == null ? null : _submit,
-                      isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
-                    ),
-                  );
-                },
-              ),
-            ],
+                    return UiTextField(
+                      controller: _eventTitleController,
+                      focusNode: _titleFocusNode,
+                      labelText: l10n.createEventNameLabel,
+                      placeholderText: l10n.createEventNamePlaceholder,
+                      errorText: _showErrors.value && isTitleMissing
+                          ? l10n.createEventErrorTitle
+                          : null,
+                      helperText: _titleHint(l10n),
+                    );
+                  },
+                ),
+                ValueListenableBuilder(
+                  valueListenable: _titleSuggestion,
+                  builder: (context, suggestion, child) => suggestion == null
+                      ? const SizedBox.shrink()
+                      : _TitleSuggestion(name: suggestion, onReplace: _replaceTitle),
+                ),
+                const SizedBox(height: UiSpacing.x4),
+                _DateTimeFields(
+                  initialDate: widget.date,
+                  dateController: _dateController,
+                  timeController: _timeController,
+                ),
+                const SizedBox(height: UiSpacing.x4),
+                _RecurrenceSelector(
+                  recurrence: _recurrence,
+                  source: _recurrenceSource,
+                  onTap: () {
+                    TailsAnalytics.log(TailsAnalyticsEvents.recurrenceOpened);
+                    _page.value = _SheetPage.recurrence;
+                  },
+                ),
+                const SizedBox(height: UiSpacing.x4),
+                UiTextField(
+                  controller: _notesController,
+                  labelText: l10n.createEventNotesLabel,
+                  placeholderText: l10n.createEventNotesPlaceholder,
+                  maxLines: 4,
+                ),
+                const SizedBox(height: UiSpacing.x5),
+                BlocConsumer<CreateEventBloc, CreateEventState>(
+                  bloc: _createEventBloc,
+                  listener: (context, state) {
+                    state.mapOrNull(
+                      success: (_) => Navigator.of(context).pop(CreateScheduleEventResult.success),
+                      error: (_) => Navigator.of(context).pop(CreateScheduleEventResult.error),
+                    );
+                  },
+                  builder: (context, state) {
+                    return BlocBuilder<EditEventBloc, EditEventState>(
+                      bloc: _editBloc,
+                      builder: (context, editState) => ValueListenableBuilder(
+                        valueListenable: _selectedType,
+                        builder: (context, type, child) => UiButton.main(
+                          label: _isEditing ? l10n.eventEditSubmit : l10n.createEventSubmit,
+                          // Пока тип не выбран, событие сохранить нельзя.
+                          onPressed: type == null ? null : _submit,
+                          isLoading:
+                              editState.isLoading ||
+                              state.maybeMap(loading: (_) => true, orElse: () => false),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -350,7 +448,16 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   ].where((filled) => filled).length;
 
   /// Пользователь что-то ввёл или изменил: заранее выбранные питомец и дата не считаются.
-  bool get _hasChanges =>
+  bool get _hasChanges => _isEditing ? _hasEditChanges : _hasCreateChanges;
+
+  /// Форма редактирования отличается от вхождения, с которого её открыли.
+  bool get _hasEditChanges => !EditChanges.compare(
+    original: widget.editing!,
+    edited: _buildModel(),
+    originalTime: _initialTime,
+  ).isEmpty;
+
+  bool get _hasCreateChanges =>
       _eventTitleController.text.trim().isNotEmpty ||
       _timeController.text.trim().isNotEmpty ||
       _notesController.text.trim().isNotEmpty ||
@@ -376,20 +483,24 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       return;
     }
 
-    _createEvent();
+    if (_isEditing) {
+      _submitEdit();
+    } else {
+      _createEvent();
+    }
   }
 
-  void _createEvent() {
-    final date = DateFormat('dd.MM.yyyy').parseStrict(_dateController.text.trim());
+  /// Модель события по текущему состоянию формы.
+  CreateEventModel _buildModel() {
     final recurrence = _recurrence.value?.toModel();
     // Первое из нескольких времён в день становится временем события.
     final time = recurrence != null && recurrence.times.length > 1
         ? recurrence.times.first.format()
         : _timeController.text.trim();
 
-    final createEventModel = CreateEventModel(
+    return CreateEventModel(
       title: _eventTitleController.text,
-      date: date,
+      date: _eventDate,
       time: time.isEmpty ? null : time,
       description: _notesController.text,
       petId: _createEventUio.value.petId!,
@@ -397,8 +508,102 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       isRecurring: recurrence != null,
       recurrence: recurrence,
     );
+  }
 
-    _createEventBloc.add(CreateEventEvent.createRequested(model: createEventModel));
+  void _createEvent() {
+    _createEventBloc.add(CreateEventEvent.createRequested(model: _buildModel()));
+  }
+
+  /// Одиночное событие сохраняется сразу; у серии сначала выбирается область.
+  void _submitEdit() {
+    final event = widget.editing!;
+    final model = _buildModel();
+    final changes = EditChanges.compare(original: event, edited: model, originalTime: _initialTime);
+
+    if (changes.isEmpty) {
+      Navigator.of(context).pop();
+
+      return;
+    }
+
+    if (event.recurrence == null) {
+      _editBloc.add(
+        EditEventEvent.saveRequested(
+          occurrence: event,
+          scope: OccurrenceScope.future,
+          model: model,
+          changes: changes,
+        ),
+      );
+
+      return;
+    }
+
+    _pendingModel = model;
+    _pendingChanges = changes;
+    _editScope.value = changes.allowsSingleOccurrence
+        ? OccurrenceScope.one
+        : OccurrenceScope.future;
+    _page.value = _SheetPage.editScope;
+
+    if (_editStats.value == null) {
+      unawaited(_loadEditStats());
+    }
+  }
+
+  Future<void> _loadEditStats() async {
+    final request = ++_editStatsRequest;
+    final repository = DependenciesScope.of(context).scheduleRepository;
+
+    _editStatsFailed.value = false;
+
+    try {
+      final stats = await repository.getSeriesStats(widget.editing!.ref);
+
+      if (mounted && request == _editStatsRequest) {
+        _editStats.value = stats;
+      }
+    } catch (_) {
+      if (mounted && request == _editStatsRequest) {
+        _editStatsFailed.value = true;
+      }
+    }
+  }
+
+  /// Отправляет изменения серии с выбранной областью.
+  void _saveEdit() {
+    final model = _pendingModel;
+    final stats = _editStats.value;
+    if (model == null || stats == null) {
+      return;
+    }
+
+    final scope = _pendingChanges.allowsSingleOccurrence
+        ? _editScope.value
+        : OccurrenceScope.future;
+
+    // «После N повторений» у новой серии считается от выбранной даты.
+    final adjusted = scope == OccurrenceScope.future
+        ? CreateEventModel(
+            title: model.title,
+            description: model.description,
+            time: model.time,
+            date: model.date,
+            petId: model.petId,
+            type: model.type,
+            isRecurring: model.isRecurring,
+            recurrence: EditChanges.withRemainingCount(model.recurrence, past: stats.past),
+          )
+        : model;
+
+    _editBloc.add(
+      EditEventEvent.saveRequested(
+        occurrence: widget.editing!,
+        scope: scope,
+        model: adjusted,
+        changes: _pendingChanges,
+      ),
+    );
   }
 
   void _onPetIdSelected(int petId) {
@@ -911,6 +1116,71 @@ class _DatePickerCalendarPopup extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Страница выбора области сохранения: связывает [EditScopePage] с bloc и статистикой серии.
+class _EditScopeHost extends StatelessWidget {
+  const _EditScopeHost({
+    required this.bloc,
+    required this.stats,
+    required this.statsFailed,
+    required this.scope,
+    required this.date,
+    required this.model,
+    required this.changes,
+    required this.onSave,
+    required this.onRetry,
+    required this.onBack,
+  });
+
+  final EditEventBloc bloc;
+  final ValueNotifier<SeriesStats?> stats;
+  final ValueNotifier<bool> statsFailed;
+  final ValueNotifier<OccurrenceScope> scope;
+  final DateTime date;
+  final CreateEventModel? model;
+  final EditChanges changes;
+  final VoidCallback onSave;
+  final VoidCallback onRetry;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: Listenable.merge([stats, statsFailed, scope]),
+      builder: (context, child) => BlocBuilder<EditEventBloc, EditEventState>(
+        bloc: bloc,
+        builder: (context, editState) {
+          final loaded = stats.value;
+          final pending = model;
+          final showReset =
+              loaded != null &&
+              pending != null &&
+              changes.changesSchedule &&
+              CancelledDatesReset.willReset(
+                cancelledDates: loaded.cancelledDates,
+                start: pending.date,
+                rule: pending.recurrence,
+              );
+
+          return EditScopePage(
+            date: date,
+            scope: scope.value,
+            allowsOne: changes.allowsSingleOccurrence,
+            isLoading: loaded == null && !statsFailed.value,
+            isSaving: editState.isLoading,
+            loadFailed: statsFailed.value,
+            showResetHint: showReset,
+            onScopeChanged: (value) => scope.value = value,
+            onSave: onSave,
+            onDiscard: () => Navigator.of(context).pop(),
+            onRetry: onRetry,
+            onBack: onBack,
+          );
+        },
       ),
     );
   }

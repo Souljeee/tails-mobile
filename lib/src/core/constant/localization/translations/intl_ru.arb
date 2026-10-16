@@ -896,5 +896,21 @@
   "eventMarkUndoneSnack": "Отметка снята",
   "scheduleTwoZonesHintTitle": "Карточка теперь делится на две части",
   "scheduleTwoZonesHintText": "Кружок справа отмечает событие выполненным, а нажатие на остальную карточку открывает детали.",
-  "scheduleTwoZonesHintAction": "Понятно"
+  "scheduleTwoZonesHintAction": "Понятно",
+  "eventEditTitle": "Редактирование",
+  "eventEditSubmit": "Сохранить изменения",
+  "eventEditSaved": "Изменения сохранены",
+  "eventEditFailed": "Не удалось сохранить изменения",
+  "eventDetailsEdit": "Изменить",
+  "editScopeTitle": "Сохранить изменения",
+  "editScopeQuestion": "К каким событиям применить изменения?",
+  "editScopeOne": "Только {date}",
+  "@editScopeOne": {"placeholders": {"date": {"type": "String"}}},
+  "editScopeFuture": "{date} и все следующие",
+  "@editScopeFuture": {"placeholders": {"date": {"type": "String"}}},
+  "editScopeOneUnavailable": "Дата, питомец и повторение меняются только вместе со следующими событиями",
+  "editScopeResetHint": "Отменённые вручную даты, которых нет в новом расписании, исчезнут",
+  "editScopeSave": "Сохранить",
+  "editScopeDiscard": "Не сохранять",
+  "editScopeLoadFailed": "Не удалось загрузить данные серии"
 }

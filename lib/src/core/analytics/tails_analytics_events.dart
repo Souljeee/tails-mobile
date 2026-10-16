@@ -273,6 +273,10 @@ abstract final class TailsAnalyticsEvents {
   /// Отменённое вхождение возвращено в расписание.
   static const eventRestored = TailsAnalyticsEvent('event_restored');
 
+  /// Вхождение изменено (`one` — только эта дата, `future` — эта дата и следующие).
+  static TailsAnalyticsEvent eventEdited({required String scope}) =>
+      TailsAnalyticsEvent('event_edited', parameters: {'scope': scope});
+
   /// Изменён фильтр расписания.
   static TailsAnalyticsEvent scheduleFilterChanged(String filter) =>
       TailsAnalyticsEvent('schedule_filter_changed', parameters: {'filter': filter});

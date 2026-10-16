@@ -28,6 +28,7 @@ import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/create_schedule_event_bottom_sheet.dart';
+import 'package:tails_mobile/src/feature/schedule/edit_event/presentation/edit_event_flow.dart';
 import 'package:tails_mobile/src/feature/schedule/event_details/presentation/cancel_snack_bars.dart';
 import 'package:tails_mobile/src/feature/schedule/event_details/presentation/event_details_sheet.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/event_actions/effect_commands.dart';
@@ -343,8 +344,19 @@ class _ScheduleScreenState extends State<ScheduleScreen>
         _actionsBloc.add(EventActionsEvent.restoreRequested(occurrence: event));
       case EventDetailsResult$Unmark():
         _unmarkOccurrence(event);
+      case EventDetailsResult$Edit():
+        unawaited(_editOccurrence(event));
       case null:
         break;
+    }
+  }
+
+  Future<void> _editOccurrence(ScheduleEventModel event) async {
+    final saved = await editEventWithSheet(context: context, occurrence: event, pets: _pets);
+
+    if (saved && mounted) {
+      // Изменение серии меняет и соседние вхождения (идентификаторы будущих тоже).
+      _reloadSchedule(silent: true);
     }
   }
 

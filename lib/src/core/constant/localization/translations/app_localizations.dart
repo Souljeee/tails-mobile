@@ -2779,6 +2779,90 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Понятно'**
   String get scheduleTwoZonesHintAction;
+
+  /// No description provided for @eventEditTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Редактирование'**
+  String get eventEditTitle;
+
+  /// No description provided for @eventEditSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить изменения'**
+  String get eventEditSubmit;
+
+  /// No description provided for @eventEditSaved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменения сохранены'**
+  String get eventEditSaved;
+
+  /// No description provided for @eventEditFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить изменения'**
+  String get eventEditFailed;
+
+  /// No description provided for @eventDetailsEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить'**
+  String get eventDetailsEdit;
+
+  /// No description provided for @editScopeTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить изменения'**
+  String get editScopeTitle;
+
+  /// No description provided for @editScopeQuestion.
+  ///
+  /// In ru, this message translates to:
+  /// **'К каким событиям применить изменения?'**
+  String get editScopeQuestion;
+
+  /// No description provided for @editScopeOne.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только {date}'**
+  String editScopeOne(String date);
+
+  /// No description provided for @editScopeFuture.
+  ///
+  /// In ru, this message translates to:
+  /// **'{date} и все следующие'**
+  String editScopeFuture(String date);
+
+  /// No description provided for @editScopeOneUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дата, питомец и повторение меняются только вместе со следующими событиями'**
+  String get editScopeOneUnavailable;
+
+  /// No description provided for @editScopeResetHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменённые вручную даты, которых нет в новом расписании, исчезнут'**
+  String get editScopeResetHint;
+
+  /// No description provided for @editScopeSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить'**
+  String get editScopeSave;
+
+  /// No description provided for @editScopeDiscard.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не сохранять'**
+  String get editScopeDiscard;
+
+  /// No description provided for @editScopeLoadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить данные серии'**
+  String get editScopeLoadFailed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

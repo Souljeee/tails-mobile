@@ -7,11 +7,13 @@ import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/core/utils/extensions/enums_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/utils/event_day_label.dart';
 import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/edit_event/presentation/edit_event_flow.dart';
 import 'package:tails_mobile/src/feature/schedule/event_details/presentation/cancel_snack_bars.dart';
 import 'package:tails_mobile/src/feature/schedule/event_details/presentation/event_details_sheet.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/event_actions/event_actions_bloc.dart';
@@ -24,7 +26,7 @@ class PetUpcomingEventTile extends StatefulWidget {
     required this.petImage,
     required this.petType,
     required this.petColor,
-    this.petName,
+    this.pet,
     this.onChanged,
     super.key,
   });
@@ -33,7 +35,9 @@ class PetUpcomingEventTile extends StatefulWidget {
   final String? petImage;
   final PetTypeEnum petType;
   final Color petColor;
-  final String? petName;
+
+  /// Питомец карточки: имя в шите деталей и выбор питомца в форме редактирования.
+  final PetModel? pet;
 
   /// Список событий изменился на сервере (отмена серии): карточку питомца стоит перезагрузить.
   final VoidCallback? onChanged;
@@ -74,7 +78,7 @@ class _PetUpcomingEventTileState extends State<PetUpcomingEventTile> {
       context: context,
       occurrence: event,
       loadStats: () => repository.getSeriesStats(event.ref),
-      petName: widget.petName,
+      petName: widget.pet?.name,
       petAvatar: UiPetAvatar(
         imageUrl: widget.petImage,
         placeholderAsset: widget.petType.emptyAvatarAsset,
@@ -91,6 +95,15 @@ class _PetUpcomingEventTileState extends State<PetUpcomingEventTile> {
       case EventDetailsResult$Unmark():
         if (_done) {
           _toggle();
+        }
+      case EventDetailsResult$Edit():
+        final saved = await editEventWithSheet(
+          context: context,
+          occurrence: event,
+          pets: [if (widget.pet != null) widget.pet!],
+        );
+        if (saved && mounted) {
+          widget.onChanged?.call();
         }
       case EventDetailsResult$Restore():
       case null:

@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:tails_mobile/src/feature/initialization/model/dependencies_container.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/breed_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/pet_details/presentation/widgets/pet_upcoming_event_tile.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
@@ -77,7 +79,17 @@ void main() {
             petImage: null,
             petType: PetTypeEnum.cat,
             petColor: Colors.green,
-            petName: 'Мурка',
+            pet: PetModel(
+              id: 1,
+              petType: PetTypeEnum.cat,
+              name: 'Мурка',
+              breed: const BreedModel(id: 1, name: 'Британская'),
+              gender: 'F',
+              birthday: DateTime(2020),
+              color: 'green',
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+            ),
           ),
         ),
       ),

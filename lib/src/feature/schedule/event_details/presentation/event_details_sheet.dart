@@ -36,6 +36,11 @@ final class EventDetailsResult$Restore extends EventDetailsResult {
   const EventDetailsResult$Restore();
 }
 
+/// Открыть форму редактирования.
+final class EventDetailsResult$Edit extends EventDetailsResult {
+  const EventDetailsResult$Edit();
+}
+
 /// Снять отметку о выполнении.
 final class EventDetailsResult$Unmark extends EventDetailsResult {
   const EventDetailsResult$Unmark();
@@ -228,7 +233,7 @@ class _EventDetailsSheetState extends State<EventDetailsSheet> {
           Text(occurrence.description!.trim(), style: fonts.body.copyWith(color: palette.ink)),
         ],
         const SizedBox(height: UiSpacing.x5),
-        for (final action in actions.where((a) => a != EventAction.edit)) ...[
+        for (final action in actions) ...[
           _actionButton(context, action),
           const SizedBox(height: UiSpacing.x3),
         ],
@@ -277,9 +282,11 @@ class _EventDetailsSheetState extends State<EventDetailsSheet> {
           pressedItemColor: palette.danger,
           onPressed: _openCancel,
         );
-      // «Изменить» появится вместе с режимом редактирования формы.
       case EventAction.edit:
-        return const SizedBox.shrink();
+        return UiButton.secondary(
+          label: l10n.eventDetailsEdit,
+          onPressed: () => _close(const EventDetailsResult$Edit()),
+        );
     }
   }
 

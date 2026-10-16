@@ -16,6 +16,7 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_details_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_sex_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/pets/core/utils/pet_age.dart';
@@ -222,7 +223,20 @@ class _PetDetailsSheet extends StatelessWidget {
               petImage: pet.image,
               petType: pet.petType,
               petColor: palette.petColor(pet.colorIndex),
-              petName: pet.name,
+              pet: PetModel(
+                id: pet.id,
+                petType: pet.petType,
+                name: pet.name,
+                breed: pet.breed,
+                gender: pet.gender == PetSexEnum.male ? 'M' : 'F',
+                birthday: pet.birthday,
+                color: pet.color,
+                image: pet.image,
+                weight: pet.weight,
+                createdAt: pet.createdAt,
+                updatedAt: pet.updatedAt,
+                colorIndex: pet.colorIndex,
+              ),
               onChanged: () => unawaited(onRefresh()),
             ),
             const SizedBox(height: UiSpacing.x3),

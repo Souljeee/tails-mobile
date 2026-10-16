@@ -124,6 +124,7 @@ AppMetrica настроена без отправки сбоев (`crashReportin
 | `event_marked_done` | `event_type`, `is_recurring`, `from` (`calendar` / `pet_details`) | `MarkDoneBloc` |
 | `event_marked_undone` | `event_type` | `MarkDoneBloc` |
 | `event_cancelled` | `scope` (`one` / `future`), `event_type`, `is_recurring` | `EventActionsBloc` |
+| `event_edited` | `scope` (`one` / `future`) | `EditEventBloc` |
 | `event_cancel_undone` | — | `EventActionsBloc` |
 | `event_restored` | — | `EventActionsBloc` |
 | `schedule_filter_changed` | `filter` (`all` / `pet`) | `ScheduleScreen` |

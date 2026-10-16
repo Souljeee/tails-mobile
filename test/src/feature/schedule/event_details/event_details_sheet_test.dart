@@ -74,7 +74,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('запланированное: шапка, строки и кнопка отмены; «Изменить» скрыта', (tester) async {
+  testWidgets('запланированное: шапка, строки и кнопки «Изменить» и отмены', (tester) async {
     await pump(tester, _event());
 
     expect(find.text('Таблетки'), findsOneWidget);
@@ -85,7 +85,16 @@ void main() {
     expect(find.textContaining('Мистерио'), findsOneWidget);
     expect(find.text('Отменить событие…'), findsOneWidget);
     expect(find.text('Снять отметку'), findsNothing);
-    expect(find.text('Изменить'), findsNothing);
+    expect(find.text('Изменить'), findsOneWidget);
+  });
+
+  testWidgets('«Изменить» закрывает шит с результатом Edit', (tester) async {
+    await pump(tester, _event());
+
+    await tester.tap(find.text('Изменить'));
+    await tester.pumpAndSettle();
+
+    expect(result, isA<EventDetailsResult$Edit>());
   });
 
   testWidgets('выполненное: время отметки, «Снять отметку», без отмены', (tester) async {

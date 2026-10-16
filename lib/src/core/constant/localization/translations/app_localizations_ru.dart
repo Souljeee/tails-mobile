@@ -1776,4 +1776,52 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get scheduleTwoZonesHintAction => 'Понятно';
+
+  @override
+  String get eventEditTitle => 'Редактирование';
+
+  @override
+  String get eventEditSubmit => 'Сохранить изменения';
+
+  @override
+  String get eventEditSaved => 'Изменения сохранены';
+
+  @override
+  String get eventEditFailed => 'Не удалось сохранить изменения';
+
+  @override
+  String get eventDetailsEdit => 'Изменить';
+
+  @override
+  String get editScopeTitle => 'Сохранить изменения';
+
+  @override
+  String get editScopeQuestion => 'К каким событиям применить изменения?';
+
+  @override
+  String editScopeOne(String date) {
+    return 'Только $date';
+  }
+
+  @override
+  String editScopeFuture(String date) {
+    return '$date и все следующие';
+  }
+
+  @override
+  String get editScopeOneUnavailable =>
+      'Дата, питомец и повторение меняются только вместе со следующими событиями';
+
+  @override
+  String get editScopeResetHint =>
+      'Отменённые вручную даты, которых нет в новом расписании, исчезнут';
+
+  @override
+  String get editScopeSave => 'Сохранить';
+
+  @override
+  String get editScopeDiscard => 'Не сохранять';
+
+  @override
+  String get editScopeLoadFailed => 'Не удалось загрузить данные серии';
 }
