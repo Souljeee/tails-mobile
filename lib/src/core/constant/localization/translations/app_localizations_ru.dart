@@ -1705,4 +1705,65 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get eventOpenDetails => 'Открыть детали';
+
+  @override
+  String get eventDetailsStatusScheduled => 'Запланировано';
+
+  @override
+  String eventDetailsStatusDone(String time) {
+    return 'Выполнено в $time';
+  }
+
+  @override
+  String get eventDetailsStatusDoneNoTime => 'Выполнено';
+
+  @override
+  String get eventDetailsClose => 'Закрыть';
+
+  @override
+  String get eventDetailsBack => 'Назад';
+
+  @override
+  String get eventDetailsWhenLabel => 'Когда';
+
+  @override
+  String get eventDetailsRepeatLabel => 'Повторение';
+
+  @override
+  String get eventDetailsNoRepeat => 'Не повторяется';
+
+  @override
+  String get eventDetailsUnmark => 'Снять отметку';
+
+  @override
+  String get eventDetailsCancelAction => 'Отменить событие…';
+
+  @override
+  String get eventDetailsRestore => 'Вернуть в расписание';
+
+  @override
+  String eventDetailsDateWithWeekday(String weekday, String date) {
+    return '$weekday, $date';
+  }
+
+  @override
+  String eventDetailsDateTime(String date, String time) {
+    return '$date, $time';
+  }
+
+  @override
+  String get eventCancelSheetTitle => 'Отменить событие?';
+
+  @override
+  String get eventCancelSheetSingleText =>
+      'Событие останется в календаре с пометкой «Отменено». Его можно будет вернуть в расписание.';
+
+  @override
+  String get eventCancelSheetSeriesText => 'К каким событиям серии применить отмену?';
+
+  @override
+  String get eventCancelStatsLoadFailed => 'Не удалось узнать, сколько событий в серии';
+
+  @override
+  String get eventMarkUndoneSnack => 'Отметка снята';
 }

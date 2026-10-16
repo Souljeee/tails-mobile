@@ -24,11 +24,15 @@ class ScheduleEventItem extends StatefulWidget {
   final Color petColor;
   final ValueChanged<bool>? onToggle;
 
+  /// Нажатие на карточку (не на кружок): открыть детали.
+  final VoidCallback? onTap;
+
   const ScheduleEventItem({
     required this.event,
     required this.petColor,
     this.pet,
     this.onToggle,
+    this.onTap,
     super.key,
   });
 
@@ -115,6 +119,7 @@ class _ScheduleEventItemState extends State<ScheduleEventItem> {
               toggleLabel: event.done ? l10n.eventToggleUndone : l10n.eventToggleDone,
               detailsLabel: l10n.eventOpenDetails,
               onToggle: _toggle,
+              onTap: widget.onTap,
             ),
           ),
         ],

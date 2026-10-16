@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +11,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.
 import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_errors/ui_fetching_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_icon_button/ui_icon_button.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_avatar/ui_pet_avatar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_shimmer/ui_shimmer.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_top_bar/ui_top_bar.dart';
@@ -24,8 +24,15 @@ import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
+import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
+import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/create_schedule_event_bottom_sheet.dart';
+import 'package:tails_mobile/src/feature/schedule/event_details/presentation/event_details_sheet.dart';
+import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/event_actions/effect_commands.dart';
+import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/event_actions/event_actions_bloc.dart';
+import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/mark_done/mark_done_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/pets/pets_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/schedule/schedule_bloc.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/schedule_window.dart';
@@ -71,6 +78,17 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   late final ScheduleBloc _scheduleBloc = ScheduleBloc(
     scheduleRepository: DependenciesScope.of(context).scheduleRepository,
   );
+  late final EventActionsBloc _actionsBloc = EventActionsBloc(
+    scheduleRepository: DependenciesScope.of(context).scheduleRepository,
+  );
+
+  /// Снятие отметки из шита деталей (кружок на карточке пользуется своим блоком).
+  late final MarkDoneBloc _unmarkBloc = MarkDoneBloc(
+    scheduleRepository: DependenciesScope.of(context).scheduleRepository,
+  );
+
+  /// Время показа снекбара «Вернуть»: совпадает с задержкой отправки отмены.
+  static const Duration _undoDuration = Duration(seconds: 6);
 
   @override
   void initState() {
@@ -114,6 +132,11 @@ class _ScheduleScreenState extends State<ScheduleScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Приложение уходит в фон: отложенная отмена должна уйти на сервер сейчас.
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      _actionsBloc.add(const EventActionsEvent.flushRequested());
+    }
+
     if (state == AppLifecycleState.resumed && TickerMode.of(context)) {
       _refresh();
     }
@@ -125,6 +148,9 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     WidgetsBinding.instance.removeObserver(this);
     _monthController.removeListener(_onMonthChanged);
     _petsBloc.close();
+    // Закрытие блока отправляет ожидающую отмену.
+    _actionsBloc.close();
+    _unmarkBloc.close();
     _scheduleBloc.close();
     _monthController.dispose();
 
@@ -296,6 +322,125 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     );
   }
 
+  Future<void> _openEventDetails(ScheduleEventModel event) async {
+    final pet = _pets.firstWhereOrNull((pet) => pet.id == event.petId);
+    final repository = DependenciesScope.of(context).scheduleRepository;
+
+    final result = await showEventDetailsSheet(
+      context: context,
+      occurrence: event,
+      loadStats: () => repository.getSeriesStats(event.ref),
+      petName: pet?.name,
+      petAvatar: UiPetAvatar(imageUrl: pet?.image, placeholderAsset: pet?.petType.emptyAvatarAsset),
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case EventDetailsResult$Cancel(:final scope):
+        _actionsBloc.add(EventActionsEvent.cancelRequested(occurrence: event, scope: scope));
+      case EventDetailsResult$Restore():
+        _actionsBloc.add(EventActionsEvent.restoreRequested(occurrence: event));
+      case EventDetailsResult$Unmark():
+        _unmarkOccurrence(event);
+      case null:
+        break;
+    }
+  }
+
+  void _unmarkOccurrence(ScheduleEventModel event) {
+    _scheduleBloc.add(
+      ScheduleEvent.markDoneRequested(
+        eventId: event.id,
+        date: event.date,
+        value: false,
+        time: event.time,
+      ),
+    );
+    _unmarkBloc.add(
+      MarkDoneEvent.markDoneRequested(
+        value: false,
+        eventId: event.id,
+        date: event.date,
+        time: event.time,
+        timeZoneOffset: event.timeZoneOffset,
+        analyticsEventType: ScheduleAnalytics.eventType(event.type),
+        analyticsIsRecurring: event.recurrence != null,
+      ),
+    );
+
+    showUiSnackBar(context, message: context.l10n.eventMarkUndoneSnack, kind: UiSnackBarKind.info);
+  }
+
+  void _onUnmarkState(MarkDoneState state) {
+    // Ошибку снятия отметки показывает общий путь: список перезагружаем, чтобы он не врал.
+    state.mapOrNull(
+      error: (_) {
+        _reloadSchedule(silent: true);
+        showUiSnackBar(context, message: context.l10n.tryLater);
+      },
+    );
+  }
+
+  /// Эффект блока отмены: обновляет список и показывает снекбар.
+  void _onActionEffect(EventActionsState state) {
+    final effect = state.effect;
+    if (effect == null) {
+      return;
+    }
+
+    scheduleCommandsFor(effect).forEach(_scheduleBloc.add);
+
+    final l10n = context.l10n;
+
+    switch (effect) {
+      case EventActionEffect$CancelApplied(:final scope, :final occurrence):
+        final controller = showUiSnackBar(
+          context,
+          message: scope == OccurrenceScope.future
+              ? l10n.eventsCancelledSnack
+              : l10n.eventCancelledSnack,
+          kind: UiSnackBarKind.info,
+          actionLabel: l10n.eventCancelUndo,
+          duration: _undoDuration,
+          onAction: () => _actionsBloc.add(const EventActionsEvent.undoRequested()),
+        );
+
+        // Снекбар закрылся сам или смахнули: запрос уходит сразу. Если на его место пришёл
+        // снекбар следующей отмены, ожидает уже другое вхождение, и первое не трогаем.
+        unawaited(
+          controller.closed.then((reason) {
+            final pending = _actionsBloc.state.pending;
+
+            if (reason != SnackBarClosedReason.action &&
+                pending != null &&
+                pending.occurrence == occurrence &&
+                pending.scope == scope) {
+              _actionsBloc.add(const EventActionsEvent.flushRequested());
+            }
+          }),
+        );
+      case EventActionEffect$CancelFailed(:final scope, :final occurrence):
+        showUiSnackBar(
+          context,
+          message: l10n.eventCancelFailed,
+          actionLabel: l10n.eventActionRetry,
+          onAction: () => _actionsBloc.add(
+            EventActionsEvent.cancelRequested(occurrence: occurrence, scope: scope),
+          ),
+        );
+      case EventActionEffect$RestoreFailed():
+        showUiSnackBar(context, message: l10n.eventRestoreFailed);
+      case EventActionEffect$CancelUndone():
+      case EventActionEffect$CancelCommitted():
+      case EventActionEffect$RestoreApplied():
+      case EventActionEffect$RestoreCommitted():
+        break;
+    }
+  }
+
   String? _todayCountLabel(ScheduleState state) {
     final today = DateTime.now().withoutTime;
 
@@ -320,80 +465,100 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       return const [];
     }
 
-    return events.map((event) => event.petId).toSet().map(_petColor).toList();
+    // День, в котором остались только отменённые события, точкой не отмечается.
+    return events
+        .where((event) => !event.cancelled)
+        .map((event) => event.petId)
+        .toSet()
+        .map(_petColor)
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final palette = context.uiPalette;
 
-    return Scaffold(
-      backgroundColor: palette.canvas,
-      body: BlocConsumer<PetsBloc, PetsState>(
-        bloc: _petsBloc,
-        listener: (context, petsState) => petsState.mapOrNull(success: _onPetsLoaded),
-        builder: (context, petsState) {
-          return BlocBuilder<ScheduleBloc, ScheduleState>(
-            bloc: _scheduleBloc,
-            builder: (context, scheduleState) {
-              return SafeArea(
-                bottom: false,
-                child: RefreshIndicator.adaptive(
-                  onRefresh: _pullToRefresh,
-                  color: palette.accent,
-                  child: CustomScrollView(
-                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: UiLargeTitleHeader(
-                          title: context.l10n.navCalendar,
-                          subtitle: _todayCountLabel(scheduleState),
-                          trailing: _TodayButton(onPressed: _goToToday),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<EventActionsBloc, EventActionsState>(
+          bloc: _actionsBloc,
+          listenWhen: (previous, current) => previous.effect != current.effect,
+          listener: (context, state) => _onActionEffect(state),
+        ),
+        BlocListener<MarkDoneBloc, MarkDoneState>(
+          bloc: _unmarkBloc,
+          listener: (context, state) => _onUnmarkState(state),
+        ),
+      ],
+      child: Scaffold(
+        backgroundColor: palette.canvas,
+        body: BlocConsumer<PetsBloc, PetsState>(
+          bloc: _petsBloc,
+          listener: (context, petsState) => petsState.mapOrNull(success: _onPetsLoaded),
+          builder: (context, petsState) {
+            return BlocBuilder<ScheduleBloc, ScheduleState>(
+              bloc: _scheduleBloc,
+              builder: (context, scheduleState) {
+                return SafeArea(
+                  bottom: false,
+                  child: RefreshIndicator.adaptive(
+                    onRefresh: _pullToRefresh,
+                    color: palette.accent,
+                    child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: UiLargeTitleHeader(
+                            title: context.l10n.navCalendar,
+                            subtitle: _todayCountLabel(scheduleState),
+                            trailing: _TodayButton(onPressed: _goToToday),
+                          ),
                         ),
-                      ),
-                      SliverToBoxAdapter(child: _MonthHeader(controller: _monthController)),
-                      SliverToBoxAdapter(
-                        child: _PetChipsSection(
-                          state: petsState,
-                          selectedPetId: _selectedPetId,
-                          onChanged: _onPetChanged,
+                        SliverToBoxAdapter(child: _MonthHeader(controller: _monthController)),
+                        SliverToBoxAdapter(
+                          child: _PetChipsSection(
+                            state: petsState,
+                            selectedPetId: _selectedPetId,
+                            onChanged: _onPetChanged,
+                          ),
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x4)),
-                      SliverToBoxAdapter(
-                        child: ScheduleCalendar(
-                          selectedDate: _selectedDate,
-                          controller: _monthController,
-                          onDateTap: (date) {
-                            TailsAnalytics.log(
-                              TailsAnalyticsEvents.calendarDateSelected(isToday: date == _today),
-                            );
-                            setState(() {
-                              _selectedDate = date;
-                            });
-                          },
-                          resolveMarkers: (date) => _markersFor(scheduleState, date),
+                        const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x4)),
+                        SliverToBoxAdapter(
+                          child: ScheduleCalendar(
+                            selectedDate: _selectedDate,
+                            controller: _monthController,
+                            onDateTap: (date) {
+                              TailsAnalytics.log(
+                                TailsAnalyticsEvents.calendarDateSelected(isToday: date == _today),
+                              );
+                              setState(() {
+                                _selectedDate = date;
+                              });
+                            },
+                            resolveMarkers: (date) => _markersFor(scheduleState, date),
+                          ),
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x5)),
-                      _EventsSliver(
-                        state: scheduleState,
-                        date: _selectedDate,
-                        pets: _pets,
-                        petColorOf: _petColor,
-                        onToggle: _onEventToggle,
-                        onRetry: _reloadSchedule,
-                      ),
-                      SliverPadding(
-                        padding: EdgeInsets.only(bottom: ShellScope.bottomInsetOf(context)),
-                      ),
-                    ],
+                        const SliverToBoxAdapter(child: SizedBox(height: UiSpacing.x5)),
+                        _EventsSliver(
+                          state: scheduleState,
+                          date: _selectedDate,
+                          pets: _pets,
+                          petColorOf: _petColor,
+                          onToggle: _onEventToggle,
+                          onOpenDetails: _openEventDetails,
+                          onRetry: _reloadSchedule,
+                        ),
+                        SliverPadding(
+                          padding: EdgeInsets.only(bottom: ShellScope.bottomInsetOf(context)),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          );
-        },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -517,6 +682,7 @@ class _EventsSliver extends StatelessWidget {
     required this.pets,
     required this.petColorOf,
     required this.onToggle,
+    required this.onOpenDetails,
     required this.onRetry,
   });
 
@@ -525,6 +691,7 @@ class _EventsSliver extends StatelessWidget {
   final List<PetModel> pets;
   final Color Function(int petId) petColorOf;
   final void Function(ScheduleEventModel event, {required bool value}) onToggle;
+  final ValueChanged<ScheduleEventModel> onOpenDetails;
   final VoidCallback onRetry;
 
   @override
@@ -594,6 +761,7 @@ class _EventsSliver extends StatelessWidget {
                       pet: pets.firstWhereOrNull((pet) => pet.id == event.petId),
                       petColor: petColorOf(event.petId),
                       onToggle: (value) => onToggle(event, value: value),
+                      onTap: () => onOpenDetails(event),
                     );
                   },
                   separatorBuilder: (context, index) => const SizedBox(height: UiSpacing.x2),

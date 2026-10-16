@@ -2653,6 +2653,114 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Открыть детали'**
   String get eventOpenDetails;
+
+  /// No description provided for @eventDetailsStatusScheduled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запланировано'**
+  String get eventDetailsStatusScheduled;
+
+  /// No description provided for @eventDetailsStatusDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выполнено в {time}'**
+  String eventDetailsStatusDone(String time);
+
+  /// No description provided for @eventDetailsStatusDoneNoTime.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выполнено'**
+  String get eventDetailsStatusDoneNoTime;
+
+  /// No description provided for @eventDetailsClose.
+  ///
+  /// In ru, this message translates to:
+  /// **'Закрыть'**
+  String get eventDetailsClose;
+
+  /// No description provided for @eventDetailsBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Назад'**
+  String get eventDetailsBack;
+
+  /// No description provided for @eventDetailsWhenLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Когда'**
+  String get eventDetailsWhenLabel;
+
+  /// No description provided for @eventDetailsRepeatLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторение'**
+  String get eventDetailsRepeatLabel;
+
+  /// No description provided for @eventDetailsNoRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не повторяется'**
+  String get eventDetailsNoRepeat;
+
+  /// No description provided for @eventDetailsUnmark.
+  ///
+  /// In ru, this message translates to:
+  /// **'Снять отметку'**
+  String get eventDetailsUnmark;
+
+  /// No description provided for @eventDetailsCancelAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить событие…'**
+  String get eventDetailsCancelAction;
+
+  /// No description provided for @eventDetailsRestore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуть в расписание'**
+  String get eventDetailsRestore;
+
+  /// No description provided for @eventDetailsDateWithWeekday.
+  ///
+  /// In ru, this message translates to:
+  /// **'{weekday}, {date}'**
+  String eventDetailsDateWithWeekday(String weekday, String date);
+
+  /// No description provided for @eventDetailsDateTime.
+  ///
+  /// In ru, this message translates to:
+  /// **'{date}, {time}'**
+  String eventDetailsDateTime(String date, String time);
+
+  /// No description provided for @eventCancelSheetTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить событие?'**
+  String get eventCancelSheetTitle;
+
+  /// No description provided for @eventCancelSheetSingleText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Событие останется в календаре с пометкой «Отменено». Его можно будет вернуть в расписание.'**
+  String get eventCancelSheetSingleText;
+
+  /// No description provided for @eventCancelSheetSeriesText.
+  ///
+  /// In ru, this message translates to:
+  /// **'К каким событиям серии применить отмену?'**
+  String get eventCancelSheetSeriesText;
+
+  /// No description provided for @eventCancelStatsLoadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось узнать, сколько событий в серии'**
+  String get eventCancelStatsLoadFailed;
+
+  /// No description provided for @eventMarkUndoneSnack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отметка снята'**
+  String get eventMarkUndoneSnack;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
