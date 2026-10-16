@@ -2761,6 +2761,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Отметка снята'**
   String get eventMarkUndoneSnack;
+
+  /// No description provided for @scheduleTwoZonesHintTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Карточка теперь делится на две части'**
+  String get scheduleTwoZonesHintTitle;
+
+  /// No description provided for @scheduleTwoZonesHintText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кружок справа отмечает событие выполненным, а нажатие на остальную карточку открывает детали.'**
+  String get scheduleTwoZonesHintText;
+
+  /// No description provided for @scheduleTwoZonesHintAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Понятно'**
+  String get scheduleTwoZonesHintAction;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

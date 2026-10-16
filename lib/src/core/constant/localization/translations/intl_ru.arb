@@ -893,5 +893,8 @@
   "eventCancelSheetSingleText": "Событие останется в календаре с пометкой «Отменено». Его можно будет вернуть в расписание.",
   "eventCancelSheetSeriesText": "К каким событиям серии применить отмену?",
   "eventCancelStatsLoadFailed": "Не удалось узнать, сколько событий в серии",
-  "eventMarkUndoneSnack": "Отметка снята"
+  "eventMarkUndoneSnack": "Отметка снята",
+  "scheduleTwoZonesHintTitle": "Карточка теперь делится на две части",
+  "scheduleTwoZonesHintText": "Кружок справа отмечает событие выполненным, а нажатие на остальную карточку открывает детали.",
+  "scheduleTwoZonesHintAction": "Понятно"
 }

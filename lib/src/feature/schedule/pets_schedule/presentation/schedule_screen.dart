@@ -26,9 +26,9 @@ import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scop
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_model.dart';
 import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
-import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/create_schedule_event_bottom_sheet.dart';
+import 'package:tails_mobile/src/feature/schedule/event_details/presentation/cancel_snack_bars.dart';
 import 'package:tails_mobile/src/feature/schedule/event_details/presentation/event_details_sheet.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/event_actions/effect_commands.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/event_actions/event_actions_bloc.dart';
@@ -39,6 +39,7 @@ import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/schedule_
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/pets_chip_list.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/schedule_calendar.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/schedule_event_item.dart';
+import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/two_zones_hint.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -86,9 +87,6 @@ class _ScheduleScreenState extends State<ScheduleScreen>
   late final MarkDoneBloc _unmarkBloc = MarkDoneBloc(
     scheduleRepository: DependenciesScope.of(context).scheduleRepository,
   );
-
-  /// Время показа снекбара «Вернуть»: совпадает с задержкой отправки отмены.
-  static const Duration _undoDuration = Duration(seconds: 6);
 
   @override
   void initState() {
@@ -396,41 +394,10 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     final l10n = context.l10n;
 
     switch (effect) {
-      case EventActionEffect$CancelApplied(:final scope, :final occurrence):
-        final controller = showUiSnackBar(
-          context,
-          message: scope == OccurrenceScope.future
-              ? l10n.eventsCancelledSnack
-              : l10n.eventCancelledSnack,
-          kind: UiSnackBarKind.info,
-          actionLabel: l10n.eventCancelUndo,
-          duration: _undoDuration,
-          onAction: () => _actionsBloc.add(const EventActionsEvent.undoRequested()),
-        );
-
-        // Снекбар закрылся сам или смахнули: запрос уходит сразу. Если на его место пришёл
-        // снекбар следующей отмены, ожидает уже другое вхождение, и первое не трогаем.
-        unawaited(
-          controller.closed.then((reason) {
-            final pending = _actionsBloc.state.pending;
-
-            if (reason != SnackBarClosedReason.action &&
-                pending != null &&
-                pending.occurrence == occurrence &&
-                pending.scope == scope) {
-              _actionsBloc.add(const EventActionsEvent.flushRequested());
-            }
-          }),
-        );
-      case EventActionEffect$CancelFailed(:final scope, :final occurrence):
-        showUiSnackBar(
-          context,
-          message: l10n.eventCancelFailed,
-          actionLabel: l10n.eventActionRetry,
-          onAction: () => _actionsBloc.add(
-            EventActionsEvent.cancelRequested(occurrence: occurrence, scope: scope),
-          ),
-        );
+      case final EventActionEffect$CancelApplied applied:
+        showCancelUndoSnackBar(context, bloc: _actionsBloc, effect: applied);
+      case final EventActionEffect$CancelFailed failed:
+        showCancelFailedSnackBar(context, bloc: _actionsBloc, effect: failed);
       case EventActionEffect$RestoreFailed():
         showUiSnackBar(context, message: l10n.eventRestoreFailed);
       case EventActionEffect$CancelUndone():
@@ -746,7 +713,11 @@ class _EventsSliver extends StatelessWidget {
                   ),
                 ),
               )
-            else
+            else ...[
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
+                sliver: SliverToBoxAdapter(child: TwoZonesHint()),
+              ),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: UiSpacing.x5),
                 sliver: SliverList.separated(
@@ -767,6 +738,7 @@ class _EventsSliver extends StatelessWidget {
                   separatorBuilder: (context, index) => const SizedBox(height: UiSpacing.x2),
                 ),
               ),
+            ],
           ],
         );
       },

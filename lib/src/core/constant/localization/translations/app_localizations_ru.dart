@@ -1766,4 +1766,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get eventMarkUndoneSnack => 'Отметка снята';
+
+  @override
+  String get scheduleTwoZonesHintTitle => 'Карточка теперь делится на две части';
+
+  @override
+  String get scheduleTwoZonesHintText =>
+      'Кружок справа отмечает событие выполненным, а нажатие на остальную карточку открывает детали.';
+
+  @override
+  String get scheduleTwoZonesHintAction => 'Понятно';
 }

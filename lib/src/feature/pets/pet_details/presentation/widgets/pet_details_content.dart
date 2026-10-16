@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
@@ -11,7 +13,6 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_sizes.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
-import 'package:tails_mobile/src/core/utils/extensions/enums_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/models/pet_details_model.dart';
@@ -115,7 +116,9 @@ class _PetDetailsContentState extends State<PetDetailsContent> {
                     ),
                     child: _PetDetailsSheet(
                       pet: widget.pet,
+                      onRefresh: widget.onRefresh,
                       upcomingEvents: widget.upcomingEvents
+                          .where((event) => !event.cancelled)
                           .take(PetDetailsContent._maxEvents)
                           .toList(),
                     ),
@@ -131,10 +134,15 @@ class _PetDetailsContentState extends State<PetDetailsContent> {
 }
 
 class _PetDetailsSheet extends StatelessWidget {
-  const _PetDetailsSheet({required this.pet, required this.upcomingEvents});
+  const _PetDetailsSheet({
+    required this.pet,
+    required this.upcomingEvents,
+    required this.onRefresh,
+  });
 
   final PetDetailsModel pet;
   final List<ScheduleEventModel> upcomingEvents;
+  final Future<void> Function() onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -214,6 +222,8 @@ class _PetDetailsSheet extends StatelessWidget {
               petImage: pet.image,
               petType: pet.petType,
               petColor: palette.petColor(pet.colorIndex),
+              petName: pet.name,
+              onChanged: () => unawaited(onRefresh()),
             ),
             const SizedBox(height: UiSpacing.x3),
           ],
