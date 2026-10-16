@@ -1256,6 +1256,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profilePhotoDelete => 'Удалить фото';
 
   @override
+  String get notificationHealthHint => 'Визиты к врачу, лекарства, прививки, обработки';
+
+  @override
+  String get notificationCareHint => 'Груминг, купание, стрижка когтей';
+
+  @override
+  String get notificationDailyHint => 'Прогулки и кормление';
+
+  @override
+  String get notificationOtherHint => 'Свои события с типом «Другое»';
+
+  @override
   String get notificationsSettingsTitle => 'Уведомления';
 
   @override
@@ -1271,21 +1283,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get notificationsSettingsFooterBlocked =>
       'Ваш выбор сохранится и заработает, как только уведомления будут разрешены.';
-
-  @override
-  String get notificationWalks => 'Прогулки';
-
-  @override
-  String get notificationFeeding => 'Кормление';
-
-  @override
-  String get notificationMedications => 'Лекарства';
-
-  @override
-  String get notificationVaccinations => 'Прививки';
-
-  @override
-  String get notificationVetVisits => 'Визиты к врачу';
 
   @override
   String get notificationsBlockedTitle => 'Уведомления отключены в настройках устройства';

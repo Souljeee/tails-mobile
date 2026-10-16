@@ -57,7 +57,7 @@ void main() {
           ..profile = _profile(
             name: 'Анна',
             settings: NotificationSettingsModel.allEnabled().copyWith(
-              category: NotificationCategory.walks,
+              category: NotificationCategory.daily,
               value: false,
             ),
           ),
@@ -67,7 +67,7 @@ void main() {
 
       expect(find.text('Анна'), findsOneWidget);
       expect(find.text('Ваше имя'), findsNothing);
-      expect(find.text('4 из 5'), findsOneWidget);
+      expect(find.text('3 из 4'), findsOneWidget);
 
       await harness.dispose(tester);
     });
@@ -203,13 +203,13 @@ void main() {
       final harness = ProfileScreenHarness(screen: (_, _) => const NotificationsSettingsScreen());
 
       await harness.pump(tester);
-      expect(find.text('Кормление'), findsOneWidget);
+      expect(find.text('Уход'), findsOneWidget);
 
-      await tester.tap(find.text('Кормление'));
+      await tester.tap(find.text('Уход'));
       await tester.pumpAndSettle();
 
-      expect(harness.profile.calls, contains('set(feeding, false)'));
-      expect(find.byType(Switch), findsNWidgets(5));
+      expect(harness.profile.calls, contains('set(care, false)'));
+      expect(find.byType(Switch), findsNWidgets(4));
 
       await harness.dispose(tester);
     });
@@ -223,7 +223,7 @@ void main() {
       );
 
       await harness.pump(tester);
-      await tester.tap(find.text('Прогулки'));
+      await tester.tap(find.text('Здоровье'));
       await tester.pumpAndSettle();
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();

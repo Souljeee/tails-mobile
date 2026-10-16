@@ -109,14 +109,14 @@ void main() {
 
       bloc.add(
         const NotificationsSettingsEvent.toggled(
-          category: NotificationCategory.vetVisits,
+          category: NotificationCategory.health,
           enabled: false,
         ),
       );
       await pumpEventQueue();
 
       expect(sink.names, ['notification_setting_changed']);
-      expect(sink.events.single.parameters, {'setting': 'vet_visits', 'enabled': false});
+      expect(sink.events.single.parameters, {'setting': 'health', 'enabled': false});
     });
 
     test('ошибка сохранения не отправляет событие', () async {
@@ -126,7 +126,7 @@ void main() {
 
       bloc.add(
         const NotificationsSettingsEvent.toggled(
-          category: NotificationCategory.walks,
+          category: NotificationCategory.daily,
           enabled: false,
         ),
       );

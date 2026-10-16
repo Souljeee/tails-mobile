@@ -52,13 +52,7 @@ const _profileJson = {
   'phone_number': '79990001122',
   'name': 'Анна',
   'avatar': 'https://example.com/a.jpg',
-  'notification_settings': {
-    'walks': true,
-    'feeding': false,
-    'medications': true,
-    'vaccinations': true,
-    'vet_visits': false,
-  },
+  'notification_settings': {'health': false, 'care': false, 'daily': true, 'other': true},
 };
 
 void main() {
@@ -93,8 +87,8 @@ void main() {
       expect(profile.name, 'Анна');
       expect(profile.avatarUrl, 'https://example.com/a.jpg');
       expect(profile.phoneNumber, '79990001122');
-      expect(profile.notificationSettings.isEnabled(NotificationCategory.feeding), isFalse);
-      expect(profile.notificationSettings.isEnabled(NotificationCategory.walks), isTrue);
+      expect(profile.notificationSettings.isEnabled(NotificationCategory.care), isFalse);
+      expect(profile.notificationSettings.isEnabled(NotificationCategory.daily), isTrue);
     });
 
     test('терпимо относится к отсутствию имени, фото и настроек', () async {
@@ -159,24 +153,18 @@ void main() {
 
   group('уведомления', () {
     test('setNotificationEnabled шлёт одну категорию по её ключу', () async {
-      client.handler = (_) => {
-        'walks': true,
-        'feeding': true,
-        'medications': true,
-        'vaccinations': true,
-        'vet_visits': false,
-      };
+      client.handler = (_) => {'health': false, 'care': true, 'daily': true, 'other': true};
 
       final settings = await repository.setNotificationEnabled(
-        category: NotificationCategory.vetVisits,
+        category: NotificationCategory.health,
         enabled: false,
       );
 
       expect(client.last.method, 'PATCH');
       expect(client.last.path, '/profile/notification-settings/');
-      expect(client.last.body, {'vet_visits': false});
-      expect(settings.isEnabled(NotificationCategory.vetVisits), isFalse);
-      expect(settings.isEnabled(NotificationCategory.walks), isTrue);
+      expect(client.last.body, {'health': false});
+      expect(settings.isEnabled(NotificationCategory.health), isFalse);
+      expect(settings.isEnabled(NotificationCategory.daily), isTrue);
     });
 
     test('запрет в системе берётся из источника разрешений', () async {

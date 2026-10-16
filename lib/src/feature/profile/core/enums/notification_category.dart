@@ -1,12 +1,12 @@
-/// Категория уведомлений в настройках профиля.
+/// Категория уведомлений в настройках профиля: совпадает с группой типов события в форме
+/// создания события.
 ///
 /// [apiKey] — ключ в `GET/PATCH /profile/notification-settings/`.
 enum NotificationCategory {
-  walks('walks'),
-  feeding('feeding'),
-  medications('medications'),
-  vaccinations('vaccinations'),
-  vetVisits('vet_visits');
+  health('health'),
+  care('care'),
+  daily('daily'),
+  other('other');
 
   const NotificationCategory(this.apiKey);
 

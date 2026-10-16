@@ -37,7 +37,7 @@ void main() {
       repository
         ..blocked = true
         ..settings = repository.settings.copyWith(
-          category: NotificationCategory.feeding,
+          category: NotificationCategory.care,
           value: false,
         );
 
@@ -45,8 +45,8 @@ void main() {
       final state = await _until(bloc.stream, (s) => s.status == NotificationsSettingsStatus.ready);
 
       expect(state.isBlockedBySystem, isTrue);
-      expect(state.settings!.isEnabled(NotificationCategory.feeding), isFalse);
-      expect(state.settings!.isEnabled(NotificationCategory.walks), isTrue);
+      expect(state.settings!.isEnabled(NotificationCategory.care), isFalse);
+      expect(state.settings!.isEnabled(NotificationCategory.daily), isTrue);
     });
 
     test('при ошибке загрузки показывает failure', () async {
@@ -71,18 +71,18 @@ void main() {
       repository.setNotificationGate = Completer<void>();
       bloc.add(
         const NotificationsSettingsEvent.toggled(
-          category: NotificationCategory.walks,
+          category: NotificationCategory.daily,
           enabled: false,
         ),
       );
 
       final optimistic = await _until(bloc.stream, (s) => s.savingCategories.isNotEmpty);
-      expect(optimistic.settings!.isEnabled(NotificationCategory.walks), isFalse);
+      expect(optimistic.settings!.isEnabled(NotificationCategory.daily), isFalse);
 
       repository.setNotificationGate!.complete();
       final confirmed = await _until(bloc.stream, (s) => s.savingCategories.isEmpty);
 
-      expect(confirmed.settings!.isEnabled(NotificationCategory.walks), isFalse);
+      expect(confirmed.settings!.isEnabled(NotificationCategory.daily), isFalse);
       expect(confirmed.saveFailures, 0);
     });
 
@@ -93,14 +93,14 @@ void main() {
       repository.setNotificationError = Exception('offline');
       bloc.add(
         const NotificationsSettingsEvent.toggled(
-          category: NotificationCategory.vaccinations,
+          category: NotificationCategory.other,
           enabled: false,
         ),
       );
 
       final state = await _until(bloc.stream, (s) => s.saveFailures == 1);
 
-      expect(state.settings!.isEnabled(NotificationCategory.vaccinations), isTrue);
+      expect(state.settings!.isEnabled(NotificationCategory.other), isTrue);
       expect(state.savingCategories, isEmpty);
     });
 
@@ -110,7 +110,7 @@ void main() {
 
       repository.setNotificationGate = Completer<void>();
       const toggle = NotificationsSettingsEvent.toggled(
-        category: NotificationCategory.walks,
+        category: NotificationCategory.daily,
         enabled: false,
       );
 

@@ -15,11 +15,10 @@ class NotificationSettingsModel extends Equatable {
 
     return NotificationSettingsModel(
       enabled: {
-        NotificationCategory.walks: source.walks,
-        NotificationCategory.feeding: source.feeding,
-        NotificationCategory.medications: source.medications,
-        NotificationCategory.vaccinations: source.vaccinations,
-        NotificationCategory.vetVisits: source.vetVisits,
+        NotificationCategory.health: source.health,
+        NotificationCategory.care: source.care,
+        NotificationCategory.daily: source.daily,
+        NotificationCategory.other: source.other,
       },
     );
   }

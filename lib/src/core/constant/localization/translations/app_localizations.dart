@@ -1862,6 +1862,30 @@ abstract class AppLocalizations {
   /// **'Удалить фото'**
   String get profilePhotoDelete;
 
+  /// No description provided for @notificationHealthHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Визиты к врачу, лекарства, прививки, обработки'**
+  String get notificationHealthHint;
+
+  /// No description provided for @notificationCareHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Груминг, купание, стрижка когтей'**
+  String get notificationCareHint;
+
+  /// No description provided for @notificationDailyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прогулки и кормление'**
+  String get notificationDailyHint;
+
+  /// No description provided for @notificationOtherHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свои события с типом «Другое»'**
+  String get notificationOtherHint;
+
   /// No description provided for @notificationsSettingsTitle.
   ///
   /// In ru, this message translates to:
@@ -1891,36 +1915,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Ваш выбор сохранится и заработает, как только уведомления будут разрешены.'**
   String get notificationsSettingsFooterBlocked;
-
-  /// No description provided for @notificationWalks.
-  ///
-  /// In ru, this message translates to:
-  /// **'Прогулки'**
-  String get notificationWalks;
-
-  /// No description provided for @notificationFeeding.
-  ///
-  /// In ru, this message translates to:
-  /// **'Кормление'**
-  String get notificationFeeding;
-
-  /// No description provided for @notificationMedications.
-  ///
-  /// In ru, this message translates to:
-  /// **'Лекарства'**
-  String get notificationMedications;
-
-  /// No description provided for @notificationVaccinations.
-  ///
-  /// In ru, this message translates to:
-  /// **'Прививки'**
-  String get notificationVaccinations;
-
-  /// No description provided for @notificationVetVisits.
-  ///
-  /// In ru, this message translates to:
-  /// **'Визиты к врачу'**
-  String get notificationVetVisits;
 
   /// No description provided for @notificationsBlockedTitle.
   ///

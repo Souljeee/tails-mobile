@@ -152,6 +152,7 @@ class _SettingsList extends StatelessWidget {
                   UiNavRow.toggle(
                     icon: _icon(category),
                     title: _title(l10n, category),
+                    subtitle: _subtitle(l10n, category),
                     isOn: settings?.isEnabled(category) ?? true,
                     // Пока уведомления запрещены в системе, выбор сохраняется, но не меняется.
                     enabled: !blocked,
@@ -176,19 +177,24 @@ class _SettingsList extends StatelessWidget {
   }
 
   IconData _icon(NotificationCategory category) => switch (category) {
-    NotificationCategory.walks => Icons.directions_walk,
-    NotificationCategory.feeding => Icons.restaurant,
-    NotificationCategory.medications => Icons.medication_outlined,
-    NotificationCategory.vaccinations => Icons.vaccines_outlined,
-    NotificationCategory.vetVisits => Icons.local_hospital_outlined,
+    NotificationCategory.health => Icons.favorite_border_rounded,
+    NotificationCategory.care => Icons.content_cut_rounded,
+    NotificationCategory.daily => Icons.pets_outlined,
+    NotificationCategory.other => Icons.event_note_outlined,
   };
 
   String _title(AppLocalizations l10n, NotificationCategory category) => switch (category) {
-    NotificationCategory.walks => l10n.notificationWalks,
-    NotificationCategory.feeding => l10n.notificationFeeding,
-    NotificationCategory.medications => l10n.notificationMedications,
-    NotificationCategory.vaccinations => l10n.notificationVaccinations,
-    NotificationCategory.vetVisits => l10n.notificationVetVisits,
+    NotificationCategory.health => l10n.eventTypeGroupHealth,
+    NotificationCategory.care => l10n.eventTypeGroupCare,
+    NotificationCategory.daily => l10n.eventTypeGroupDaily,
+    NotificationCategory.other => l10n.eventTypeGroupOther,
+  };
+
+  String _subtitle(AppLocalizations l10n, NotificationCategory category) => switch (category) {
+    NotificationCategory.health => l10n.notificationHealthHint,
+    NotificationCategory.care => l10n.notificationCareHint,
+    NotificationCategory.daily => l10n.notificationDailyHint,
+    NotificationCategory.other => l10n.notificationOtherHint,
   };
 }
 

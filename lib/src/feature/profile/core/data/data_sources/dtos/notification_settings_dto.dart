@@ -7,22 +7,19 @@ part 'notification_settings_dto.g.dart';
 @JsonSerializable()
 class NotificationSettingsDto extends Equatable {
   @JsonKey(defaultValue: true)
-  final bool walks;
+  final bool health;
   @JsonKey(defaultValue: true)
-  final bool feeding;
+  final bool care;
   @JsonKey(defaultValue: true)
-  final bool medications;
+  final bool daily;
   @JsonKey(defaultValue: true)
-  final bool vaccinations;
-  @JsonKey(defaultValue: true)
-  final bool vetVisits;
+  final bool other;
 
   const NotificationSettingsDto({
-    this.walks = true,
-    this.feeding = true,
-    this.medications = true,
-    this.vaccinations = true,
-    this.vetVisits = true,
+    this.health = true,
+    this.care = true,
+    this.daily = true,
+    this.other = true,
   });
 
   factory NotificationSettingsDto.fromJson(Map<String, dynamic> json) =>
@@ -31,5 +28,5 @@ class NotificationSettingsDto extends Equatable {
   Map<String, dynamic> toJson() => _$NotificationSettingsDtoToJson(this);
 
   @override
-  List<Object?> get props => [walks, feeding, medications, vaccinations, vetVisits];
+  List<Object?> get props => [health, care, daily, other];
 }
