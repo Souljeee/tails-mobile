@@ -49,7 +49,7 @@ void main() {
     'светлая': UiThemeData.lightTheme,
     'тёмная': UiThemeData.darkTheme,
   }.entries) {
-    for (final scale in [1.0]) {
+    for (final scale in [1.0, 2.0]) {
       testWidgets('${entry.key} тема, масштаб текста $scale: без переполнения', (tester) async {
         await pump(tester, theme: entry.value, showResetHint: true, textScale: scale);
 

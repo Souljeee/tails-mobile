@@ -43,6 +43,22 @@ void main() {
     });
   });
 
+  group('UiSheetHeader', () {
+    testWidgets('длинный заголовок при крупном шрифте не переполняет шапку', (tester) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: uiTestApp(
+            const UiSheetHeader(title: 'Сохранить изменения', cancelLabel: 'Отмена'),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Отмена'), findsOneWidget);
+    });
+  });
+
   group('UiSectionHeader', () {
     testWidgets('показывает заголовок капсом и вызывает действие', (tester) async {
       var taps = 0;

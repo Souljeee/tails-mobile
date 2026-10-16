@@ -116,6 +116,9 @@ class UiSheetHeader extends StatelessWidget {
   /// По умолчанию закрывает текущий маршрут.
   final VoidCallback? onCancel;
 
+  /// Резерв под кнопку слева и симметрично справа: длинный заголовок обрезается, а не переполняет.
+  static const double _titleInset = UiSpacing.x12 + UiSpacing.x6;
+
   @override
   Widget build(BuildContext context) {
     final palette = context.uiPalette;
@@ -124,9 +127,10 @@ class UiSheetHeader extends StatelessWidget {
 
     return SizedBox(
       height: UiSizes.minTapTarget,
-      child: Row(
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Expanded(
+          Positioned.fill(
             child: Align(
               alignment: Alignment.centerLeft,
               child: Semantics(
@@ -149,8 +153,16 @@ class UiSheetHeader extends StatelessWidget {
               ),
             ),
           ),
-          Text(title, style: fonts.bodySemibold.copyWith(color: palette.ink)),
-          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: _titleInset),
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: fonts.bodySemibold.copyWith(color: palette.ink),
+            ),
+          ),
         ],
       ),
     );
