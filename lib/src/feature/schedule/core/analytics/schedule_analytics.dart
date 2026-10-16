@@ -2,8 +2,10 @@ import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
+import 'package:tails_mobile/src/feature/schedule/reminder/domain/reminder_rules.dart';
 
 /// Переводит доменные модели расписания в параметры событий аналитики.
 ///
@@ -38,7 +40,22 @@ abstract final class ScheduleAnalytics {
       timesPerDay: rule == null || rule.period != RecurrencePeriod.day
           ? null
           : (rule.times.length < 2 ? 1 : rule.times.length),
+      reminder: model.reminder == null
+          ? null
+          : reminderKind(model.reminder!, allDay: model.time == null),
     );
+  }
+
+  /// Вид напоминания без точных минут: `none`, `at_event`, `preset`, `custom`.
+  static String reminderKind(EventReminder reminder, {required bool allDay}) {
+    if (reminder.isNone) {
+      return 'none';
+    }
+    if (reminder == EventReminder.atEvent) {
+      return 'at_event';
+    }
+
+    return ReminderRules.isPreset(reminder, allDay: allDay) ? 'preset' : 'custom';
   }
 
   /// Событие `recurrence_saved` по правилу.

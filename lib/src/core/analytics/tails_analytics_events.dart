@@ -224,6 +224,7 @@ abstract final class TailsAnalyticsEvents {
     int? recurrenceInterval,
     String? recurrenceEnd,
     int? timesPerDay,
+    String? reminder,
   }) => TailsAnalyticsEvent(
     'event_created',
     parameters: {
@@ -235,6 +236,7 @@ abstract final class TailsAnalyticsEvents {
       if (recurrenceInterval != null) 'recurrence_interval': recurrenceInterval,
       if (recurrenceEnd != null) 'recurrence_end': recurrenceEnd,
       if (timesPerDay != null) 'times_per_day': timesPerDay,
+      if (reminder != null) 'reminder': reminder,
       if (isFirstEvent != null) 'is_first_event': isFirstEvent,
     },
   );
@@ -274,8 +276,13 @@ abstract final class TailsAnalyticsEvents {
   static const eventRestored = TailsAnalyticsEvent('event_restored');
 
   /// Вхождение изменено (`one` — только эта дата, `future` — эта дата и следующие).
-  static TailsAnalyticsEvent eventEdited({required String scope}) =>
-      TailsAnalyticsEvent('event_edited', parameters: {'scope': scope});
+  ///
+  /// [reminder] — вид нового напоминания, если его меняли: `none`, `at_event`, `preset`, `custom`.
+  static TailsAnalyticsEvent eventEdited({required String scope, String? reminder}) =>
+      TailsAnalyticsEvent(
+        'event_edited',
+        parameters: {'scope': scope, if (reminder != null) 'reminder': reminder},
+      );
 
   /// Изменён фильтр расписания.
   static TailsAnalyticsEvent scheduleFilterChanged(String filter) =>

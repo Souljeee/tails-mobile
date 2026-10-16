@@ -6,6 +6,7 @@ import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
+import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/edit_occurrence_result.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
@@ -60,7 +61,17 @@ class EditEventBloc extends Bloc<EditEventEvent, EditEventState> {
         ),
       };
 
-      TailsAnalytics.log(TailsAnalyticsEvents.eventEdited(scope: event.scope.apiValue));
+      final newReminder = event.changes.fields.contains(EditedField.reminder)
+          ? model.reminder
+          : null;
+      TailsAnalytics.log(
+        TailsAnalyticsEvents.eventEdited(
+          scope: event.scope.apiValue,
+          reminder: newReminder == null
+              ? null
+              : ScheduleAnalytics.reminderKind(newReminder, allDay: model.time == null),
+        ),
+      );
       TailsLogger.info(
         'Событие изменено',
         source: _logSource,

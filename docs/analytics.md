@@ -119,12 +119,12 @@ AppMetrica настроена без отправки сбоев (`crashReportin
 | Событие | Параметры | Где |
 |---|---|---|
 | `event_create_started` | `source` | `ScheduleScreen` |
-| `event_created` | `event_type`, `has_time`, `has_description`, `is_recurring`, `recurrence_period`, `recurrence_interval`, `recurrence_end`, `times_per_day` | `CreateEventBloc` |
+| `event_created` | `event_type`, `has_time`, `has_description`, `is_recurring`, `recurrence_period`, `recurrence_interval`, `recurrence_end`, `times_per_day`, `reminder` (`none` / `at_event` / `preset` / `custom`) | `CreateEventBloc` |
 | `event_create_failed` | `reason` | `CreateEventBloc` |
 | `event_marked_done` | `event_type`, `is_recurring`, `from` (`calendar` / `pet_details`) | `MarkDoneBloc` |
 | `event_marked_undone` | `event_type` | `MarkDoneBloc` |
 | `event_cancelled` | `scope` (`one` / `future`), `event_type`, `is_recurring` | `EventActionsBloc` |
-| `event_edited` | `scope` (`one` / `future`) | `EditEventBloc` |
+| `event_edited` | `scope` (`one` / `future`), `reminder` (`none` / `at_event` / `preset` / `custom`; только если напоминание меняли) | `EditEventBloc` |
 | `event_cancel_undone` | — | `EventActionsBloc` |
 | `event_restored` | — | `EventActionsBloc` |
 | `schedule_filter_changed` | `filter` (`all` / `pet`) | `ScheduleScreen` |

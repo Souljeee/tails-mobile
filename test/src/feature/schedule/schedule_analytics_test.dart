@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
+import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
@@ -31,17 +33,22 @@ final class _FakeScheduleRepository extends Fake implements ScheduleRepository {
   }
 }
 
-CreateEventModel _model({RecurrenceModel? recurrence, String? time, String? description}) =>
-    CreateEventModel(
-      title: 'Прививка Барсику',
-      description: description,
-      time: time,
-      date: DateTime(2026, 10, 6),
-      petId: 1,
-      type: ScheduleEventTypeEnum.vetVisit,
-      isRecurring: recurrence != null,
-      recurrence: recurrence,
-    );
+CreateEventModel _model({
+  RecurrenceModel? recurrence,
+  String? time,
+  String? description,
+  EventReminder? reminder,
+}) => CreateEventModel(
+  title: 'Прививка Барсику',
+  description: description,
+  time: time,
+  date: DateTime(2026, 10, 6),
+  petId: 1,
+  type: ScheduleEventTypeEnum.vetVisit,
+  isRecurring: recurrence != null,
+  recurrence: recurrence,
+  reminder: reminder,
+);
 
 Future<void> _pump() => Future<void>.delayed(const Duration(milliseconds: 50));
 
@@ -159,6 +166,30 @@ void main() {
       await _pump();
 
       expect(sink.events, isEmpty);
+    });
+  });
+
+  group('вид напоминания', () {
+    test('закрытые значения без минут', () {
+      String kind(EventReminder reminder, {bool allDay = false}) =>
+          ScheduleAnalytics.reminderKind(reminder, allDay: allDay);
+
+      expect(kind(const EventReminder.none()), 'none');
+      expect(kind(EventReminder.atEvent), 'at_event');
+      expect(kind(const EventReminder.before(60)), 'preset');
+      expect(kind(const EventReminder.before(45)), 'custom');
+      expect(kind(const EventReminder.before(60), allDay: true), 'custom');
+      expect(kind(const EventReminder.before(1440), allDay: true), 'preset');
+    });
+
+    test('event_created несёт вид напоминания, а без напоминания параметра нет', () {
+      final withReminder = ScheduleAnalytics.eventCreated(
+        _model(time: '10:00', reminder: const EventReminder.before(30)),
+      );
+      final without = ScheduleAnalytics.eventCreated(_model(time: '10:00'));
+
+      expect(withReminder.parameters['reminder'], 'preset');
+      expect(without.parameters.containsKey('reminder'), isFalse);
     });
   });
 }

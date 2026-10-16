@@ -6,6 +6,7 @@ import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/sc
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/schedule_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
@@ -106,6 +107,34 @@ void main() {
     expect(states.first, isA<EditEventState$Loading>());
     expect(states.last, isA<EditEventState$Success>());
     expect(analytics.events.single.name, 'event_edited');
+  });
+
+  test('«только эта дата»: напоминание уходит и попадает в аналитику видом', () async {
+    final withReminder = CreateEventModel(
+      title: 'Новое',
+      description: null,
+      time: '10:00',
+      date: DateTime(2026, 10, 20),
+      petId: 1,
+      type: ScheduleEventTypeEnum.dailyPills,
+      isRecurring: false,
+      reminder: const EventReminder.before(45),
+    );
+
+    bloc.add(
+      EditEventEvent.saveRequested(
+        occurrence: occurrence,
+        scope: OccurrenceScope.one,
+        model: withReminder,
+        changes: const EditChanges({EditedField.reminder}),
+      ),
+    );
+    await pumpEventQueue();
+
+    expect(dataSource.sent, {
+      'reminders': [45],
+    });
+    expect(analytics.events.single.parameters['reminder'], 'custom');
   });
 
   test('«и все следующие» отправляет всю форму', () async {
