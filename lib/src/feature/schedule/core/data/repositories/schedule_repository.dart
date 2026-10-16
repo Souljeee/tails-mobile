@@ -1,9 +1,15 @@
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/create_event_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/series_stats_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/schedule_remote_data_source.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/mappers/recurrence_mapper.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/edit_occurrence_result.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_occurrence_ref.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/series_stats.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/utils/event_time_converter.dart';
 
 class ScheduleRepository {
@@ -72,6 +78,105 @@ class ScheduleRepository {
       );
     }
   }
+
+  /// Отменяет вхождение ([OccurrenceScope.one]) либо его и все следующие ([OccurrenceScope.future]).
+  Future<ScheduleEventModel> cancelOccurrence(
+    EventOccurrenceRef ref, {
+    required OccurrenceScope scope,
+  }) async {
+    final dto = await _scheduleRemoteDataSource.cancelOccurrence(
+      eventId: ref.eventId,
+      date: ref.date,
+      scope: scope,
+      time: _wireTime(ref),
+    );
+
+    return dto.toModel();
+  }
+
+  /// Возвращает отменённое вхождение.
+  Future<ScheduleEventModel> restoreOccurrence(EventOccurrenceRef ref) async {
+    final dto = await _scheduleRemoteDataSource.restoreOccurrence(
+      eventId: ref.eventId,
+      date: ref.date,
+      time: _wireTime(ref),
+    );
+
+    return dto.toModel();
+  }
+
+  Future<SeriesStats> getSeriesStats(EventOccurrenceRef ref) async {
+    final dto = await _scheduleRemoteDataSource.getSeriesStats(
+      eventId: ref.eventId,
+      date: ref.date,
+    );
+
+    return dto.toModel();
+  }
+
+  /// «Изменить только эту дату»: меняются только переданные поля (`time` — локальное).
+  Future<EditOccurrenceResult> editOccurrenceFields(
+    EventOccurrenceRef ref, {
+    String? title,
+    String? description,
+    ScheduleEventTypeEnum? type,
+    String? time,
+  }) async {
+    final offset = _offsetOf(ref);
+    final fields = <String, dynamic>{
+      'title': ?title,
+      'description': ?description,
+      'type': ?type?.name,
+      if (time != null) 'time': EventTimeConverter.localToUtc(time, offsetMinutes: offset),
+    };
+
+    return _edit(ref, OccurrenceScope.one, fields);
+  }
+
+  /// «Изменить эту дату и все следующие»: [model] — форма целиком (как при создании); у серии
+  /// с окончанием «после N повторений» N уже должен быть остатком с этой даты.
+  Future<EditOccurrenceResult> editOccurrenceAndFollowing(
+    EventOccurrenceRef ref,
+    CreateEventModel model,
+  ) => _edit(ref, OccurrenceScope.future, model.toDto().toJson());
+
+  Future<EditOccurrenceResult> _edit(
+    EventOccurrenceRef ref,
+    OccurrenceScope scope,
+    Map<String, dynamic> fields,
+  ) async {
+    final result = await _scheduleRemoteDataSource.editOccurrence(
+      eventId: ref.eventId,
+      date: ref.date,
+      scope: scope,
+      event: fields,
+      time: _wireTime(ref),
+    );
+
+    return EditOccurrenceResult(
+      event: result.event.toModel(),
+      createdEvent: result.createdEvent?.toModel(),
+    );
+  }
+
+  int _offsetOf(EventOccurrenceRef ref) =>
+      ref.timeZoneOffset ?? EventTimeConverter.deviceOffsetMinutes(ref.date, time: ref.time);
+
+  /// Время вхождения в UTC для запроса: в модели оно локальное.
+  String? _wireTime(EventOccurrenceRef ref) =>
+      EventTimeConverter.localToUtc(ref.time, offsetMinutes: _offsetOf(ref));
+}
+
+extension on SeriesStatsDto {
+  SeriesStats toModel() => SeriesStats(
+    remaining: remaining,
+    past: past,
+    seriesEnd: seriesEnd == null
+        ? null
+        : DateTime(seriesEnd!.year, seriesEnd!.month, seriesEnd!.day),
+    isOpenEnded: isOpenEnded,
+    cancelledDates: [for (final d in cancelledDates) DateTime(d.year, d.month, d.day)],
+  );
 }
 
 extension on ScheduleEventDto {
@@ -89,6 +194,8 @@ extension on ScheduleEventDto {
       date: date,
       type: type,
       done: done,
+      cancelled: cancelled,
+      doneAt: doneAt?.toLocal(),
       recurrence: recurrence?.toModel(offsetMinutes: offset),
     );
   }

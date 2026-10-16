@@ -23,6 +23,10 @@ class ScheduleEventDto extends Equatable {
   @JsonKey(unknownEnumValue: ScheduleEventTypeEnum.custom)
   final ScheduleEventTypeEnum type;
   final bool done;
+  // Старые версии сервера поля не присылают: тогда вхождение не отменено.
+  @JsonKey(defaultValue: false)
+  final bool cancelled;
+  final DateTime? doneAt;
   final RecurrenceDto? recurrence;
 
   const ScheduleEventDto({
@@ -36,6 +40,8 @@ class ScheduleEventDto extends Equatable {
     this.time,
     this.timeZoneOffset,
     this.recurrence,
+    this.cancelled = false,
+    this.doneAt,
   });
 
   factory ScheduleEventDto.fromJson(Map<String, dynamic> json) => _$ScheduleEventDtoFromJson(json);
@@ -54,5 +60,7 @@ class ScheduleEventDto extends Equatable {
     type,
     done,
     recurrence,
+    cancelled,
+    doneAt,
   ];
 }

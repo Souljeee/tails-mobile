@@ -2,6 +2,8 @@ import 'package:intl/intl.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/create_event_dto.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/schedule_event_dto.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/data_sources/dtos/series_stats_dto.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 
 class ScheduleRemoteDataSource {
   const ScheduleRemoteDataSource({required this.restClient});
@@ -87,5 +89,90 @@ class ScheduleRemoteDataSource {
       '/event_schedule/$eventId/mark_undone/',
       body: {'date': DateFormat('yyyy-MM-dd').format(date), if (time != null) 'time': time},
     );
+  }
+
+  /// Отмена вхождения ([OccurrenceScope.one]) либо даты и всех следующих ([OccurrenceScope.future]).
+  /// [time] — время слота в UTC (`HH:mm`), нужно при нескольких временах в день.
+  Future<ScheduleEventDto> cancelOccurrence({
+    required String eventId,
+    required DateTime date,
+    required OccurrenceScope scope,
+    String? time,
+  }) async {
+    final response = await restClient.post(
+      '/event_schedule/$eventId/cancel/',
+      body: _occurrenceBody(date, time, scope: scope),
+    );
+
+    return _parseEvent(response);
+  }
+
+  /// Возврат отменённого вхождения (серию, остановленную отменой «и все следующие», не удлиняет).
+  Future<ScheduleEventDto> restoreOccurrence({
+    required String eventId,
+    required DateTime date,
+    String? time,
+  }) async {
+    final response = await restClient.post(
+      '/event_schedule/$eventId/restore/',
+      body: _occurrenceBody(date, time),
+    );
+
+    return _parseEvent(response);
+  }
+
+  /// Сколько вхождений осталось и прошло относительно [date] (для подтверждения отмены серии).
+  Future<SeriesStatsDto> getSeriesStats({required String eventId, required DateTime date}) async {
+    final response = await restClient.get(
+      '/event_schedule/$eventId/series_stats/',
+      queryParams: {'date': DateFormat('yyyy-MM-dd').format(date)},
+    );
+    if (response is! Map<String, dynamic>) {
+      throw Exception('Invalid response');
+    }
+
+    return SeriesStatsDto.fromJson(response);
+  }
+
+  /// Изменение вхождения. [event] — поля как на сервере: для [OccurrenceScope.one] только
+  /// `title`, `description`, `type`, `time` (UTC), для [OccurrenceScope.future] — форма события
+  /// как при создании. Ответ: `event` и, если серия разделилась, `created_event`.
+  Future<({ScheduleEventDto event, ScheduleEventDto? createdEvent})> editOccurrence({
+    required String eventId,
+    required DateTime date,
+    required OccurrenceScope scope,
+    required Map<String, dynamic> event,
+    String? time,
+  }) async {
+    final response = await restClient.post(
+      '/event_schedule/$eventId/edit/',
+      body: {
+        ..._occurrenceBody(date, time, scope: scope),
+        'event': event,
+      },
+    );
+    if (response is! Map<String, dynamic>) {
+      throw Exception('Invalid response');
+    }
+    final created = response['created_event'];
+
+    return (
+      event: _parseEvent(response['event']),
+      createdEvent: created == null ? null : _parseEvent(created),
+    );
+  }
+
+  Map<String, dynamic> _occurrenceBody(DateTime date, String? time, {OccurrenceScope? scope}) => {
+    'date': DateFormat('yyyy-MM-dd').format(date),
+    if (time != null) 'time': time,
+    if (scope != null) 'scope': scope.apiValue,
+  };
+
+  ScheduleEventDto _parseEvent(Object? response) {
+    if (response is! Map<String, dynamic>) {
+      throw Exception('Invalid response');
+    }
+
+    return ScheduleEventDto.fromJson(response);
   }
 }

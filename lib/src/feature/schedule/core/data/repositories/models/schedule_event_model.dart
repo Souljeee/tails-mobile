@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_occurrence_ref.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_status.dart';
 
 typedef ScheduleEventModelList = Map<DateTime, List<ScheduleEventModel>>;
 
@@ -15,6 +17,12 @@ class ScheduleEventModel extends Equatable {
   final int? timeZoneOffset;
   final ScheduleEventTypeEnum type;
   final bool done;
+
+  /// Вхождение отменено (остаётся в календаре с пометкой «Отменено»).
+  final bool cancelled;
+
+  /// Когда вхождение отмечено выполненным (локальное время устройства).
+  final DateTime? doneAt;
   final RecurrenceModel? recurrence;
 
   const ScheduleEventModel({
@@ -28,7 +36,20 @@ class ScheduleEventModel extends Equatable {
     this.time,
     this.timeZoneOffset,
     this.recurrence,
+    this.cancelled = false,
+    this.doneAt,
   });
+
+  /// Состояние вхождения; отмена главнее отметки (на сервере они не сочетаются).
+  ScheduleEventStatus get status => cancelled
+      ? ScheduleEventStatus.cancelled
+      : done
+      ? ScheduleEventStatus.done
+      : ScheduleEventStatus.scheduled;
+
+  /// Адрес вхождения для отметки, отмены и возврата.
+  EventOccurrenceRef get ref =>
+      EventOccurrenceRef(eventId: id, date: date, time: time, timeZoneOffset: timeZoneOffset);
 
   ScheduleEventModel copyWith({
     CopyWithWrapper<String>? id,
@@ -41,6 +62,8 @@ class ScheduleEventModel extends Equatable {
     CopyWithWrapper<String?>? time,
     CopyWithWrapper<int?>? timeZoneOffset,
     CopyWithWrapper<RecurrenceModel?>? recurrence,
+    CopyWithWrapper<bool>? cancelled,
+    CopyWithWrapper<DateTime?>? doneAt,
   }) => ScheduleEventModel(
     id: id?.value ?? this.id,
     petId: petId?.value ?? this.petId,
@@ -52,6 +75,8 @@ class ScheduleEventModel extends Equatable {
     time: time?.value ?? this.time,
     timeZoneOffset: timeZoneOffset?.value ?? this.timeZoneOffset,
     recurrence: recurrence?.value ?? this.recurrence,
+    cancelled: cancelled?.value ?? this.cancelled,
+    doneAt: doneAt == null ? this.doneAt : doneAt.value,
   );
 
   @override
@@ -66,5 +91,7 @@ class ScheduleEventModel extends Equatable {
     type,
     done,
     recurrence,
+    cancelled,
+    doneAt,
   ];
 }
