@@ -90,6 +90,11 @@ void main() {
       expect(ReminderRules.isCustom(const EventReminder.none(), allDay: false), isFalse);
     });
 
+    test('готовые варианты со временем начинаются с 5 минут', () {
+      expect(ReminderRules.presets(allDay: false).take(3), [0, 5, 10]);
+      expect(ReminderRules.isPreset(const EventReminder.before(5), allDay: false), isTrue);
+    });
+
     test('adaptTo keeps day multiples and replaces others for all-day', () {
       expect(
         ReminderRules.adaptTo(const EventReminder.before(2880), allDay: true),

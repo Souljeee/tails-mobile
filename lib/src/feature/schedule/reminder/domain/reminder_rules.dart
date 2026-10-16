@@ -76,7 +76,7 @@ abstract final class ReminderRules {
   static const int _day = 24 * 60;
 
   /// Готовые варианты события со временем, в минутах.
-  static const List<int> timedPresets = [0, 10, 30, 60, _day, 2 * _day, 7 * _day];
+  static const List<int> timedPresets = [0, 5, 10, 30, 60, _day, 2 * _day, 7 * _day];
 
   /// Готовые варианты события «на весь день»: в день события, накануне, за 2 дня, за неделю.
   static const List<int> allDayPresets = [0, _day, 2 * _day, 7 * _day];
