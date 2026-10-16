@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
+import 'package:tails_mobile/src/core/constant/localization/translations/app_localizations.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
@@ -12,6 +13,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_discard_guard/ui_discard_guard.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_flyout/ui_flyout.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_pet_avatar/ui_pet_avatar.dart';
+import 'package:tails_mobile/src/core/ui_kit/components/ui_text_link/ui_text_link.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfield_controller.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
@@ -20,6 +22,7 @@ import 'package:tails_mobile/src/core/ui_kit/tokens/ui_shadows.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
+import 'package:tails_mobile/src/core/utils/extensions/enums_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/core/utils/extensions/string_extension.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
@@ -30,8 +33,11 @@ import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/domain/create_event_bloc.dart';
+import 'package:tails_mobile/src/feature/schedule/create_event/domain/event_title_rules.dart';
+import 'package:tails_mobile/src/feature/schedule/create_event/domain/event_type_rules.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/uio/create_event_uio.dart';
-import 'package:tails_mobile/src/feature/schedule/create_event/presentation/utils/event_type_options.dart';
+import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/event_type_field.dart';
+import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/event_type_page.dart';
 import 'package:tails_mobile/src/feature/schedule/create_event/presentation/widgets/time_picker_carousel_popup.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_calculator.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_draft.dart';
@@ -40,6 +46,21 @@ import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/recurr
 import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/utils/recurrence_date_format.dart';
 
 enum CreateScheduleEventResult { success, error }
+
+/// Страница шторки: форма либо одна из вторых страниц.
+enum _SheetPage { form, eventType, recurrence }
+
+/// Откуда взято повторение события.
+enum _RecurrenceSource {
+  /// Не задано.
+  none,
+
+  /// Подставлено по типу события.
+  type,
+
+  /// Настроено пользователем (в том числе «Не повторять»).
+  user,
+}
 
 /// Содержимое sheet «Новое событие». Показывается через `showUiBottomSheet`.
 class CreateScheduleEventBottomSheet extends StatefulWidget {
@@ -75,10 +96,11 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     CreateEventUio(date: widget.date, petId: widget.selectedPetId),
   );
 
-  /// Выбранный чип типа; если ничего не выбрано, отправляется `custom`, как и раньше.
+  /// Выбранный тип события; пока он не выбран, событие создать нельзя.
   final ValueNotifier<ScheduleEventTypeEnum?> _selectedType = ValueNotifier(null);
 
   final UiTextFieldController _eventTitleController = UiTextFieldController();
+  final FocusNode _titleFocusNode = FocusNode();
   final UiTextFieldController _dateController = UiTextFieldController();
   final UiTextFieldController _timeController = UiTextFieldController();
   final UiTextFieldController _notesController = UiTextFieldController();
@@ -87,8 +109,19 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
   /// и времени события нетронутые значения по умолчанию пересчитывались.
   final ValueNotifier<RecurrenceDraft?> _recurrence = ValueNotifier(null);
 
-  /// Открыта ли вторая страница шторки — «Повторение».
-  final ValueNotifier<bool> _isRecurrenceOpen = ValueNotifier(false);
+  final ValueNotifier<_RecurrenceSource> _recurrenceSource = ValueNotifier(_RecurrenceSource.none);
+
+  /// Какая страница шторки открыта.
+  final ValueNotifier<_SheetPage> _page = ValueNotifier(_SheetPage.form);
+
+  /// Название в поле подставлено из типа (его не писал пользователь).
+  bool _isTitleFromType = false;
+
+  /// Название типа, на которое можно заменить своё название после смены типа.
+  final ValueNotifier<String?> _titleSuggestion = ValueNotifier(null);
+
+  /// Идёт программная запись в поле названия: слушатель не считает её правкой пользователя.
+  bool _isSettingTitle = false;
 
   /// Ошибки показываем только после первой попытки создать событие.
   final ValueNotifier<bool> _showErrors = ValueNotifier(false);
@@ -112,7 +145,10 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     _createEventUio.dispose();
     _selectedType.dispose();
     _recurrence.dispose();
-    _isRecurrenceOpen.dispose();
+    _recurrenceSource.dispose();
+    _page.dispose();
+    _titleSuggestion.dispose();
+    _titleFocusNode.dispose();
     _showErrors.dispose();
     _eventTitleController.dispose();
     _dateController.dispose();
@@ -127,14 +163,20 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     final l10n = context.l10n;
 
     return ValueListenableBuilder(
-      valueListenable: _isRecurrenceOpen,
-      builder: (context, isOpen, form) => isOpen
-          ? RecurrencePage(
-              initial: _recurrence.value ?? _initialRecurrenceDraft(),
-              onBack: () => _isRecurrenceOpen.value = false,
-              onApply: _applyRecurrence,
-            )
-          : form!,
+      valueListenable: _page,
+      builder: (context, page, form) => switch (page) {
+        _SheetPage.form => form!,
+        _SheetPage.eventType => EventTypePage(
+          selected: _selectedType.value,
+          onSelected: _onTypeSelected,
+          onBack: _showForm,
+        ),
+        _SheetPage.recurrence => RecurrencePage(
+          initial: _recurrence.value ?? _initialRecurrenceDraft(),
+          onBack: _showForm,
+          onApply: _applyRecurrence,
+        ),
+      },
       child: ListenableBuilder(
         listenable: Listenable.merge([
           _createEventUio,
@@ -177,31 +219,35 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
                 },
               ),
               const SizedBox(height: UiSpacing.x4),
+              _FieldLabel(label: l10n.createEventTypeLabel),
+              ValueListenableBuilder(
+                valueListenable: _selectedType,
+                builder: (context, selected, child) =>
+                    EventTypeField(selected: selected, onTap: _openEventType),
+              ),
+              const SizedBox(height: UiSpacing.x4),
               ListenableBuilder(
-                listenable: Listenable.merge([_eventTitleController, _showErrors]),
+                listenable: Listenable.merge([_eventTitleController, _showErrors, _selectedType]),
                 builder: (context, child) {
                   final isTitleMissing = _eventTitleController.text.trim().isEmpty;
 
                   return UiTextField(
                     controller: _eventTitleController,
+                    focusNode: _titleFocusNode,
                     labelText: l10n.createEventNameLabel,
                     placeholderText: l10n.createEventNamePlaceholder,
                     errorText: _showErrors.value && isTitleMissing
                         ? l10n.createEventErrorTitle
                         : null,
+                    helperText: _titleHint(l10n),
                   );
                 },
               ),
-              const SizedBox(height: UiSpacing.x4),
-              _FieldLabel(label: l10n.createEventTypeLabel),
               ValueListenableBuilder(
-                valueListenable: _selectedType,
-                builder: (context, selected, child) {
-                  return _TypeChips(
-                    selected: selected,
-                    onSelected: (type) => _selectedType.value = type,
-                  );
-                },
+                valueListenable: _titleSuggestion,
+                builder: (context, suggestion, child) => suggestion == null
+                    ? const SizedBox.shrink()
+                    : _TitleSuggestion(name: suggestion, onReplace: _replaceTitle),
               ),
               const SizedBox(height: UiSpacing.x4),
               _DateTimeFields(
@@ -212,9 +258,10 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
               const SizedBox(height: UiSpacing.x4),
               _RecurrenceSelector(
                 recurrence: _recurrence,
+                source: _recurrenceSource,
                 onTap: () {
                   TailsAnalytics.log(TailsAnalyticsEvents.recurrenceOpened);
-                  _isRecurrenceOpen.value = true;
+                  _page.value = _SheetPage.recurrence;
                 },
               ),
               const SizedBox(height: UiSpacing.x4),
@@ -234,10 +281,14 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
                   );
                 },
                 builder: (context, state) {
-                  return UiButton.main(
-                    label: l10n.createEventSubmit,
-                    onPressed: _submit,
-                    isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
+                  return ValueListenableBuilder(
+                    valueListenable: _selectedType,
+                    builder: (context, type, child) => UiButton.main(
+                      label: l10n.createEventSubmit,
+                      // Пока тип не выбран, событие создать нельзя.
+                      onPressed: type == null ? null : _submit,
+                      isLoading: state.maybeMap(loading: (_) => true, orElse: () => false),
+                    ),
                   );
                 },
               ),
@@ -274,7 +325,8 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
 
   /// `null` — «Не повторять». Время события берётся из первого слота повторения.
   void _applyRecurrence(RecurrenceDraft? draft) {
-    _isRecurrenceOpen.value = false;
+    _page.value = _SheetPage.form;
+    _recurrenceSource.value = _RecurrenceSource.user;
     _recurrence.value = draft;
     if (draft != null) {
       TailsAnalytics.log(ScheduleAnalytics.recurrenceSaved(draft.toModel()));
@@ -319,7 +371,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
 
     // Дату события могли сдвинуть за дату окончания повторения: просим поправить правило.
     if (_recurrence.value case final draft? when !draft.canSave) {
-      _isRecurrenceOpen.value = true;
+      _page.value = _SheetPage.recurrence;
 
       return;
     }
@@ -341,7 +393,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       time: time.isEmpty ? null : time,
       description: _notesController.text,
       petId: _createEventUio.value.petId!,
-      type: _selectedType.value ?? ScheduleEventTypeEnum.custom,
+      type: EventTypeRules.apiType(_selectedType.value!, recurrence),
       isRecurring: recurrence != null,
       recurrence: recurrence,
     );
@@ -353,7 +405,106 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     _createEventUio.value = _createEventUio.value.copyWith(petId: CopyWithWrapper.value(petId));
   }
 
+  void _showForm() => _page.value = _SheetPage.form;
+
+  void _openEventType() => _page.value = _SheetPage.eventType;
+
+  /// Подсказка под полем названия: откуда взято название либо почему оно обязательно.
+  String? _titleHint(AppLocalizations l10n) {
+    if (_isTitleFromType && _eventTitleController.text.isNotEmpty) {
+      return l10n.createEventTitleFromType;
+    }
+    if (_selectedType.value == ScheduleEventTypeEnum.custom) {
+      return l10n.createEventTitleOtherRequired;
+    }
+
+    return null;
+  }
+
+  void _setTitle(String title) {
+    _isSettingTitle = true;
+    _eventTitleController.text = title;
+    _isSettingTitle = false;
+  }
+
+  /// Пользователь выбрал тип: подставляем название и повторение по правилам типа.
+  void _onTypeSelected(ScheduleEventTypeEnum type) {
+    final previous = _selectedType.value;
+    final typeName = type.getLocalizedName(context.l10n);
+
+    _showForm();
+    _selectedType.value = type;
+
+    final action = EventTitleRules.onTypeSelected(
+      current: _eventTitleController.text,
+      autofilled: _isTitleFromType,
+      previousType: previous,
+      newType: type,
+      typeName: typeName,
+    );
+    switch (action) {
+      case EventTitleAction.fill:
+        _setTitle(typeName);
+        _isTitleFromType = true;
+        _titleSuggestion.value = null;
+      case EventTitleAction.clear:
+        _setTitle('');
+        _isTitleFromType = false;
+        _titleSuggestion.value = null;
+      case EventTitleAction.suggest:
+        _titleSuggestion.value = typeName;
+      case EventTitleAction.keep:
+        _titleSuggestion.value = null;
+    }
+
+    if (type == ScheduleEventTypeEnum.custom) {
+      // Название для «Другое» обязательно: сразу ставим курсор в поле.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _titleFocusNode.requestFocus();
+        }
+      });
+    }
+
+    _applyTypeRecurrence(type);
+  }
+
+  /// «Заменить» в подсказке: подставляет название нового типа вместо своего.
+  void _replaceTitle() {
+    final name = _titleSuggestion.value;
+    if (name == null) {
+      return;
+    }
+
+    _setTitle(name);
+    _isTitleFromType = true;
+    _titleSuggestion.value = null;
+  }
+
+  /// Подставляет повторение по типу, пока пользователь не настраивал его сам.
+  void _applyTypeRecurrence(ScheduleEventTypeEnum type) {
+    if (_recurrenceSource.value == _RecurrenceSource.user) {
+      return;
+    }
+
+    final period = EventTypeRules.defaultPeriod(type);
+    if (period == null) {
+      _recurrence.value = null;
+      _recurrenceSource.value = _RecurrenceSource.none;
+
+      return;
+    }
+
+    _recurrence.value = _initialRecurrenceDraft().withPeriod(period);
+    _recurrenceSource.value = _RecurrenceSource.type;
+  }
+
   void _onTitleChanged() {
+    if (!_isSettingTitle) {
+      _isTitleFromType = false;
+      _titleSuggestion.value = null;
+    }
+
     final title = _eventTitleController.text;
 
     if (title.isEmpty) {
@@ -449,41 +600,38 @@ class _PetChips extends StatelessWidget {
   }
 }
 
-class _TypeChips extends StatelessWidget {
-  const _TypeChips({required this.selected, required this.onSelected});
+/// Подсказка под названием после смены типа: «Тип изменён. Назвать «Купание»?» и «Заменить».
+class _TitleSuggestion extends StatelessWidget {
+  const _TitleSuggestion({required this.name, required this.onReplace});
 
-  final ScheduleEventTypeEnum? selected;
-  final ValueChanged<ScheduleEventTypeEnum> onSelected;
+  final String name;
+  final VoidCallback onReplace;
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.uiPalette;
     final l10n = context.l10n;
 
-    return Wrap(
-      spacing: UiSpacing.x2,
-      runSpacing: UiSpacing.x2,
+    return Row(
       children: [
-        for (final option in eventTypeOptions)
-          UiChip(
-            label: option.labelOf(l10n),
-            selected: selected == option.type,
-            onTap: () => onSelected(option.type),
-            leading: Icon(
-              option.icon,
-              size: 18,
-              color: selected == option.type ? palette.surface : palette.ink2,
-            ),
+        Expanded(
+          child: Text(
+            l10n.createEventTitleSuggest(name),
+            style: context.uiFonts.footnote.copyWith(color: context.uiPalette.ink3),
           ),
+        ),
+        UiTextLink(label: l10n.createEventTitleSuggestReplace, onTap: onReplace),
       ],
     );
   }
 }
 
 class _RecurrenceSelector extends StatelessWidget {
-  const _RecurrenceSelector({required this.recurrence, required this.onTap});
+  const _RecurrenceSelector({required this.recurrence, required this.source, required this.onTap});
 
   final ValueListenable<RecurrenceDraft?> recurrence;
+
+  /// Откуда взято повторение: подставленное по типу помечается подписью.
+  final ValueListenable<_RecurrenceSource> source;
   final VoidCallback onTap;
 
   @override
@@ -492,9 +640,10 @@ class _RecurrenceSelector extends StatelessWidget {
     final palette = context.uiPalette;
     final fonts = context.uiFonts;
 
-    return ValueListenableBuilder(
-      valueListenable: recurrence,
-      builder: (context, draft, child) {
+    return ListenableBuilder(
+      listenable: Listenable.merge([recurrence, source]),
+      builder: (context, child) {
+        final draft = recurrence.value;
         final model = draft?.toModel();
         final title = draft == null
             ? l10n.createEventNoRecurrence
@@ -526,7 +675,15 @@ class _RecurrenceSelector extends StatelessWidget {
                 ],
               ),
             ),
-            if (next.isNotEmpty)
+            if (draft != null && source.value == _RecurrenceSource.type)
+              Padding(
+                padding: const EdgeInsets.only(top: UiSpacing.x2),
+                child: Text(
+                  l10n.recurrenceFromType,
+                  style: fonts.footnote.copyWith(color: palette.ink3),
+                ),
+              )
+            else if (next.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: UiSpacing.x2),
                 child: Text(

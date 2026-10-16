@@ -267,19 +267,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fetchingErrorRetry => 'Повторить';
 
   @override
-  String get eventTypeDeworming => 'Дегельминтизация';
+  String get eventTypeDeworming => 'Обработка от глистов';
 
   @override
-  String get eventTypeYearlyVaccination => 'Годовая вакцинация';
+  String get eventTypeYearlyVaccination => 'Плановая вакцинация';
 
   @override
-  String get eventTypeRabiesVaccination => 'Вакцинация от бешенства';
+  String get eventTypeRabiesVaccination => 'Прививка от бешенства';
 
   @override
-  String get eventTypeWeeklyPills => 'Недельные таблетки';
+  String get eventTypeWeeklyPills => 'Приём лекарств';
 
   @override
-  String get eventTypeDailyPills => 'Лекарства';
+  String get eventTypeDailyPills => 'Приём лекарств';
 
   @override
   String get eventTypeGrooming => 'Уход за шерстью';
@@ -318,10 +318,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createEventNameLabel => 'Название';
 
   @override
-  String get createEventNamePlaceholder => 'Например, «Покормить кота»';
+  String get createEventNamePlaceholder => 'Например, прогулка или витамины';
 
   @override
-  String get createEventTypeLabel => 'Тип';
+  String get createEventTypeLabel => 'Тип события';
 
   @override
   String get createEventDateLabel => 'Дата';
@@ -345,13 +345,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createEventNotesLabel => 'Заметки · необязательно';
 
   @override
-  String get createEventNotesPlaceholder => 'Добавьте детали...';
+  String get createEventNotesPlaceholder => 'Что важно не забыть';
 
   @override
   String get createEventSubmit => 'Создать событие';
-
-  @override
-  String get eventChipTime => 'Время';
 
   @override
   String get timePickerClear => 'Очистить';
@@ -1558,4 +1555,75 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get accountDeletedButton => 'Вернуться ко входу';
+
+  @override
+  String get createEventTypePlaceholder => 'Выберите тип';
+
+  @override
+  String get eventTypePickerTitle => 'Тип события';
+
+  @override
+  String get eventTypeGroupHealth => 'Здоровье';
+
+  @override
+  String get eventTypeGroupCare => 'Уход';
+
+  @override
+  String get eventTypeGroupDaily => 'Повседневные дела';
+
+  @override
+  String get eventTypeGroupOther => 'Другое';
+
+  @override
+  String get eventTypeSubtitleVetVisit => 'Осмотр, анализы, процедуры';
+
+  @override
+  String get eventTypeSubtitleMedication => 'Таблетки, капли, витамины';
+
+  @override
+  String get eventTypeSubtitleYearlyVaccination => 'Ежегодная прививка по графику';
+
+  @override
+  String get eventTypeSubtitleRabiesVaccination => 'Вакцинация против бешенства';
+
+  @override
+  String get eventTypeSubtitleFleaTreatment => 'Профилактика паразитов';
+
+  @override
+  String get eventTypeSubtitleDeworming => 'Дегельминтизация';
+
+  @override
+  String get eventTypeSubtitleGrooming => 'Расчёсывание, стрижка';
+
+  @override
+  String get eventTypeSubtitleBathing => 'Водные процедуры';
+
+  @override
+  String get eventTypeSubtitleNailTrimming => 'Уход за когтями';
+
+  @override
+  String get eventTypeSubtitleWalking => 'Выгул и активность';
+
+  @override
+  String get eventTypeSubtitleFeeding => 'Корм и вода';
+
+  @override
+  String get eventTypeSubtitleCustom => 'Любое своё событие';
+
+  @override
+  String get createEventTitleFromType => 'Подставлено из типа · можно изменить';
+
+  @override
+  String get createEventTitleOtherRequired => 'Для типа «Другое» название обязательно';
+
+  @override
+  String createEventTitleSuggest(String name) {
+    return 'Тип изменён. Назвать «$name»?';
+  }
+
+  @override
+  String get createEventTitleSuggestReplace => 'Заменить';
+
+  @override
+  String get recurrenceFromType => 'Подставлено по типу';
 }

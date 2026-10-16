@@ -4,19 +4,19 @@ import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_
 
 extension ScheduleEventTypeEnumExtension on ScheduleEventTypeEnum {
   IconData get icon => switch (this) {
-    ScheduleEventTypeEnum.deworming => Icons.medication,
-    ScheduleEventTypeEnum.yearlyVaccination => Icons.vaccines,
-    ScheduleEventTypeEnum.rabiesVaccination => Icons.vaccines,
-    ScheduleEventTypeEnum.weeklyPills => Icons.medication,
-    ScheduleEventTypeEnum.dailyPills => Icons.medication,
-    ScheduleEventTypeEnum.grooming => Icons.cleaning_services,
-    ScheduleEventTypeEnum.bathing => Icons.water,
-    ScheduleEventTypeEnum.walking => Icons.directions_walk,
-    ScheduleEventTypeEnum.feeding => Icons.restaurant,
-    ScheduleEventTypeEnum.nailTrimming => Icons.pets,
-    ScheduleEventTypeEnum.fleaTreatment => Icons.bug_report,
-    ScheduleEventTypeEnum.vetVisit => Icons.local_hospital,
-    ScheduleEventTypeEnum.custom => Icons.pets,
+    ScheduleEventTypeEnum.deworming => Icons.waves_rounded,
+    ScheduleEventTypeEnum.yearlyVaccination => Icons.vaccines_outlined,
+    ScheduleEventTypeEnum.rabiesVaccination => Icons.science_outlined,
+    ScheduleEventTypeEnum.weeklyPills => Icons.medication_outlined,
+    ScheduleEventTypeEnum.dailyPills => Icons.medication_outlined,
+    ScheduleEventTypeEnum.grooming => Icons.brush_outlined,
+    ScheduleEventTypeEnum.bathing => Icons.bathtub_outlined,
+    ScheduleEventTypeEnum.walking => Icons.route_outlined,
+    ScheduleEventTypeEnum.feeding => Icons.restaurant_outlined,
+    ScheduleEventTypeEnum.nailTrimming => Icons.content_cut_rounded,
+    ScheduleEventTypeEnum.fleaTreatment => Icons.shield_outlined,
+    ScheduleEventTypeEnum.vetVisit => Icons.medical_services_outlined,
+    ScheduleEventTypeEnum.custom => Icons.more_horiz_rounded,
   };
 
   String getLocalizedName(AppLocalizations l10n) => switch (this) {

@@ -6,20 +6,44 @@ import 'package:tails_mobile/src/feature/schedule/create_event/presentation/util
 void main() {
   final l10n = AppLocalizationsRu();
 
-  test('чипы типа события: подписи и отправляемые типы', () {
-    final labels = {for (final option in eventTypeOptions) option.labelOf(l10n): option.type};
+  test('справочник типов: группы, названия и отправляемые типы по макету', () {
+    final byGroup = <EventTypeGroup, Map<String, ScheduleEventTypeEnum>>{};
+    for (final option in eventTypeOptions) {
+      (byGroup[option.group] ??= {})[option.titleOf(l10n)] = option.type;
+    }
 
-    expect(labels, {
-      'Прогулка': ScheduleEventTypeEnum.walking,
-      'Кормление': ScheduleEventTypeEnum.feeding,
-      'Лекарства': ScheduleEventTypeEnum.dailyPills,
-      'Время': ScheduleEventTypeEnum.custom,
+    expect(byGroup, {
+      EventTypeGroup.health: {
+        'Визит к ветеринару': ScheduleEventTypeEnum.vetVisit,
+        'Приём лекарств': ScheduleEventTypeEnum.dailyPills,
+        'Плановая вакцинация': ScheduleEventTypeEnum.yearlyVaccination,
+        'Прививка от бешенства': ScheduleEventTypeEnum.rabiesVaccination,
+        'Обработка от блох': ScheduleEventTypeEnum.fleaTreatment,
+        'Обработка от глистов': ScheduleEventTypeEnum.deworming,
+      },
+      EventTypeGroup.care: {
+        'Уход за шерстью': ScheduleEventTypeEnum.grooming,
+        'Купание': ScheduleEventTypeEnum.bathing,
+        'Стрижка когтей': ScheduleEventTypeEnum.nailTrimming,
+      },
+      EventTypeGroup.daily: {
+        'Прогулка': ScheduleEventTypeEnum.walking,
+        'Кормление': ScheduleEventTypeEnum.feeding,
+      },
+      EventTypeGroup.other: {'Другое': ScheduleEventTypeEnum.custom},
     });
   });
 
-  test('типы в чипах не повторяются', () {
+  test('типы в списке не повторяются, у каждого есть подпись', () {
     final types = eventTypeOptions.map((option) => option.type).toList();
 
     expect(types.toSet().length, types.length);
+    for (final option in eventTypeOptions) {
+      expect(option.subtitleOf(l10n), isNotEmpty);
+    }
+  });
+
+  test('недельные таблетки отображаются как «Приём лекарств»', () {
+    expect(eventTypeOptionOf(ScheduleEventTypeEnum.weeklyPills).titleOf(l10n), 'Приём лекарств');
   });
 }

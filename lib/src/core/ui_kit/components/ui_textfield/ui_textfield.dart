@@ -119,6 +119,7 @@ class _UiTextFieldState extends State<UiTextField> {
   FocusNode? _focusNode;
   late UiTextFieldController _controller = widget.controller;
   VoidCallback? _controllerListener;
+  VoidCallback? _focusListener;
 
   bool get _hasFocus => _focusNode?.hasFocus ?? false;
 
@@ -156,13 +157,14 @@ class _UiTextFieldState extends State<UiTextField> {
     _controllerListener = () => setState(() {});
     _controller.addListener(_controllerListener!);
 
-    _focusNode?.addListener(() {
+    _focusListener = () {
       // Помечаем поле как "тронутое" при потере фокуса
       if (!_hasFocus && _controller.text.isNotEmpty) {
         _controller.markAsTouched();
       }
       setState(() {}); // Rebuild when focus changes, to update the border
-    });
+    };
+    _focusNode?.addListener(_focusListener!);
   }
 
   @override
@@ -182,6 +184,9 @@ class _UiTextFieldState extends State<UiTextField> {
   void dispose() {
     if (widget.focusNode == null) {
       _focusNode?.dispose();
+    } else {
+      // Внешний FocusNode переживает поле: без этого он продолжит дёргать setState.
+      _focusNode?.removeListener(_focusListener!);
     }
 
     _controller.removeListener(_controllerListener!);

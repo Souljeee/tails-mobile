@@ -479,31 +479,31 @@ abstract class AppLocalizations {
   /// No description provided for @eventTypeDeworming.
   ///
   /// In ru, this message translates to:
-  /// **'Дегельминтизация'**
+  /// **'Обработка от глистов'**
   String get eventTypeDeworming;
 
   /// No description provided for @eventTypeYearlyVaccination.
   ///
   /// In ru, this message translates to:
-  /// **'Годовая вакцинация'**
+  /// **'Плановая вакцинация'**
   String get eventTypeYearlyVaccination;
 
   /// No description provided for @eventTypeRabiesVaccination.
   ///
   /// In ru, this message translates to:
-  /// **'Вакцинация от бешенства'**
+  /// **'Прививка от бешенства'**
   String get eventTypeRabiesVaccination;
 
   /// No description provided for @eventTypeWeeklyPills.
   ///
   /// In ru, this message translates to:
-  /// **'Недельные таблетки'**
+  /// **'Приём лекарств'**
   String get eventTypeWeeklyPills;
 
   /// No description provided for @eventTypeDailyPills.
   ///
   /// In ru, this message translates to:
-  /// **'Лекарства'**
+  /// **'Приём лекарств'**
   String get eventTypeDailyPills;
 
   /// No description provided for @eventTypeGrooming.
@@ -581,13 +581,13 @@ abstract class AppLocalizations {
   /// No description provided for @createEventNamePlaceholder.
   ///
   /// In ru, this message translates to:
-  /// **'Например, «Покормить кота»'**
+  /// **'Например, прогулка или витамины'**
   String get createEventNamePlaceholder;
 
   /// No description provided for @createEventTypeLabel.
   ///
   /// In ru, this message translates to:
-  /// **'Тип'**
+  /// **'Тип события'**
   String get createEventTypeLabel;
 
   /// No description provided for @createEventDateLabel.
@@ -635,7 +635,7 @@ abstract class AppLocalizations {
   /// No description provided for @createEventNotesPlaceholder.
   ///
   /// In ru, this message translates to:
-  /// **'Добавьте детали...'**
+  /// **'Что важно не забыть'**
   String get createEventNotesPlaceholder;
 
   /// No description provided for @createEventSubmit.
@@ -643,12 +643,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Создать событие'**
   String get createEventSubmit;
-
-  /// No description provided for @eventChipTime.
-  ///
-  /// In ru, this message translates to:
-  /// **'Время'**
-  String get eventChipTime;
 
   /// No description provided for @timePickerClear.
   ///
@@ -2413,6 +2407,144 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Вернуться ко входу'**
   String get accountDeletedButton;
+
+  /// No description provided for @createEventTypePlaceholder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите тип'**
+  String get createEventTypePlaceholder;
+
+  /// No description provided for @eventTypePickerTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип события'**
+  String get eventTypePickerTitle;
+
+  /// No description provided for @eventTypeGroupHealth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здоровье'**
+  String get eventTypeGroupHealth;
+
+  /// No description provided for @eventTypeGroupCare.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уход'**
+  String get eventTypeGroupCare;
+
+  /// No description provided for @eventTypeGroupDaily.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повседневные дела'**
+  String get eventTypeGroupDaily;
+
+  /// No description provided for @eventTypeGroupOther.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое'**
+  String get eventTypeGroupOther;
+
+  /// No description provided for @eventTypeSubtitleVetVisit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Осмотр, анализы, процедуры'**
+  String get eventTypeSubtitleVetVisit;
+
+  /// No description provided for @eventTypeSubtitleMedication.
+  ///
+  /// In ru, this message translates to:
+  /// **'Таблетки, капли, витамины'**
+  String get eventTypeSubtitleMedication;
+
+  /// No description provided for @eventTypeSubtitleYearlyVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ежегодная прививка по графику'**
+  String get eventTypeSubtitleYearlyVaccination;
+
+  /// No description provided for @eventTypeSubtitleRabiesVaccination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вакцинация против бешенства'**
+  String get eventTypeSubtitleRabiesVaccination;
+
+  /// No description provided for @eventTypeSubtitleFleaTreatment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профилактика паразитов'**
+  String get eventTypeSubtitleFleaTreatment;
+
+  /// No description provided for @eventTypeSubtitleDeworming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дегельминтизация'**
+  String get eventTypeSubtitleDeworming;
+
+  /// No description provided for @eventTypeSubtitleGrooming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расчёсывание, стрижка'**
+  String get eventTypeSubtitleGrooming;
+
+  /// No description provided for @eventTypeSubtitleBathing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Водные процедуры'**
+  String get eventTypeSubtitleBathing;
+
+  /// No description provided for @eventTypeSubtitleNailTrimming.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уход за когтями'**
+  String get eventTypeSubtitleNailTrimming;
+
+  /// No description provided for @eventTypeSubtitleWalking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выгул и активность'**
+  String get eventTypeSubtitleWalking;
+
+  /// No description provided for @eventTypeSubtitleFeeding.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корм и вода'**
+  String get eventTypeSubtitleFeeding;
+
+  /// No description provided for @eventTypeSubtitleCustom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Любое своё событие'**
+  String get eventTypeSubtitleCustom;
+
+  /// No description provided for @createEventTitleFromType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подставлено из типа · можно изменить'**
+  String get createEventTitleFromType;
+
+  /// No description provided for @createEventTitleOtherRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для типа «Другое» название обязательно'**
+  String get createEventTitleOtherRequired;
+
+  /// No description provided for @createEventTitleSuggest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тип изменён. Назвать «{name}»?'**
+  String createEventTitleSuggest(String name);
+
+  /// No description provided for @createEventTitleSuggestReplace.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заменить'**
+  String get createEventTitleSuggestReplace;
+
+  /// No description provided for @recurrenceFromType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подставлено по типу'**
+  String get recurrenceFromType;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
