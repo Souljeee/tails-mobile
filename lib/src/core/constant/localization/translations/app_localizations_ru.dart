@@ -1626,4 +1626,71 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get recurrenceFromType => 'Подставлено по типу';
+
+  @override
+  String eventCancelScopeOne(String date) {
+    return 'Только $date';
+  }
+
+  @override
+  String eventCancelScopeFuture(String date) {
+    return '$date и все следующие';
+  }
+
+  @override
+  String get eventCancelConfirmOne => 'Отменить событие';
+
+  @override
+  String get eventCancelConfirmFuture => 'Отменить это и все следующие';
+
+  @override
+  String eventCancelConfirmCount(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Отменить $n события',
+      many: 'Отменить $n событий',
+      few: 'Отменить $n события',
+      one: 'Отменить $n событие',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String eventCancelPastKept(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Сохранятся $n прошедших события',
+      many: 'Сохранятся $n прошедших событий',
+      few: 'Сохранятся $n прошедших события',
+      one: 'Сохранится $n прошедшее событие',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get eventCancelFutureOpenEndedHint => 'Серия закончится на этой дате';
+
+  @override
+  String get eventCancelLastInSeries =>
+      'Это последнее событие серии, оно будет отменено как одиночное';
+
+  @override
+  String get eventCancelledSnack => 'Событие отменено';
+
+  @override
+  String get eventsCancelledSnack => 'События отменены';
+
+  @override
+  String get eventCancelUndo => 'Вернуть';
+
+  @override
+  String get eventCancelFailed => 'Не удалось отменить';
+
+  @override
+  String get eventRestoreFailed => 'Не удалось вернуть событие';
+
+  @override
+  String get eventActionRetry => 'Повторить';
 }

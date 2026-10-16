@@ -2545,6 +2545,90 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Подставлено по типу'**
   String get recurrenceFromType;
+
+  /// No description provided for @eventCancelScopeOne.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только {date}'**
+  String eventCancelScopeOne(String date);
+
+  /// No description provided for @eventCancelScopeFuture.
+  ///
+  /// In ru, this message translates to:
+  /// **'{date} и все следующие'**
+  String eventCancelScopeFuture(String date);
+
+  /// No description provided for @eventCancelConfirmOne.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить событие'**
+  String get eventCancelConfirmOne;
+
+  /// No description provided for @eventCancelConfirmFuture.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить это и все следующие'**
+  String get eventCancelConfirmFuture;
+
+  /// No description provided for @eventCancelConfirmCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{Отменить {n} событие} few{Отменить {n} события} many{Отменить {n} событий} other{Отменить {n} события}}'**
+  String eventCancelConfirmCount(int n);
+
+  /// No description provided for @eventCancelPastKept.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{Сохранится {n} прошедшее событие} few{Сохранятся {n} прошедших события} many{Сохранятся {n} прошедших событий} other{Сохранятся {n} прошедших события}}'**
+  String eventCancelPastKept(int n);
+
+  /// No description provided for @eventCancelFutureOpenEndedHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Серия закончится на этой дате'**
+  String get eventCancelFutureOpenEndedHint;
+
+  /// No description provided for @eventCancelLastInSeries.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это последнее событие серии, оно будет отменено как одиночное'**
+  String get eventCancelLastInSeries;
+
+  /// No description provided for @eventCancelledSnack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Событие отменено'**
+  String get eventCancelledSnack;
+
+  /// No description provided for @eventsCancelledSnack.
+  ///
+  /// In ru, this message translates to:
+  /// **'События отменены'**
+  String get eventsCancelledSnack;
+
+  /// No description provided for @eventCancelUndo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуть'**
+  String get eventCancelUndo;
+
+  /// No description provided for @eventCancelFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось отменить'**
+  String get eventCancelFailed;
+
+  /// No description provided for @eventRestoreFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось вернуть событие'**
+  String get eventRestoreFailed;
+
+  /// No description provided for @eventActionRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить'**
+  String get eventActionRetry;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
