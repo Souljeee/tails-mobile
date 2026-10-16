@@ -34,6 +34,7 @@ import 'package:tails_mobile/src/feature/pets/core/enums/pet_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/analytics/schedule_analytics.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/enums/scheule_event_type_enum.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/create_event_model.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_reminder.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/recurrence_types.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
@@ -54,11 +55,16 @@ import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_d
 import 'package:tails_mobile/src/feature/schedule/recurrence/domain/recurrence_summary.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/recurrence_page.dart';
 import 'package:tails_mobile/src/feature/schedule/recurrence/presentation/utils/recurrence_date_format.dart';
+import 'package:tails_mobile/src/feature/schedule/reminder/domain/reminder_rules.dart';
+import 'package:tails_mobile/src/feature/schedule/reminder/presentation/reminder_custom_page.dart';
+import 'package:tails_mobile/src/feature/schedule/reminder/presentation/reminder_field.dart';
+import 'package:tails_mobile/src/feature/schedule/reminder/presentation/reminder_page.dart';
+import 'package:tails_mobile/src/feature/schedule/reminder/presentation/reminder_scope_texts.dart';
 
 enum CreateScheduleEventResult { success, error }
 
 /// Страница шторки: форма либо одна из вторых страниц.
-enum _SheetPage { form, eventType, recurrence, editScope }
+enum _SheetPage { form, eventType, recurrence, reminder, reminderCustom, editScope }
 
 /// Откуда взято повторение события.
 enum _RecurrenceSource {
@@ -93,7 +99,8 @@ class CreateScheduleEventBottomSheet extends StatefulWidget {
   State<CreateScheduleEventBottomSheet> createState() => _CreateScheduleEventBottomSheetState();
 }
 
-class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBottomSheet> {
+class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBottomSheet>
+    with WidgetsBindingObserver {
   /// Отступы формы: шторка показывается с `fullBleed`, поэтому поля задаёт содержимое.
   static const EdgeInsets _contentPadding = EdgeInsets.fromLTRB(
     UiSpacing.x5,
@@ -144,6 +151,17 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
 
   final ValueNotifier<_RecurrenceSource> _recurrenceSource = ValueNotifier(_RecurrenceSource.none);
 
+  /// Напоминание и признак, что его подобрали по типу (пользователь не менял).
+  final ValueNotifier<ReminderDraft> _reminder = ValueNotifier(
+    ReminderDraft.auto(null, allDay: true),
+  );
+
+  /// Событие «на весь день» (без времени): у него свои варианты напоминания.
+  bool _wasAllDay = true;
+
+  /// Уведомления выключены в настройках телефона.
+  final ValueNotifier<bool> _pushBlocked = ValueNotifier(false);
+
   /// Какая страница шторки открыта.
   final ValueNotifier<_SheetPage> _page = ValueNotifier(_SheetPage.form);
 
@@ -170,9 +188,21 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     _dateController.addListener(_rebaseRecurrence);
     _timeController.addListener(_rebaseRecurrence);
     _notesController.addListener(_onNotesChanged);
+    _timeController.addListener(_onAllDayChanged);
 
     if (_isEditing) {
       _prefillForEditing(widget.editing!);
+    }
+
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_refreshPushBlocked()));
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Пользователь мог включить уведомления в настройках телефона.
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_refreshPushBlocked());
     }
   }
 
@@ -195,6 +225,8 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     if (rule != null) {
       _recurrence.value = RecurrenceDraft.fromModel(rule, eventDate: event.date, eventTime: time);
     }
+
+    _reminder.value = ReminderDraft.saved(event.reminder);
   }
 
   @override
@@ -208,6 +240,9 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     _selectedType.dispose();
     _recurrence.dispose();
     _recurrenceSource.dispose();
+    _reminder.dispose();
+    _pushBlocked.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     _page.dispose();
     _titleSuggestion.dispose();
     _titleFocusNode.dispose();
@@ -251,6 +286,31 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
             onBack: _showForm,
             onApply: _applyRecurrence,
           ),
+          _SheetPage.reminder => ValueListenableBuilder(
+            valueListenable: _reminder,
+            builder: (context, draft, child) => ReminderPage(
+              reminder: draft.reminder,
+              eventAt: _eventAt,
+              allDay: _isAllDay,
+              recurring: _recurrence.value != null,
+              now: DateTime.now(),
+              onSelected: _pickReminder,
+              onOpenCustom: () => _page.value = _SheetPage.reminderCustom,
+              onBack: _showForm,
+            ),
+          ),
+          _SheetPage.reminderCustom => ReminderCustomPage(
+            current: _reminder.value.reminder,
+            eventAt: _eventAt,
+            allDay: _isAllDay,
+            recurring: _recurrence.value != null,
+            now: DateTime.now(),
+            onApply: (reminder) {
+              _pickReminder(reminder);
+              _page.value = _SheetPage.reminder;
+            },
+            onBack: () => _page.value = _SheetPage.reminder,
+          ),
           _SheetPage.editScope => _EditScopeHost(
             bloc: _editBloc,
             stats: _editStats,
@@ -259,6 +319,8 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
             date: widget.editing!.date,
             model: _pendingModel,
             changes: _pendingChanges,
+            originalReminder: widget.editing!.reminder,
+            allDay: _isAllDay,
             onSave: _saveEdit,
             onRetry: _loadEditStats,
             onBack: _showForm,
@@ -268,6 +330,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
           listenable: Listenable.merge([
             _createEventUio,
             _recurrence,
+            _reminder,
             _selectedType,
             _eventTitleController,
             _timeController,
@@ -358,6 +421,29 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
                   },
                 ),
                 const SizedBox(height: UiSpacing.x4),
+                _FieldLabel(label: l10n.reminderLabel),
+                ListenableBuilder(
+                  listenable: Listenable.merge([
+                    _reminder,
+                    _pushBlocked,
+                    _dateController,
+                    _timeController,
+                    _recurrence,
+                    _selectedType,
+                  ]),
+                  builder: (context, child) => ReminderField(
+                    draft: _reminder.value,
+                    eventAt: _eventAt,
+                    allDay: _isAllDay,
+                    recurring: _recurrence.value != null,
+                    typePicked: _selectedType.value != null,
+                    pushBlocked: _pushBlocked.value,
+                    now: DateTime.now(),
+                    onTap: () => _page.value = _SheetPage.reminder,
+                    onEnablePush: () => unawaited(_enablePush()),
+                  ),
+                ),
+                const SizedBox(height: UiSpacing.x4),
                 UiTextField(
                   controller: _notesController,
                   labelText: l10n.createEventNotesLabel,
@@ -407,6 +493,70 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     final time = _timeController.text.trim();
 
     return LocalTime.tryParse(time)?.format();
+  }
+
+  /// Событие без времени — «на весь день».
+  bool get _isAllDay => _eventTime == null;
+
+  /// Момент события, от которого считается напоминание (у «всего дня» — 09:00).
+  DateTime get _eventAt => ReminderSchedule.occurrenceAt(date: _eventDate, time: _eventTime);
+
+  /// Пользователь выбрал напоминание: тип события его больше не меняет.
+  void _pickReminder(EventReminder reminder) => _reminder.value = _reminder.value.picked(reminder);
+
+  /// Время стерли или задали: у «всего дня» свои варианты напоминания.
+  void _onAllDayChanged() {
+    final allDay = _isAllDay;
+    if (allDay == _wasAllDay) {
+      return;
+    }
+
+    _wasAllDay = allDay;
+    _reminder.value = _reminder.value.onAllDayChanged(_selectedType.value, allDay: allDay);
+  }
+
+  /// Напоминание для сохранения: у старого события без напоминания нетронутое «в момент
+  /// события» не отправляется, чтобы сервер оставил прежнее поведение.
+  EventReminder? get _reminderForModel {
+    final reminder = _reminder.value.reminder;
+    final legacy = _isEditing && widget.editing!.reminder == null;
+
+    return legacy && reminder == EventReminder.atEvent ? null : reminder;
+  }
+
+  Future<void> _refreshPushBlocked() async {
+    try {
+      final blocked = await DependenciesScope.of(
+        context,
+      ).notificationPermissionDataSource.isBlockedBySystem();
+      if (mounted) {
+        _pushBlocked.value = blocked;
+      }
+    } catch (e, s) {
+      TailsLogger.warning(
+        'Не удалось проверить разрешение на уведомления',
+        source: 'CreateScheduleEventBottomSheet',
+        error: e,
+        stackTrace: s,
+      );
+    }
+  }
+
+  /// «Включить»: системный запрос либо настройки приложения; после — новая проверка.
+  Future<void> _enablePush() async {
+    try {
+      await DependenciesScope.of(context).notificationPermissionDataSource.enable();
+    } catch (e, s) {
+      TailsLogger.warning(
+        'Не удалось открыть включение уведомлений',
+        source: 'CreateScheduleEventBottomSheet',
+        error: e,
+        stackTrace: s,
+      );
+    }
+    if (mounted) {
+      await _refreshPushBlocked();
+    }
   }
 
   RecurrenceDraft _initialRecurrenceDraft() =>
@@ -464,6 +614,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       _notesController.text.trim().isNotEmpty ||
       _selectedType.value != null ||
       _recurrence.value != null ||
+      !_reminder.value.autoPicked ||
       _createEventUio.value.petId != widget.selectedPetId ||
       _createEventUio.value.date != widget.date;
 
@@ -508,6 +659,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       type: EventTypeRules.apiType(_selectedType.value!, recurrence),
       isRecurring: recurrence != null,
       recurrence: recurrence,
+      reminder: _reminderForModel,
     );
   }
 
@@ -601,6 +753,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
             type: model.type,
             isRecurring: model.isRecurring,
             recurrence: EditChanges.withRemainingCount(model.recurrence, past: stats.past),
+            reminder: model.reminder,
           )
         : model;
 
@@ -680,6 +833,7 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
     }
 
     _applyTypeRecurrence(type);
+    _reminder.value = _reminder.value.onTypeChanged(type, allDay: _isAllDay);
   }
 
   /// «Заменить» в подсказке: подставляет название нового типа вместо своего.
@@ -1139,6 +1293,8 @@ class _EditScopeHost extends StatelessWidget {
     required this.date,
     required this.model,
     required this.changes,
+    required this.originalReminder,
+    required this.allDay,
     required this.onSave,
     required this.onRetry,
     required this.onBack,
@@ -1151,6 +1307,10 @@ class _EditScopeHost extends StatelessWidget {
   final DateTime date;
   final CreateEventModel? model;
   final EditChanges changes;
+
+  /// Напоминание, с которым открыта форма: «как было» в пояснении к «Только {дата}».
+  final EventReminder? originalReminder;
+  final bool allDay;
   final VoidCallback onSave;
   final VoidCallback onRetry;
   final VoidCallback onBack;
@@ -1174,8 +1334,22 @@ class _EditScopeHost extends StatelessWidget {
                 rule: pending.recurrence,
               );
 
+          final reminder = pending?.reminder;
+          final reminderTexts =
+              changes.fields.length == 1 &&
+                  changes.fields.contains(EditedField.reminder) &&
+                  reminder != null
+              ? ReminderScopeTexts.of(
+                  context.l10n,
+                  reminder: reminder,
+                  previous: originalReminder ?? EventReminder.atEvent,
+                  allDay: allDay,
+                )
+              : null;
+
           return EditScopePage(
             date: date,
+            reminderTexts: reminderTexts,
             scope: scope.value,
             allowsOne: changes.allowsSingleOccurrence,
             isLoading: loaded == null && !statsFailed.value,

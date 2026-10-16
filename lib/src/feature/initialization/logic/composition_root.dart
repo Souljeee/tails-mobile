@@ -12,6 +12,7 @@ import 'package:tails_mobile/src/core/logging/sinks/file_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
+import 'package:tails_mobile/src/core/notifications/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/sentry_error_reporter.dart';
 import 'package:tails_mobile/src/feature/auth/data/data_sources/auth_remote_data_source.dart';
@@ -28,7 +29,6 @@ import 'package:tails_mobile/src/feature/pets/core/data/data_sources/pets_remote
 import 'package:tails_mobile/src/feature/pets/core/data/pet_color_store.dart';
 import 'package:tails_mobile/src/feature/pets/core/data/repositories/pet_repository.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/device_info_data_source.dart';
-import 'package:tails_mobile/src/feature/profile/core/data/data_sources/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/profile_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
 import 'package:tails_mobile/src/feature/push_notifications/data/data_sources/devices_remote_data_source.dart';
@@ -147,11 +147,7 @@ abstract class AsyncFactory<T> {
 /// {@endtemplate}
 class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
   /// {@macro dependencies_factory}
-  const DependenciesFactory({
-    required this.config,
-    required this.errorReporter,
-    this.fileLogSink,
-  });
+  const DependenciesFactory({required this.config, required this.errorReporter, this.fileLogSink});
 
   /// Application configuration
   final ApplicationConfig config;
@@ -246,10 +242,12 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       authorizationStatus: authRepository.authorizationStatus,
     );
 
+    const notificationPermissionDataSource = NotificationPermissionDataSource();
+
     final profileRepository = ProfileRepository(
       remoteDataSource: ProfileRemoteDataSource(restClient: restClient),
       deviceInfoDataSource: const DeviceInfoDataSource(),
-      notificationPermissionDataSource: const NotificationPermissionDataSource(),
+      notificationPermissionDataSource: notificationPermissionDataSource,
       packageInfo: packageInfo,
       logExporter: fileLogSink == null ? null : LogExporter(sink: fileLogSink!),
     );
@@ -269,6 +267,7 @@ class DependenciesFactory extends AsyncFactory<DependenciesContainer> {
       profileRepository: profileRepository,
       pushNotificationsBloc: pushNotificationsBloc,
       notificationsInboxRepository: notificationsInboxRepository,
+      notificationPermissionDataSource: notificationPermissionDataSource,
     );
   }
 }

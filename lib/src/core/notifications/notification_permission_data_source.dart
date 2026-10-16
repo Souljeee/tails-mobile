@@ -16,4 +16,20 @@ class NotificationPermissionDataSource {
   }
 
   Future<bool> openSettings() => openAppSettings();
+
+  /// «Включить»: если разрешение ещё можно запросить — системный запрос, иначе настройки.
+  ///
+  /// Возвращает `true`, если уведомления разрешены сразу после системного запроса.
+  Future<bool> enable() async {
+    final status = await Permission.notification.status;
+    if (status.isDenied) {
+      final requested = await Permission.notification.request();
+
+      return requested.isGranted || requested.isProvisional;
+    }
+
+    await openAppSettings();
+
+    return false;
+  }
 }

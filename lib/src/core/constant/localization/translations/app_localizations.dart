@@ -2863,6 +2863,396 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось загрузить данные серии'**
   String get editScopeLoadFailed;
+
+  /// No description provided for @reminderLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напоминание'**
+  String get reminderLabel;
+
+  /// No description provided for @reminderPageTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напоминание'**
+  String get reminderPageTitle;
+
+  /// No description provided for @reminderNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не напоминать'**
+  String get reminderNone;
+
+  /// No description provided for @reminderNoneHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомление не придёт'**
+  String get reminderNoneHint;
+
+  /// No description provided for @reminderAtEvent.
+  ///
+  /// In ru, this message translates to:
+  /// **'В момент события'**
+  String get reminderAtEvent;
+
+  /// No description provided for @reminderAllDayAtEvent.
+  ///
+  /// In ru, this message translates to:
+  /// **'В день события в 09:00'**
+  String get reminderAllDayAtEvent;
+
+  /// No description provided for @reminderAllDayDayBefore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Накануне в 09:00'**
+  String get reminderAllDayDayBefore;
+
+  /// No description provided for @reminderAllDayDaysBefore.
+  ///
+  /// In ru, this message translates to:
+  /// **'За 2 дня в 09:00'**
+  String get reminderAllDayDaysBefore;
+
+  /// No description provided for @reminderAllDayWeekBefore.
+  ///
+  /// In ru, this message translates to:
+  /// **'За неделю в 09:00'**
+  String get reminderAllDayWeekBefore;
+
+  /// No description provided for @reminderBeforeMinutes.
+  ///
+  /// In ru, this message translates to:
+  /// **'За {n, plural, one{{n} минуту} few{{n} минуты} many{{n} минут} other{{n} минут}}'**
+  String reminderBeforeMinutes(int n);
+
+  /// No description provided for @reminderThroughMinutes.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{{n} минуту} few{{n} минуты} many{{n} минут} other{{n} минут}}'**
+  String reminderThroughMinutes(int n);
+
+  /// No description provided for @reminderBeforeHours.
+  ///
+  /// In ru, this message translates to:
+  /// **'За {n, plural, one{{n} час} few{{n} часа} many{{n} часов} other{{n} часов}}'**
+  String reminderBeforeHours(int n);
+
+  /// No description provided for @reminderThroughHours.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{{n} час} few{{n} часа} many{{n} часов} other{{n} часов}}'**
+  String reminderThroughHours(int n);
+
+  /// No description provided for @reminderBeforeDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'За {n, plural, one{{n} день} few{{n} дня} many{{n} дней} other{{n} дней}}'**
+  String reminderBeforeDays(int n);
+
+  /// No description provided for @reminderThroughDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{{n} день} few{{n} дня} many{{n} дней} other{{n} дней}}'**
+  String reminderThroughDays(int n);
+
+  /// No description provided for @reminderBeforeWeeks.
+  ///
+  /// In ru, this message translates to:
+  /// **'За {n, plural, one{{n} неделю} few{{n} недели} many{{n} недель} other{{n} недель}}'**
+  String reminderBeforeWeeks(int n);
+
+  /// No description provided for @reminderThroughWeeks.
+  ///
+  /// In ru, this message translates to:
+  /// **'{n, plural, one{{n} неделю} few{{n} недели} many{{n} недель} other{{n} недель}}'**
+  String reminderThroughWeeks(int n);
+
+  /// No description provided for @reminderUnitShortMinutes.
+  ///
+  /// In ru, this message translates to:
+  /// **'мин'**
+  String get reminderUnitShortMinutes;
+
+  /// No description provided for @reminderUnitShortHours.
+  ///
+  /// In ru, this message translates to:
+  /// **'ч'**
+  String get reminderUnitShortHours;
+
+  /// No description provided for @reminderUnitShortDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'дн'**
+  String get reminderUnitShortDays;
+
+  /// No description provided for @reminderUnitShortWeeks.
+  ///
+  /// In ru, this message translates to:
+  /// **'нед'**
+  String get reminderUnitShortWeeks;
+
+  /// No description provided for @reminderUnitMinutes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Минуты'**
+  String get reminderUnitMinutes;
+
+  /// No description provided for @reminderUnitHours.
+  ///
+  /// In ru, this message translates to:
+  /// **'Часы'**
+  String get reminderUnitHours;
+
+  /// No description provided for @reminderUnitDays.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дни'**
+  String get reminderUnitDays;
+
+  /// No description provided for @reminderUnitWeeks.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недели'**
+  String get reminderUnitWeeks;
+
+  /// No description provided for @reminderCustom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Своё время'**
+  String get reminderCustom;
+
+  /// No description provided for @reminderCustomHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например, за 3 часа или за 3 дня'**
+  String get reminderCustomHint;
+
+  /// No description provided for @reminderCustomTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Своё время'**
+  String get reminderCustomTitle;
+
+  /// No description provided for @reminderCustomLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напомнить за'**
+  String get reminderCustomLabel;
+
+  /// No description provided for @reminderCustomLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Можно от 1 до {max} {unit}. Нужно больше — выберите следующую единицу.'**
+  String reminderCustomLimit(int max, String unit);
+
+  /// No description provided for @reminderCustomLimitLast.
+  ///
+  /// In ru, this message translates to:
+  /// **'Можно от 1 до {max} {unit}.'**
+  String reminderCustomLimitLast(int max, String unit);
+
+  /// No description provided for @reminderCustomDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово'**
+  String get reminderCustomDone;
+
+  /// No description provided for @reminderCustomBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбрать из готовых вариантов'**
+  String get reminderCustomBack;
+
+  /// No description provided for @reminderDecrement.
+  ///
+  /// In ru, this message translates to:
+  /// **'Меньше'**
+  String get reminderDecrement;
+
+  /// No description provided for @reminderIncrement.
+  ///
+  /// In ru, this message translates to:
+  /// **'Больше'**
+  String get reminderIncrement;
+
+  /// No description provided for @reminderPreviewEvent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Событие'**
+  String get reminderPreviewEvent;
+
+  /// No description provided for @reminderPreviewRemind.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напомним'**
+  String get reminderPreviewRemind;
+
+  /// No description provided for @reminderPreviewNever.
+  ///
+  /// In ru, this message translates to:
+  /// **'не будем'**
+  String get reminderPreviewNever;
+
+  /// No description provided for @reminderPreviewPast.
+  ///
+  /// In ru, this message translates to:
+  /// **'уже прошло'**
+  String get reminderPreviewPast;
+
+  /// No description provided for @reminderTimeAt.
+  ///
+  /// In ru, this message translates to:
+  /// **'в {time}'**
+  String reminderTimeAt(String time);
+
+  /// No description provided for @reminderDateTimeAt.
+  ///
+  /// In ru, this message translates to:
+  /// **'{date} в {time}'**
+  String reminderDateTimeAt(String date, String time);
+
+  /// No description provided for @reminderToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'сегодня в {time}'**
+  String reminderToday(String time);
+
+  /// No description provided for @reminderPrefixOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'{weekday, select, tuesday{во} other{в}} {text}'**
+  String reminderPrefixOn(String weekday, String text);
+
+  /// No description provided for @reminderWhen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Придёт {when}'**
+  String reminderWhen(String when);
+
+  /// No description provided for @reminderWhenByType.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подобрано по типу · придёт {when}'**
+  String reminderWhenByType(String when);
+
+  /// No description provided for @reminderWhenRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для каждого повторения · придёт в {time}'**
+  String reminderWhenRepeat(String time);
+
+  /// No description provided for @reminderRepeatSameDay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый раз в {time}'**
+  String reminderRepeatSameDay(String time);
+
+  /// No description provided for @reminderRepeatDayBefore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый раз накануне в {time}'**
+  String reminderRepeatDayBefore(String time);
+
+  /// No description provided for @reminderRepeatWeekBefore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый раз за неделю в {time}'**
+  String reminderRepeatWeekBefore(String time);
+
+  /// No description provided for @reminderRepeatDaysBefore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый раз за {days, plural, one{{days} день} few{{days} дня} many{{days} дней} other{{days} дней}} в {time}'**
+  String reminderRepeatDaysBefore(int days, String time);
+
+  /// No description provided for @reminderOptionPast.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уже прошло'**
+  String get reminderOptionPast;
+
+  /// No description provided for @reminderOptionPastSemantics.
+  ///
+  /// In ru, this message translates to:
+  /// **'{label}, недоступно, время уже прошло'**
+  String reminderOptionPastSemantics(String label);
+
+  /// No description provided for @reminderPastBanner.
+  ///
+  /// In ru, this message translates to:
+  /// **'Событие уже через {left}. Варианты, время которых прошло, недоступны.'**
+  String reminderPastBanner(String left);
+
+  /// No description provided for @reminderWarnPast.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это время уже прошло — напоминание не придёт. Выберите вариант позже.'**
+  String get reminderWarnPast;
+
+  /// No description provided for @reminderWarnPush.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления выключены в настройках телефона — напоминание не придёт.'**
+  String get reminderWarnPush;
+
+  /// No description provided for @reminderWarnPushAction.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить'**
+  String get reminderWarnPushAction;
+
+  /// No description provided for @reminderOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомление об этом событии не придёт'**
+  String get reminderOff;
+
+  /// No description provided for @reminderFooter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Время напоминания считается от времени события. Перенесёте событие — напоминание сдвинется вместе с ним.'**
+  String get reminderFooter;
+
+  /// No description provided for @reminderFooterRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напоминание сработает перед каждым повторением события.'**
+  String get reminderFooterRepeat;
+
+  /// No description provided for @reminderFieldSemantics.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напоминание: {value}. {status}'**
+  String reminderFieldSemantics(String value, String status);
+
+  /// No description provided for @reminderScopeQuestion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое напоминание «{value}» — для каких событий?'**
+  String reminderScopeQuestion(String value);
+
+  /// No description provided for @reminderScopeOneHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этот день напомним {value}. В остальные дни — как было: {old}.'**
+  String reminderScopeOneHint(String value, String old);
+
+  /// No description provided for @reminderScopeOneHintNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этот день уведомление не придёт. В остальные дни — как было: {old}.'**
+  String reminderScopeOneHintNone(String old);
+
+  /// No description provided for @reminderScopeFutureHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Напоминание {value} для всех следующих повторений. Прошедшие не изменятся.'**
+  String reminderScopeFutureHint(String value);
+
+  /// No description provided for @reminderScopeFutureHintNone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления не будет для всех следующих повторений. Прошедшие не изменятся.'**
+  String get reminderScopeFutureHintNone;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

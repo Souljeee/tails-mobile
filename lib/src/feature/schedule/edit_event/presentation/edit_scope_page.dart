@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/occurrence_scope.dart';
+import 'package:tails_mobile/src/feature/schedule/reminder/presentation/reminder_scope_texts.dart';
 
 /// Страница «К каким событиям применить изменения?» после «Сохранить изменения» у серии.
 ///
@@ -27,6 +28,7 @@ class EditScopePage extends StatelessWidget {
     required this.onDiscard,
     required this.onRetry,
     required this.onBack,
+    this.reminderTexts,
     super.key,
   });
 
@@ -46,6 +48,9 @@ class EditScopePage extends StatelessWidget {
   final VoidCallback onDiscard;
   final VoidCallback onRetry;
   final VoidCallback onBack;
+
+  /// Изменено только напоминание: свой вопрос и пояснения к вариантам.
+  final ReminderScopeTexts? reminderTexts;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +76,10 @@ class EditScopePage extends StatelessWidget {
               onCancel: onBack,
             ),
             const SizedBox(height: UiSpacing.x3),
-            Text(l10n.editScopeQuestion, style: fonts.body.copyWith(color: palette.ink2)),
+            Text(
+              reminderTexts?.question ?? l10n.editScopeQuestion,
+              style: fonts.body.copyWith(color: palette.ink2),
+            ),
             const SizedBox(height: UiSpacing.x3),
             if (loadFailed) ...[
               Text(l10n.editScopeLoadFailed, style: fonts.body.copyWith(color: palette.danger)),
@@ -89,6 +97,7 @@ class EditScopePage extends StatelessWidget {
                   selected: effective == OccurrenceScope.one,
                   onTap: () => onScopeChanged(OccurrenceScope.one),
                 ),
+                if (reminderTexts case final texts?) _ScopeHint(text: texts.oneHint),
                 const SizedBox(height: UiSpacing.x2),
               ],
               UiSelectableCard(
@@ -96,6 +105,7 @@ class EditScopePage extends StatelessWidget {
                 selected: effective == OccurrenceScope.future,
                 onTap: () => onScopeChanged(OccurrenceScope.future),
               ),
+              if (reminderTexts case final texts?) _ScopeHint(text: texts.futureHint),
               if (!allowsOne) ...[
                 const SizedBox(height: UiSpacing.x3),
                 Text(
@@ -125,6 +135,21 @@ class EditScopePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Пояснение под вариантом области.
+class _ScopeHint extends StatelessWidget {
+  const _ScopeHint({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(UiSpacing.x1, UiSpacing.x2, UiSpacing.x1, 0),
+      child: Text(text, style: context.uiFonts.footnote.copyWith(color: context.uiPalette.ink2)),
     );
   }
 }

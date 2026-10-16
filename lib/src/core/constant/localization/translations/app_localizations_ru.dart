@@ -1824,4 +1824,332 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get editScopeLoadFailed => 'Не удалось загрузить данные серии';
+
+  @override
+  String get reminderLabel => 'Напоминание';
+
+  @override
+  String get reminderPageTitle => 'Напоминание';
+
+  @override
+  String get reminderNone => 'Не напоминать';
+
+  @override
+  String get reminderNoneHint => 'Уведомление не придёт';
+
+  @override
+  String get reminderAtEvent => 'В момент события';
+
+  @override
+  String get reminderAllDayAtEvent => 'В день события в 09:00';
+
+  @override
+  String get reminderAllDayDayBefore => 'Накануне в 09:00';
+
+  @override
+  String get reminderAllDayDaysBefore => 'За 2 дня в 09:00';
+
+  @override
+  String get reminderAllDayWeekBefore => 'За неделю в 09:00';
+
+  @override
+  String reminderBeforeMinutes(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n минут',
+      many: '$n минут',
+      few: '$n минуты',
+      one: '$n минуту',
+    );
+    return 'За $_temp0';
+  }
+
+  @override
+  String reminderThroughMinutes(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n минут',
+      many: '$n минут',
+      few: '$n минуты',
+      one: '$n минуту',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderBeforeHours(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n часов',
+      many: '$n часов',
+      few: '$n часа',
+      one: '$n час',
+    );
+    return 'За $_temp0';
+  }
+
+  @override
+  String reminderThroughHours(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n часов',
+      many: '$n часов',
+      few: '$n часа',
+      one: '$n час',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderBeforeDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n дней',
+      many: '$n дней',
+      few: '$n дня',
+      one: '$n день',
+    );
+    return 'За $_temp0';
+  }
+
+  @override
+  String reminderThroughDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n дней',
+      many: '$n дней',
+      few: '$n дня',
+      one: '$n день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderBeforeWeeks(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n недель',
+      many: '$n недель',
+      few: '$n недели',
+      one: '$n неделю',
+    );
+    return 'За $_temp0';
+  }
+
+  @override
+  String reminderThroughWeeks(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n недель',
+      many: '$n недель',
+      few: '$n недели',
+      one: '$n неделю',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reminderUnitShortMinutes => 'мин';
+
+  @override
+  String get reminderUnitShortHours => 'ч';
+
+  @override
+  String get reminderUnitShortDays => 'дн';
+
+  @override
+  String get reminderUnitShortWeeks => 'нед';
+
+  @override
+  String get reminderUnitMinutes => 'Минуты';
+
+  @override
+  String get reminderUnitHours => 'Часы';
+
+  @override
+  String get reminderUnitDays => 'Дни';
+
+  @override
+  String get reminderUnitWeeks => 'Недели';
+
+  @override
+  String get reminderCustom => 'Своё время';
+
+  @override
+  String get reminderCustomHint => 'Например, за 3 часа или за 3 дня';
+
+  @override
+  String get reminderCustomTitle => 'Своё время';
+
+  @override
+  String get reminderCustomLabel => 'Напомнить за';
+
+  @override
+  String reminderCustomLimit(int max, String unit) {
+    return 'Можно от 1 до $max $unit. Нужно больше — выберите следующую единицу.';
+  }
+
+  @override
+  String reminderCustomLimitLast(int max, String unit) {
+    return 'Можно от 1 до $max $unit.';
+  }
+
+  @override
+  String get reminderCustomDone => 'Готово';
+
+  @override
+  String get reminderCustomBack => 'Выбрать из готовых вариантов';
+
+  @override
+  String get reminderDecrement => 'Меньше';
+
+  @override
+  String get reminderIncrement => 'Больше';
+
+  @override
+  String get reminderPreviewEvent => 'Событие';
+
+  @override
+  String get reminderPreviewRemind => 'Напомним';
+
+  @override
+  String get reminderPreviewNever => 'не будем';
+
+  @override
+  String get reminderPreviewPast => 'уже прошло';
+
+  @override
+  String reminderTimeAt(String time) {
+    return 'в $time';
+  }
+
+  @override
+  String reminderDateTimeAt(String date, String time) {
+    return '$date в $time';
+  }
+
+  @override
+  String reminderToday(String time) {
+    return 'сегодня в $time';
+  }
+
+  @override
+  String reminderPrefixOn(String weekday, String text) {
+    String _temp0 = intl.Intl.selectLogic(weekday, {'tuesday': 'во', 'other': 'в'});
+    return '$_temp0 $text';
+  }
+
+  @override
+  String reminderWhen(String when) {
+    return 'Придёт $when';
+  }
+
+  @override
+  String reminderWhenByType(String when) {
+    return 'Подобрано по типу · придёт $when';
+  }
+
+  @override
+  String reminderWhenRepeat(String time) {
+    return 'Для каждого повторения · придёт в $time';
+  }
+
+  @override
+  String reminderRepeatSameDay(String time) {
+    return 'Каждый раз в $time';
+  }
+
+  @override
+  String reminderRepeatDayBefore(String time) {
+    return 'Каждый раз накануне в $time';
+  }
+
+  @override
+  String reminderRepeatWeekBefore(String time) {
+    return 'Каждый раз за неделю в $time';
+  }
+
+  @override
+  String reminderRepeatDaysBefore(int days, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days дней',
+      many: '$days дней',
+      few: '$days дня',
+      one: '$days день',
+    );
+    return 'Каждый раз за $_temp0 в $time';
+  }
+
+  @override
+  String get reminderOptionPast => 'Уже прошло';
+
+  @override
+  String reminderOptionPastSemantics(String label) {
+    return '$label, недоступно, время уже прошло';
+  }
+
+  @override
+  String reminderPastBanner(String left) {
+    return 'Событие уже через $left. Варианты, время которых прошло, недоступны.';
+  }
+
+  @override
+  String get reminderWarnPast =>
+      'Это время уже прошло — напоминание не придёт. Выберите вариант позже.';
+
+  @override
+  String get reminderWarnPush =>
+      'Уведомления выключены в настройках телефона — напоминание не придёт.';
+
+  @override
+  String get reminderWarnPushAction => 'Включить';
+
+  @override
+  String get reminderOff => 'Уведомление об этом событии не придёт';
+
+  @override
+  String get reminderFooter =>
+      'Время напоминания считается от времени события. Перенесёте событие — напоминание сдвинется вместе с ним.';
+
+  @override
+  String get reminderFooterRepeat => 'Напоминание сработает перед каждым повторением события.';
+
+  @override
+  String reminderFieldSemantics(String value, String status) {
+    return 'Напоминание: $value. $status';
+  }
+
+  @override
+  String reminderScopeQuestion(String value) {
+    return 'Новое напоминание «$value» — для каких событий?';
+  }
+
+  @override
+  String reminderScopeOneHint(String value, String old) {
+    return 'В этот день напомним $value. В остальные дни — как было: $old.';
+  }
+
+  @override
+  String reminderScopeOneHintNone(String old) {
+    return 'В этот день уведомление не придёт. В остальные дни — как было: $old.';
+  }
+
+  @override
+  String reminderScopeFutureHint(String value) {
+    return 'Напоминание $value для всех следующих повторений. Прошедшие не изменятся.';
+  }
+
+  @override
+  String get reminderScopeFutureHintNone =>
+      'Уведомления не будет для всех следующих повторений. Прошедшие не изменятся.';
 }

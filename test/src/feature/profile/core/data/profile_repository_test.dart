@@ -9,8 +9,8 @@ import 'package:tails_mobile/src/core/logging/sinks/file_log_sink.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_config.dart';
 import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
 import 'package:tails_mobile/src/core/logging/tails_logger.dart';
+import 'package:tails_mobile/src/core/notifications/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/device_info_data_source.dart';
-import 'package:tails_mobile/src/feature/profile/core/data/data_sources/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/profile_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/feedback_model.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/profile_repository.dart';
@@ -39,6 +39,9 @@ class _FakePermission implements NotificationPermissionDataSource {
 
     return true;
   }
+
+  @override
+  Future<bool> enable() async => !blocked;
 }
 
 BackendException _backend(int status, [Object? response]) =>

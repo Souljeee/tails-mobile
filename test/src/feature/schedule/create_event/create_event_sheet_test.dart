@@ -46,7 +46,7 @@ void main() {
   late _FakeScheduleRepository repository;
 
   Future<void> pumpSheet(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(400, 1000);
+    tester.view.physicalSize = const Size(400, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 

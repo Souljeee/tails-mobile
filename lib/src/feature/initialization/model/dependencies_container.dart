@@ -1,6 +1,7 @@
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rest_client/rest_client.dart';
 import 'package:tails_mobile/src/core/constant/application_config.dart';
+import 'package:tails_mobile/src/core/notifications/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/core/utils/error_reporter/error_reporter.dart';
 import 'package:tails_mobile/src/feature/auth/data/repositories/auth_repository.dart';
 import 'package:tails_mobile/src/feature/auth/domain/auth/auth_bloc.dart';
@@ -25,7 +26,7 @@ class DependenciesContainer {
     required this.appSettingsBloc,
     required this.errorReporter,
     required this.packageInfo,
-    required this.restClient, 
+    required this.restClient,
     required this.authRepository,
     required this.authorizationBloc,
     required this.sendCodeBloc,
@@ -35,6 +36,7 @@ class DependenciesContainer {
     required this.profileRepository,
     required this.pushNotificationsBloc,
     required this.notificationsInboxRepository,
+    required this.notificationPermissionDataSource,
   });
 
   /// [ApplicationConfig] instance, contains configuration of the application.
@@ -78,6 +80,9 @@ class DependenciesContainer {
 
   /// [NotificationsInboxRepository] instance, history of notifications and the unread counter.
   final NotificationsInboxRepository notificationsInboxRepository;
+
+  /// [NotificationPermissionDataSource] instance, system permission for notifications.
+  final NotificationPermissionDataSource notificationPermissionDataSource;
 }
 
 /// {@template testing_dependencies_container}

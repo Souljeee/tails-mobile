@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tails_mobile/src/core/logging/log_exporter.dart';
+import 'package:tails_mobile/src/core/notifications/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/device_info_data_source.dart';
-import 'package:tails_mobile/src/feature/profile/core/data/data_sources/notification_permission_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/data_sources/profile_remote_data_source.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/feedback_model.dart';
 import 'package:tails_mobile/src/feature/profile/core/data/repositories/models/notification_settings_model.dart';
