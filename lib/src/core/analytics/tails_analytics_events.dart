@@ -257,6 +257,22 @@ abstract final class TailsAnalyticsEvents {
   static TailsAnalyticsEvent eventMarkedUndone({required String eventType}) =>
       TailsAnalyticsEvent('event_marked_undone', parameters: {'event_type': eventType});
 
+  /// Вхождение отменено (запрос ушёл на сервер).
+  static TailsAnalyticsEvent eventCancelled({
+    required String scope,
+    required String eventType,
+    required bool isRecurring,
+  }) => TailsAnalyticsEvent(
+    'event_cancelled',
+    parameters: {'scope': scope, 'event_type': eventType, 'is_recurring': isRecurring},
+  );
+
+  /// Отмена отозвана кнопкой «Вернуть» до отправки.
+  static const eventCancelUndone = TailsAnalyticsEvent('event_cancel_undone');
+
+  /// Отменённое вхождение возвращено в расписание.
+  static const eventRestored = TailsAnalyticsEvent('event_restored');
+
   /// Изменён фильтр расписания.
   static TailsAnalyticsEvent scheduleFilterChanged(String filter) =>
       TailsAnalyticsEvent('schedule_filter_changed', parameters: {'filter': filter});

@@ -7,6 +7,7 @@ import 'package:tails_mobile/src/core/analytics/tails_analytics_event.dart';
 import 'package:tails_mobile/src/core/constant/enums/pagination_status_enum.dart';
 import 'package:tails_mobile/src/core/utils/copy_with_wrapper.dart';
 import 'package:tails_mobile/src/core/utils/extensions/date_time_extension.dart';
+import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/event_occurrence_ref.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/models/schedule_event_model.dart';
 import 'package:tails_mobile/src/feature/schedule/core/data/repositories/schedule_repository.dart';
 
@@ -24,14 +25,22 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
         fetchRequested: (event) => _onFetchRequested(event, emit),
         loadMoreRequested: (event) => _onLoadMoreRequested(event, emit),
         markDoneRequested: (event) => _onMarkDoneRequested(event, emit),
+        occurrenceCancelledChanged: (event) => _onOccurrenceCancelledChanged(event, emit),
+        occurrenceReplaced: (event) => _onOccurrenceReplaced(event, emit),
+        refreshRequested: (event) => _onRefreshRequested(event, emit),
       ),
     );
   }
+
+  /// Параметры последней загрузки окна: по ним работает [ScheduleEvent.refreshRequested].
+  ScheduleEvent$FetchRequested? _lastFetch;
 
   Future<void> _onFetchRequested(
     ScheduleEvent$FetchRequested event,
     Emitter<ScheduleState> emit,
   ) async {
+    _lastFetch = event;
+
     final hasData = state is ScheduleState$Success;
     final keepData = event.silent && hasData;
 
@@ -137,4 +146,85 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
       },
     );
   }
+
+  Future<void> _onOccurrenceCancelledChanged(
+    ScheduleEvent$OccurrenceCancelledChanged event,
+    Emitter<ScheduleState> emit,
+  ) async {
+    final current = state;
+    if (current is! ScheduleState$Success) {
+      return;
+    }
+
+    final ref = event.ref;
+    final updated = <DateTime, List<ScheduleEventModel>>{};
+
+    current.scheduleEvents.forEach((day, items) {
+      final next = <ScheduleEventModel>[];
+
+      for (final item in items) {
+        if (item.id != ref.eventId) {
+          next.add(item);
+        } else if (event.dropFollowing && item.date.isAfter(ref.date)) {
+          // Остановленная серия: вхождения после даты отмены исчезают.
+          continue;
+        } else if (_isSameOccurrence(item, ref)) {
+          next.add(item.copyWith(cancelled: CopyWithWrapper.value(event.cancelled)));
+        } else {
+          next.add(item);
+        }
+      }
+
+      updated[day] = next;
+    });
+
+    emit(current.copyWith(scheduleEvents: CopyWithWrapper.value(updated)));
+  }
+
+  Future<void> _onOccurrenceReplaced(
+    ScheduleEvent$OccurrenceReplaced event,
+    Emitter<ScheduleState> emit,
+  ) async {
+    final current = state;
+    if (current is! ScheduleState$Success) {
+      return;
+    }
+
+    final replacement = event.occurrence;
+    final updated = <DateTime, List<ScheduleEventModel>>{};
+
+    current.scheduleEvents.forEach((day, items) {
+      updated[day] = [
+        for (final item in items) _isSameOccurrence(item, replacement.ref) ? replacement : item,
+      ];
+    });
+
+    emit(current.copyWith(scheduleEvents: CopyWithWrapper.value(updated)));
+  }
+
+  Future<void> _onRefreshRequested(
+    ScheduleEvent$RefreshRequested event,
+    Emitter<ScheduleState> emit,
+  ) async {
+    final last = _lastFetch;
+    if (last == null) {
+      event.completer?.complete();
+
+      return;
+    }
+
+    await _onFetchRequested(
+      ScheduleEvent$FetchRequested(
+        startDate: last.startDate,
+        endDate: last.endDate,
+        petId: last.petId,
+        silent: true,
+        completer: event.completer,
+      ),
+      emit,
+    );
+  }
+
+  bool _isSameOccurrence(ScheduleEventModel item, EventOccurrenceRef ref) =>
+      item.id == ref.eventId && item.date.isSameDate(ref.date) && item.time == ref.time;
 }
