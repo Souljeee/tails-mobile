@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/constant/localization/translations/app_localizations.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_calendar/ui_calendar.dart';
@@ -563,7 +564,14 @@ class _CreateScheduleEventBottomSheetState extends State<CreateScheduleEventBott
       if (mounted && request == _editStatsRequest) {
         _editStats.value = stats;
       }
-    } catch (_) {
+    } catch (e, s) {
+      TailsLogger.warning(
+        'Не удалось загрузить сводку серии для редактирования',
+        source: 'CreateScheduleEventBottomSheet',
+        error: e,
+        stackTrace: s,
+      );
+
       if (mounted && request == _editStatsRequest) {
         _editStatsFailed.value = true;
       }

@@ -1,9 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tails_mobile/src/core/logging/tails_log_event.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/utils/persisted_entry.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/domain/schedule_hint_store.dart';
 import 'package:tails_mobile/src/feature/schedule/pets_schedule/presentation/widgets/two_zones_hint.dart';
 
+import '../../../../helpers/recording_log_sink.dart';
 import '../../../../helpers/ui_test_app.dart';
 
 class _MemoryEntry extends PersistedEntry<bool> {
@@ -76,5 +79,19 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  test('сбой хранилища пишется в журнал предупреждением', () async {
+    final sink = RecordingLogSink();
+    TailsLogger.configure(sinks: [sink]);
+    addTearDown(TailsLogger.reset);
+
+    final store = ScheduleHintStore(entry: _MemoryEntry(fails: true));
+
+    expect(await store.isSeen(), isTrue);
+    await store.markSeen();
+
+    expect(sink.events.map((event) => event.level), [TailsLogLevel.warning, TailsLogLevel.warning]);
+    expect(sink.events.every((event) => event.error != null), isTrue);
   });
 }

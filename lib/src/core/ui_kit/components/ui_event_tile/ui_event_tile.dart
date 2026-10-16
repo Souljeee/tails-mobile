@@ -84,7 +84,16 @@ class UiEventTile extends StatelessWidget {
       children: [
         Opacity(opacity: isCancelled ? 0.5 : 1, child: leading),
         const SizedBox(width: UiSpacing.x3),
-        Expanded(child: _texts(context, muted: muted)),
+        Expanded(
+          child: _TileTexts(
+            title: title,
+            subtitle: subtitle,
+            typeIcon: typeIcon,
+            isRecurring: isRecurring,
+            isDone: isDone,
+            muted: muted,
+          ),
+        ),
       ],
     );
 
@@ -123,7 +132,7 @@ class UiEventTile extends StatelessWidget {
                     child: Semantics(button: onTap != null, label: detailsLabel, child: body),
                   ),
                   if (isCancelled)
-                    _cancelledMark(context)
+                    _CancelledMark(label: cancelledLabel)
                   else ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: UiSpacing.x3),
@@ -149,22 +158,50 @@ class UiEventTile extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _cancelledMark(BuildContext context) {
-    final label = cancelledLabel;
-    if (label == null) {
+/// Метка справа у отменённого вхождения; без текста остаётся только отступ.
+class _CancelledMark extends StatelessWidget {
+  const _CancelledMark({required this.label});
+
+  final String? label;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = label;
+    if (text == null) {
       return const SizedBox(width: UiSpacing.x3);
     }
 
     return Padding(
       padding: const EdgeInsets.only(right: UiSpacing.x3),
       child: Center(
-        child: Text(label, style: context.uiFonts.footnote.copyWith(color: context.uiPalette.ink3)),
+        child: Text(text, style: context.uiFonts.footnote.copyWith(color: context.uiPalette.ink3)),
       ),
     );
   }
+}
 
-  Widget _texts(BuildContext context, {required bool muted}) {
+/// Название, тип и подпись карточки.
+class _TileTexts extends StatelessWidget {
+  const _TileTexts({
+    required this.title,
+    required this.subtitle,
+    required this.typeIcon,
+    required this.isRecurring,
+    required this.isDone,
+    required this.muted,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData? typeIcon;
+  final bool isRecurring;
+  final bool isDone;
+  final bool muted;
+
+  @override
+  Widget build(BuildContext context) {
     final palette = context.uiPalette;
     final fonts = context.uiFonts;
 
@@ -175,7 +212,7 @@ class UiEventTile extends StatelessWidget {
           duration: UiMotion.base,
           style: fonts.bodyBold.copyWith(
             color: muted ? palette.ink3 : palette.ink,
-            decoration: status.isDone ? TextDecoration.lineThrough : null,
+            decoration: isDone ? TextDecoration.lineThrough : null,
           ),
           child: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
         ),

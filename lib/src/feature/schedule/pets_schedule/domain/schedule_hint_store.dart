@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tails_mobile/src/core/logging/tails_logger.dart';
 import 'package:tails_mobile/src/core/utils/persisted_entry.dart';
 
 /// Запоминает, что пользователь уже видел подсказку о двух зонах на карточке события.
@@ -19,7 +20,14 @@ class ScheduleHintStore {
   Future<bool> isSeen() async {
     try {
       return await _entry.read() ?? false;
-    } catch (_) {
+    } catch (e, s) {
+      TailsLogger.warning(
+        'Не удалось прочитать флаг подсказки',
+        source: 'ScheduleHintStore',
+        error: e,
+        stackTrace: s,
+      );
+
       return true;
     }
   }
@@ -27,8 +35,14 @@ class ScheduleHintStore {
   Future<void> markSeen() async {
     try {
       await _entry.set(true);
-    } catch (_) {
+    } catch (e, s) {
       // Не удалось сохранить: подсказка просто покажется ещё раз.
+      TailsLogger.warning(
+        'Не удалось сохранить флаг подсказки',
+        source: 'ScheduleHintStore',
+        error: e,
+        stackTrace: s,
+      );
     }
   }
 }
