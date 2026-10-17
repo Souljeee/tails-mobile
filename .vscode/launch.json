@@ -23,6 +23,15 @@
       ],
     },
     {
+      "name": "prod",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=env/.prod.env"
+      ],
+    },
+    {
       "name": "profile",
       "request": "launch",
       "type": "dart",
