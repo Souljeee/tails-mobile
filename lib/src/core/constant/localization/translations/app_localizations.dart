@@ -101,14 +101,20 @@ abstract class AppLocalizations {
   /// No description provided for @enterCodeTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Ввод кода\nподтверждения'**
+  /// **'Введите последние\n4 цифры номера'**
   String get enterCodeTitle;
 
   /// No description provided for @enterCodeSubtitle.
   ///
   /// In ru, this message translates to:
-  /// **'Вам позвонит робот на номер'**
+  /// **'Сейчас поступит звонок на номер'**
   String get enterCodeSubtitle;
+
+  /// No description provided for @enterCodeHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отвечать на него не нужно. Введите последние 4 цифры номера, с которого вам позвонили.'**
+  String get enterCodeHint;
 
   /// No description provided for @callAgain.
   ///
@@ -365,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @authPhoneSubtitle.
   ///
   /// In ru, this message translates to:
-  /// **'Мы отправим вам безопасный код подтверждения'**
+  /// **'Мы позвоним вам, а кодом станут последние 4 цифры номера, с которого поступит звонок'**
   String get authPhoneSubtitle;
 
   /// No description provided for @authPhoneLabel.
@@ -2705,7 +2711,7 @@ abstract class AppLocalizations {
   /// No description provided for @eventDetailsCancelAction.
   ///
   /// In ru, this message translates to:
-  /// **'Отменить событие…'**
+  /// **'Отменить событие'**
   String get eventDetailsCancelAction;
 
   /// No description provided for @eventDetailsRestore.
@@ -3247,6 +3253,42 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Уведомления не будет для всех следующих повторений. Прошедшие не изменятся.'**
   String get reminderScopeFutureHintNone;
+
+  /// No description provided for @permissionCameraDeniedTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступа к камере'**
+  String get permissionCameraDeniedTitle;
+
+  /// No description provided for @permissionCameraDeniedText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чтобы сделать фото, разрешите Хвостикам доступ к камере в настройках телефона.'**
+  String get permissionCameraDeniedText;
+
+  /// No description provided for @permissionPhotosDeniedTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступа к фото'**
+  String get permissionPhotosDeniedTitle;
+
+  /// No description provided for @permissionPhotosDeniedText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чтобы выбрать фото, разрешите Хвостикам доступ к фото в настройках телефона.'**
+  String get permissionPhotosDeniedText;
+
+  /// No description provided for @permissionOpenSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть настройки'**
+  String get permissionOpenSettings;
+
+  /// No description provided for @permissionNotNow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не сейчас'**
+  String get permissionNotNow;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -12,10 +12,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appTitle => 'Хвостики';
 
   @override
-  String get enterCodeTitle => 'Ввод кода\nподтверждения';
+  String get enterCodeTitle => 'Введите последние\n4 цифры номера';
 
   @override
-  String get enterCodeSubtitle => 'Вам позвонит робот на номер';
+  String get enterCodeSubtitle => 'Сейчас поступит звонок на номер';
+
+  @override
+  String get enterCodeHint =>
+      'Отвечать на него не нужно. Введите последние 4 цифры номера, с которого вам позвонили.';
 
   @override
   String get callAgain => 'Перезвонить еще раз';
@@ -185,7 +189,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get authPhoneTitle => 'Введите ваш номер телефона';
 
   @override
-  String get authPhoneSubtitle => 'Мы отправим вам безопасный код подтверждения';
+  String get authPhoneSubtitle =>
+      'Мы позвоним вам, а кодом станут последние 4 цифры номера, с которого поступит звонок';
 
   @override
   String get authPhoneLabel => 'Номер телефона';
@@ -1733,7 +1738,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get eventDetailsUnmark => 'Снять отметку';
 
   @override
-  String get eventDetailsCancelAction => 'Отменить событие…';
+  String get eventDetailsCancelAction => 'Отменить событие';
 
   @override
   String get eventDetailsRestore => 'Вернуть в расписание';
@@ -2149,4 +2154,24 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get reminderScopeFutureHintNone =>
       'Уведомления не будет для всех следующих повторений. Прошедшие не изменятся.';
+
+  @override
+  String get permissionCameraDeniedTitle => 'Нет доступа к камере';
+
+  @override
+  String get permissionCameraDeniedText =>
+      'Чтобы сделать фото, разрешите Хвостикам доступ к камере в настройках телефона.';
+
+  @override
+  String get permissionPhotosDeniedTitle => 'Нет доступа к фото';
+
+  @override
+  String get permissionPhotosDeniedText =>
+      'Чтобы выбрать фото, разрешите Хвостикам доступ к фото в настройках телефона.';
+
+  @override
+  String get permissionOpenSettings => 'Открыть настройки';
+
+  @override
+  String get permissionNotNow => 'Не сейчас';
 }

@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:tails_mobile/src/core/permissions/photo_pick_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_photo_picker/ui_photo_picker.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
+import 'package:tails_mobile/src/core/utils/photo_picking.dart';
 
 /// Виджет для загрузки фото питомца
 class PhotoUploadWidget extends StatefulWidget {
@@ -68,19 +69,19 @@ class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      late XFile? pickedFile;
+      final pickedFile = await guardPhotoAccess(source, () async {
+        if (Platform.isAndroid) {
+          final ImagePickerPlatform imagePickerImplementation = ImagePickerPlatform.instance;
 
-      if (Platform.isAndroid) {
-        final ImagePickerPlatform imagePickerImplementation = ImagePickerPlatform.instance;
+          if (imagePickerImplementation is ImagePickerAndroid) {
+            imagePickerImplementation.useAndroidPhotoPicker = true;
+          }
 
-        if (imagePickerImplementation is ImagePickerAndroid) {
-          imagePickerImplementation.useAndroidPhotoPicker = true;
+          return imagePickerImplementation.getImageFromSource(source: source);
         }
 
-        pickedFile = await imagePickerImplementation.getImageFromSource(source: source);
-      } else {
-        pickedFile = await _picker.pickImage(source: source);
-      }
+        return _picker.pickImage(source: source);
+      });
 
       if (pickedFile != null) {
         final file = File(pickedFile.path);
@@ -91,9 +92,9 @@ class _PhotoUploadWidgetState extends State<PhotoUploadWidget> {
 
         widget.onImageSelected(file);
       }
-    } catch (e) {
+    } on Object catch (e, s) {
       if (mounted) {
-        showUiSnackBar(context, message: context.l10n.photoPickError);
+        await showPhotoPickError(context, e, s);
       }
     }
   }

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/constant/localization/translations/app_localizations.dart';
+import 'package:tails_mobile/src/core/permissions/photo_pick_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_chip/ui_chip.dart';
@@ -74,9 +75,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       if (file != null && mounted) {
         setState(() => _screenshot = file);
       }
-    } catch (_) {
+    } on Object catch (e, s) {
       if (mounted) {
-        showUiSnackBar(context, message: context.l10n.photoPickError);
+        await showPhotoPickError(context, e, s);
       }
     }
   }

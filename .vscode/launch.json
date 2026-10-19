@@ -32,6 +32,16 @@
       ],
     },
     {
+      "name": "prod release",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=env/.prod.env"
+      ],
+      "flutterMode": "release"
+    },
+    {
       "name": "profile",
       "request": "launch",
       "type": "dart",

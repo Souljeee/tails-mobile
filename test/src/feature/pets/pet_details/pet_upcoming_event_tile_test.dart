@@ -99,7 +99,7 @@ void main() {
   Future<void> cancelViaSheet(WidgetTester tester) async {
     await tester.tap(find.text('Прививка'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Отменить событие…'));
+    await tester.tap(find.text('Отменить событие'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Отменить событие'));
     await tester.pumpAndSettle();

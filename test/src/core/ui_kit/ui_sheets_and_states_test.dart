@@ -43,7 +43,94 @@ void main() {
     });
   });
 
+  group('showUiBottomSheet: свайп вниз', () {
+    Widget host({required bool enableDrag, bool canPop = true}) => uiTestApp(
+      Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showUiBottomSheet<void>(
+            context: context,
+            enableDrag: enableDrag,
+            builder: (_) => PopScope(
+              canPop: canPop,
+              child: const Column(
+                children: [
+                  UiSheetHeader(title: 'Заголовок', cancelLabel: 'Отмена'),
+                  SizedBox(height: 200, child: Text('Содержимое')),
+                ],
+              ),
+            ),
+          ),
+          child: const Text('Открыть'),
+        ),
+      ),
+    );
+
+    Future<void> open(WidgetTester tester) async {
+      await tester.tap(find.text('Открыть'));
+      await tester.pumpAndSettle();
+    }
+
+    Offset handle(WidgetTester tester) =>
+        tester.getTopLeft(find.byType(UiSheetHeader)) + const Offset(150, -10);
+
+    testWidgets('закрывается, если тянуть ручку', (tester) async {
+      await tester.pumpWidget(host(enableDrag: true));
+      await open(tester);
+
+      await tester.dragFrom(handle(tester), const Offset(0, 300));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Содержимое'), findsNothing);
+    });
+
+    testWidgets('без enableDrag тоже закрывается за ручку', (tester) async {
+      await tester.pumpWidget(host(enableDrag: false));
+      await open(tester);
+
+      await tester.dragFrom(handle(tester), const Offset(0, 300));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Содержимое'), findsNothing);
+    });
+
+    testWidgets('без enableDrag свайп по содержимому не закрывает', (tester) async {
+      await tester.pumpWidget(host(enableDrag: false));
+      await open(tester);
+
+      await tester.dragFrom(tester.getCenter(find.text('Содержимое')), const Offset(0, 300));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Содержимое'), findsOneWidget);
+    });
+
+    testWidgets('защита от закрытия (PopScope) не обходится свайпом за ручку', (tester) async {
+      await tester.pumpWidget(host(enableDrag: false, canPop: false));
+      await open(tester);
+
+      await tester.dragFrom(handle(tester), const Offset(0, 300));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Содержимое'), findsOneWidget);
+    });
+  });
+
   group('UiSheetHeader', () {
+    testWidgets('«Отмена» стоит у левого края, а не рядом с заголовком', (tester) async {
+      await tester.pumpWidget(
+        uiTestApp(
+          const Column(
+            children: [UiSheetHeader(title: 'Новый питомец', cancelLabel: 'Отмена')],
+          ),
+        ),
+      );
+
+      final cancel = tester.getRect(find.text('Отмена'));
+      final title = tester.getRect(find.text('Новый питомец'));
+
+      expect(cancel.left, lessThan(24));
+      expect(title.left - cancel.right, greaterThan(40));
+    });
+
     testWidgets('длинный заголовок при крупном шрифте не переполняет шапку', (tester) async {
       await tester.pumpWidget(
         MediaQuery(

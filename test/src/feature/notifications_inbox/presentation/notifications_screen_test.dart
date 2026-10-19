@@ -230,6 +230,25 @@ void main() {
         await close(tester);
       });
     });
+
+    testWidgets('«Всё прочитано»: иконка и подписи одним блоком по центру', (tester) async {
+      await inClock(() async {
+        inbox.items = [fakeInboxItem('n1', isRead: true, createdAt: _now)];
+
+        await open(tester);
+        await tester.tap(find.text('Непрочитанные'));
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+
+        final icon = tester.getRect(find.byIcon(Icons.check));
+        final title = tester.getRect(find.text('Всё прочитано'));
+
+        // Иконка стоит прямо над заголовком, а не на отдельном «этаже» экрана.
+        expect(title.top - icon.bottom, lessThan(80));
+
+        await close(tester);
+      });
+    });
   });
 
   group('пустые состояния и ошибки', () {

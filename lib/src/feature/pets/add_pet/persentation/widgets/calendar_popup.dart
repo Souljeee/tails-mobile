@@ -39,6 +39,7 @@ class _CalendarPopupState extends State<CalendarPopup> {
         const SizedBox(height: UiSpacing.x2),
         MonthCalendar(
           initialMonth: widget.initialDate?.monthStart,
+          fixedWeekRows: true,
           onDateTap: (date) {
             setState(() {
               _seletedDate = date;

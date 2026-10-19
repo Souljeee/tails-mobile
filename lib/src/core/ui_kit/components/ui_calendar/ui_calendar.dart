@@ -131,6 +131,10 @@ class MonthCalendar extends StatefulWidget {
   final OnMonthChangeCallback? onChangeMonth;
   final CalendarHeaderBuilder? headerBuilder;
 
+  /// Всегда показывать шесть строк недель: высота календаря не меняется при листании месяцев,
+  /// и кнопки перелистывания остаются на месте. Лишние строки пустые.
+  final bool fixedWeekRows;
+
   const MonthCalendar({
     this.initialMonth,
     this.controller,
@@ -141,6 +145,7 @@ class MonthCalendar extends StatefulWidget {
     this.badgeWidget,
     this.onChangeMonth,
     this.headerBuilder,
+    this.fixedWeekRows = false,
     super.key,
   });
 
@@ -242,6 +247,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
               selectedMonth: selectedMonth,
               onDateTap: widget.onDateTap,
               badgeWidget: widget.badgeWidget,
+              fixedWeekRows: widget.fixedWeekRows,
             ),
           ],
         ),
@@ -338,8 +344,14 @@ class _CalendarBody extends StatefulWidget {
   final DateTime selectedMonth;
   final OnDateTapCallback? onDateTap;
   final Widget? badgeWidget;
+  final bool fixedWeekRows;
 
-  const _CalendarBody({required this.selectedMonth, required this.onDateTap, this.badgeWidget});
+  const _CalendarBody({
+    required this.selectedMonth,
+    required this.onDateTap,
+    required this.fixedWeekRows,
+    this.badgeWidget,
+  });
 
   @override
   State<_CalendarBody> createState() => _CalendarBodyState();
@@ -364,6 +376,7 @@ class _CalendarBodyState extends State<_CalendarBody> {
     final data = _CalendarMonthData(
       year: widget.selectedMonth.year,
       month: widget.selectedMonth.month,
+      fixedWeekRows: widget.fixedWeekRows,
     );
 
     return DecoratedBox(
@@ -550,14 +563,19 @@ class _DateMarkers extends StatelessWidget {
 class _CalendarMonthData {
   final int year;
   final int month;
+  final bool fixedWeekRows;
 
-  const _CalendarMonthData({required this.year, required this.month});
+  const _CalendarMonthData({required this.year, required this.month, required this.fixedWeekRows});
 
   static const _daysInWeekCount = 7;
 
+  /// Больше шести недель месяц не занимает.
+  static const _maxWeeksCount = 6;
+
   int get _daysInMonth => DateUtils.getDaysInMonth(year, month);
 
-  int get _weeksCount => ((_daysInMonth + _firstDayOffset) / _daysInWeekCount).ceil();
+  int get _weeksCount =>
+      fixedWeekRows ? _maxWeeksCount : ((_daysInMonth + _firstDayOffset) / _daysInWeekCount).ceil();
 
   int get _firstDayOffset => DateTime(year, month).weekday - 1;
 
