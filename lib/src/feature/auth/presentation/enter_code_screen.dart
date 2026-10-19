@@ -96,6 +96,12 @@ class EnterCodeScreen extends StatelessWidget {
                                       style: fonts.monoDigits.copyWith(color: palette.ink),
                                       textAlign: TextAlign.center,
                                     ),
+                                    const SizedBox(height: UiSpacing.x3),
+                                    Text(
+                                      context.l10n.enterCodeHint,
+                                      style: fonts.body.copyWith(color: palette.ink2),
+                                      textAlign: TextAlign.center,
+                                    ),
                                     const SizedBox(height: UiSpacing.x6),
                                     UiCodeInput(
                                       onCompleted: (code) {

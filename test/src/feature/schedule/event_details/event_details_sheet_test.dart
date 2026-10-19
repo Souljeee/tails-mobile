@@ -83,7 +83,7 @@ void main() {
     expect(find.text('Не повторяется'), findsOneWidget);
     expect(find.text('Мистерио', findRichText: true), findsNothing);
     expect(find.textContaining('Мистерио'), findsOneWidget);
-    expect(find.text('Отменить событие…'), findsOneWidget);
+    expect(find.text('Отменить событие'), findsOneWidget);
     expect(find.text('Снять отметку'), findsNothing);
     expect(find.text('Изменить'), findsOneWidget);
   });
@@ -101,7 +101,7 @@ void main() {
     await pump(tester, _event(done: true, doneAt: DateTime(2026, 10, 20, 9, 12)));
 
     expect(find.text('Выполнено в 09:12'), findsOneWidget);
-    expect(find.text('Отменить событие…'), findsNothing);
+    expect(find.text('Отменить событие'), findsNothing);
 
     await tester.tap(find.text('Снять отметку'));
     await tester.pumpAndSettle();
@@ -124,13 +124,13 @@ void main() {
     await pump(tester, _event(cancelled: true, recurring: true));
 
     expect(find.text('Вернуть в расписание'), findsNothing);
-    expect(find.text('Отменить событие…'), findsNothing);
+    expect(find.text('Отменить событие'), findsNothing);
   });
 
   testWidgets('одиночное событие: отмена в два шага', (tester) async {
     await pump(tester, _event());
 
-    await tester.tap(find.text('Отменить событие…'));
+    await tester.tap(find.text('Отменить событие'));
     await tester.pumpAndSettle();
 
     expect(find.text('Отменить событие?'), findsOneWidget);
@@ -145,7 +145,7 @@ void main() {
   testWidgets('кнопка «Назад» возвращает к деталям', (tester) async {
     await pump(tester, _event());
 
-    await tester.tap(find.text('Отменить событие…'));
+    await tester.tap(find.text('Отменить событие'));
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.chevron_left_rounded));
     await tester.pumpAndSettle();
@@ -157,7 +157,7 @@ void main() {
   testWidgets('серия: выбор области, число событий на кнопке', (tester) async {
     await pump(tester, _event(recurring: true));
 
-    await tester.tap(find.text('Отменить событие…'));
+    await tester.tap(find.text('Отменить событие'));
     await tester.pumpAndSettle();
 
     expect(find.text('Только 20 октября'), findsOneWidget);
@@ -183,7 +183,7 @@ void main() {
       loadStats: () async => _stats(remaining: null, openEnded: true),
     );
 
-    await tester.tap(find.text('Отменить событие…'));
+    await tester.tap(find.text('Отменить событие'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('20 октября и все следующие'));
     await tester.pumpAndSettle();
@@ -199,7 +199,7 @@ void main() {
       loadStats: () async => _stats(remaining: 1, past: 5),
     );
 
-    await tester.tap(find.text('Отменить событие…'));
+    await tester.tap(find.text('Отменить событие'));
     await tester.pumpAndSettle();
 
     expect(find.text('Только 20 октября'), findsNothing);
@@ -227,7 +227,7 @@ void main() {
       },
     );
 
-    await tester.tap(find.text('Отменить событие…'));
+    await tester.tap(find.text('Отменить событие'));
     await tester.pumpAndSettle();
 
     expect(find.text('Не удалось узнать, сколько событий в серии'), findsOneWidget);
@@ -243,7 +243,7 @@ void main() {
     final completer = Completer<SeriesStats>();
 
     await pump(tester, _event(recurring: true), loadStats: () => completer.future);
-    await tester.tap(find.text('Отменить событие…'));
+    await tester.tap(find.text('Отменить событие'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 

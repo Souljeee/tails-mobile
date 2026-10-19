@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
 import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
+import 'package:tails_mobile/src/core/permissions/photo_pick_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_bottom_sheet/ui_bottom_sheet.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_button/ui_button.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_discard_guard/ui_discard_guard.dart';
@@ -117,9 +118,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _removeAvatar = false;
         });
       }
-    } catch (_) {
+    } on Object catch (e, s) {
       if (mounted) {
-        showUiSnackBar(context, message: context.l10n.photoPickError);
+        await showPhotoPickError(context, e, s);
       }
     }
   }

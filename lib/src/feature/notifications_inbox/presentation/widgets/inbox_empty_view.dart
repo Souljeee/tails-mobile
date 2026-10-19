@@ -53,14 +53,14 @@ class InboxAllReadView extends StatelessWidget {
     return AnalyticsImpression(
       onShown: _logShown,
       child: UiEmptyState(
-        illustration: Center(
-          child: UiIconBadge(
-            icon: Icons.check,
-            size: _tileSize,
-            iconSize: _tileIconSize,
-            foregroundColor: palette.pine,
-            backgroundColor: palette.pineTint,
-          ),
+        // Без обёртки Center: иначе плитка растягивается до предельного размера иллюстрации,
+        // и иконка отрывается от подписей.
+        illustration: UiIconBadge(
+          icon: Icons.check,
+          size: _tileSize,
+          iconSize: _tileIconSize,
+          foregroundColor: palette.pine,
+          backgroundColor: palette.pineTint,
         ),
         title: l10n.inboxAllReadTitle,
         message: l10n.inboxAllReadMessage,

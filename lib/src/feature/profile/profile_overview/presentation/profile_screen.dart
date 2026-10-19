@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
 import 'package:tails_mobile/src/core/navigation/shell_actions.dart';
+import 'package:tails_mobile/src/core/permissions/photo_pick_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_card/ui_card.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_errors/ui_fetching_error.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_grouped_list/ui_grouped_list.dart';
@@ -199,9 +200,9 @@ class _ProfileContent extends StatelessWidget {
       if (file != null) {
         onAvatarSelected(file);
       }
-    } catch (_) {
+    } on Object catch (e, s) {
       if (context.mounted) {
-        showUiSnackBar(context, message: context.l10n.photoPickError);
+        await showPhotoPickError(context, e, s);
       }
     }
   }

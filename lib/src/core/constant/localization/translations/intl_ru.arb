@@ -1,8 +1,9 @@
 {
   "@@locale": "ru",
   "appTitle": "Хвостики",
-  "enterCodeTitle": "Ввод кода\nподтверждения",
-  "enterCodeSubtitle": "Вам позвонит робот на номер",
+  "enterCodeTitle": "Введите последние\n4 цифры номера",
+  "enterCodeSubtitle": "Сейчас поступит звонок на номер",
+  "enterCodeHint": "Отвечать на него не нужно. Введите последние 4 цифры номера, с которого вам позвонили.",
   "callAgain": "Перезвонить еще раз",
   "tryLater": "Произошла ошибка. Попробуйте позже.",
   "petAgeYears": "{years, plural, one{{years} год} few{{years} года} many{{years} лет} other{{years} лет}}",
@@ -76,7 +77,7 @@
   "authSlide3Title": "Ничего не забыть",
   "authSlide3Subtitle": "Создавайте напоминания о важных делах для питомца за пару секунд.",
   "authPhoneTitle": "Введите ваш номер телефона",
-  "authPhoneSubtitle": "Мы отправим вам безопасный код подтверждения",
+  "authPhoneSubtitle": "Мы позвоним вам, а кодом станут последние 4 цифры номера, с которого поступит звонок",
   "authPhoneLabel": "Номер телефона",
   "authGetCode": "Получить код",
   "authConsentPrefix": "Нажимая «Получить код», вы соглашаетесь с нашими ",
@@ -882,7 +883,7 @@
   "eventDetailsRepeatLabel": "Повторение",
   "eventDetailsNoRepeat": "Не повторяется",
   "eventDetailsUnmark": "Снять отметку",
-  "eventDetailsCancelAction": "Отменить событие…",
+  "eventDetailsCancelAction": "Отменить событие",
   "eventDetailsRestore": "Вернуть в расписание",
   "eventDetailsDateWithWeekday": "{weekday}, {date}",
   "@eventDetailsDateWithWeekday": {"placeholders": {"weekday": {"type": "String"}, "date": {"type": "String"}}},
@@ -1004,5 +1005,11 @@
   "@reminderScopeOneHintNone": {"placeholders": {"old": {"type": "String"}}},
   "reminderScopeFutureHint": "Напоминание {value} для всех следующих повторений. Прошедшие не изменятся.",
   "@reminderScopeFutureHint": {"placeholders": {"value": {"type": "String"}}},
-  "reminderScopeFutureHintNone": "Уведомления не будет для всех следующих повторений. Прошедшие не изменятся."
+  "reminderScopeFutureHintNone": "Уведомления не будет для всех следующих повторений. Прошедшие не изменятся.",
+  "permissionCameraDeniedTitle": "Нет доступа к камере",
+  "permissionCameraDeniedText": "Чтобы сделать фото, разрешите Хвостикам доступ к камере в настройках телефона.",
+  "permissionPhotosDeniedTitle": "Нет доступа к фото",
+  "permissionPhotosDeniedText": "Чтобы выбрать фото, разрешите Хвостикам доступ к фото в настройках телефона.",
+  "permissionOpenSettings": "Открыть настройки",
+  "permissionNotNow": "Не сейчас"
 }
