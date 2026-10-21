@@ -1,49 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:tails_mobile/src/core/analytics/tails_analytics.dart';
-import 'package:tails_mobile/src/core/analytics/tails_analytics_events.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_grouped_list/ui_grouped_list.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_nav_row/ui_nav_row.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_section_header/ui_section_header.dart';
-import 'package:tails_mobile/src/core/ui_kit/components/ui_snack_bar/ui_snack_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/components/ui_top_bar/ui_top_bar.dart';
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_radius.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_shadows.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
+import 'package:tails_mobile/src/core/utils/legal_document_opener.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// «О приложении»: версия и ссылки на юридические документы.
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
-
-  /// Открывает документ во встроенном браузере (Safari View Controller / Custom Tabs). Пока ссылка не задана — сообщает, что документа нет.
-  Future<void> _openDocument(BuildContext context, String url, {required String document}) async {
-    final l10n = context.l10n;
-
-    if (url.isEmpty) {
-      showUiSnackBar(context, message: l10n.aboutDocumentSoon, kind: UiSnackBarKind.info);
-
-      return;
-    }
-
-    TailsAnalytics.log(TailsAnalyticsEvents.legalLinkOpened(document));
-
-    var opened = false;
-
-    try {
-      final uri = Uri.tryParse(url);
-
-      opened = uri != null && await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
-    } catch (_) {
-      opened = false;
-    }
-
-    if (!opened && context.mounted) {
-      showUiSnackBar(context, message: l10n.aboutDocumentOpenError);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,13 +70,29 @@ class AboutScreen extends StatelessWidget {
                         UiNavRow(
                           icon: Icons.description_outlined,
                           title: l10n.aboutTerms,
-                          onTap: () => _openDocument(context, config.termsUrl, document: 'terms'),
+                          onTap: () => openLegalDocument(
+                            context,
+                            url: config.termsUrl,
+                            document: LegalDocument.terms,
+                          ),
                         ),
                         UiNavRow(
                           icon: Icons.verified_user_outlined,
                           title: l10n.aboutPrivacy,
-                          onTap: () =>
-                              _openDocument(context, config.privacyUrl, document: 'privacy'),
+                          onTap: () => openLegalDocument(
+                            context,
+                            url: config.privacyUrl,
+                            document: LegalDocument.privacy,
+                          ),
+                        ),
+                        UiNavRow(
+                          icon: Icons.fact_check_outlined,
+                          title: l10n.aboutConsent,
+                          onTap: () => openLegalDocument(
+                            context,
+                            url: config.consentUrl,
+                            document: LegalDocument.consent,
+                          ),
                         ),
                       ],
                     ),

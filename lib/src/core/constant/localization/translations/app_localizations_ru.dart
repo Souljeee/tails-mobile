@@ -1381,6 +1381,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutPrivacy => 'Политика конфиденциальности';
 
   @override
+  String get aboutConsent => 'Согласие на обработку персональных данных';
+
+  @override
   String aboutCopyright(int year) {
     return '© $year Хвостики';
   }
