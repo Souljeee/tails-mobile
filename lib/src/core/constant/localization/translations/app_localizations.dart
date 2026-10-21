@@ -2078,6 +2078,12 @@ abstract class AppLocalizations {
   /// **'Политика конфиденциальности'**
   String get aboutPrivacy;
 
+  /// No description provided for @aboutConsent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Согласие на обработку персональных данных'**
+  String get aboutConsent;
+
   /// No description provided for @aboutCopyright.
   ///
   /// In ru, this message translates to:

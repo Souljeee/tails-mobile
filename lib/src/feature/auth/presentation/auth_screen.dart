@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tails_mobile/src/core/navigation/routes.dart';
@@ -10,6 +11,7 @@ import 'package:tails_mobile/src/core/ui_kit/components/ui_textfield/ui_textfiel
 import 'package:tails_mobile/src/core/ui_kit/theme/theme_x.dart';
 import 'package:tails_mobile/src/core/ui_kit/tokens/ui_spacing.dart';
 import 'package:tails_mobile/src/core/utils/extensions/l10n_extension.dart';
+import 'package:tails_mobile/src/core/utils/legal_document_opener.dart';
 import 'package:tails_mobile/src/feature/auth/domain/code_timer/code_timer_bloc.dart';
 import 'package:tails_mobile/src/feature/auth/domain/send_code/send_code_bloc.dart';
 import 'package:tails_mobile/src/feature/initialization/widget/dependencies_scope.dart';
@@ -225,8 +227,35 @@ class _LoginFormState extends State<_LoginForm> {
   }
 }
 
-class _PrivacyTerms extends StatelessWidget {
+class _PrivacyTerms extends StatefulWidget {
   const _PrivacyTerms();
+
+  @override
+  State<_PrivacyTerms> createState() => _PrivacyTermsState();
+}
+
+class _PrivacyTermsState extends State<_PrivacyTerms> {
+  late final TapGestureRecognizer _termsTap = TapGestureRecognizer()
+    ..onTap = () => openLegalDocument(
+      context,
+      url: DependenciesScope.of(context).config.termsUrl,
+      document: LegalDocument.terms,
+    );
+
+  late final TapGestureRecognizer _privacyTap = TapGestureRecognizer()
+    ..onTap = () => openLegalDocument(
+      context,
+      url: DependenciesScope.of(context).config.privacyUrl,
+      document: LegalDocument.privacy,
+    );
+
+  @override
+  void dispose() {
+    _termsTap.dispose();
+    _privacyTap.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -240,9 +269,9 @@ class _PrivacyTerms extends StatelessWidget {
         style: base,
         children: [
           TextSpan(text: l10n.authConsentPrefix),
-          TextSpan(text: l10n.authTerms, style: link),
+          TextSpan(text: l10n.authTerms, style: link, recognizer: _termsTap),
           TextSpan(text: l10n.authConsentAnd),
-          TextSpan(text: l10n.authPrivacy, style: link),
+          TextSpan(text: l10n.authPrivacy, style: link, recognizer: _privacyTap),
         ],
       ),
     );

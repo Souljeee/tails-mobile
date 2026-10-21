@@ -737,6 +737,7 @@
   "aboutDocumentsSection": "Документы",
   "aboutTerms": "Условия использования",
   "aboutPrivacy": "Политика конфиденциальности",
+  "aboutConsent": "Согласие на обработку персональных данных",
   "aboutCopyright": "© {year} Хвостики",
   "@aboutCopyright": {
     "placeholders": {

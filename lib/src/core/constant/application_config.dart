@@ -35,6 +35,9 @@ class ApplicationConfig {
 
   /// Ссылка на политику конфиденциальности. Пусто, пока документ не опубликован.
   String get privacyUrl => const String.fromEnvironment('PRIVACY_URL').trim();
+
+  /// Ссылка на согласие на обработку персональных данных. Пусто, пока документ не опубликован.
+  String get consentUrl => const String.fromEnvironment('CONSENT_URL').trim();
 }
 
 /// {@template testing_dependencies_container}

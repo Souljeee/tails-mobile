@@ -154,7 +154,7 @@ AppMetrica настроена без отправки сбоев (`crashReportin
 | `profile_photo_action` | `action` (`add` / `change` / `remove`) | `EditProfileBloc` |
 | `feedback_sent` | `category` | `FeedbackBloc` |
 | `feedback_failed` | `reason` | `FeedbackBloc` |
-| `legal_link_opened` | `document` (`terms` / `privacy`) | `AboutScreen` |
+| `legal_link_opened` | `document` (`terms` / `privacy` / `consent`) | `AboutScreen`, экран входа |
 | `app_setting_changed` | `setting`, `value` | `ProfileThemeRow` |
 | `error_state_shown`, `error_retry_tapped` | `screen_name` (+ `reason`) | `UiFetchingError` |
 | `empty_state_shown` | `screen_name` | пустые состояния питомцев и центра уведомлений |

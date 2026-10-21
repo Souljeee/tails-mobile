@@ -374,7 +374,7 @@ abstract final class TailsAnalyticsEvents {
   static TailsAnalyticsEvent feedbackFailed(AnalyticsReason reason) =>
       TailsAnalyticsEvent('feedback_failed', parameters: {'reason': reason.value});
 
-  /// Открыта юридическая ссылка: `terms`, `privacy`.
+  /// Открыта юридическая ссылка: `terms`, `privacy`, `consent`.
   static TailsAnalyticsEvent legalLinkOpened(String document) =>
       TailsAnalyticsEvent('legal_link_opened', parameters: {'document': document});
 

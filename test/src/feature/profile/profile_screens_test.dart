@@ -290,6 +290,11 @@ void main() {
 
       expect(find.text('Документ скоро появится'), findsOneWidget);
 
+      await tester.tap(find.text('Согласие на обработку персональных данных'));
+      await tester.pump();
+
+      expect(find.text('Документ скоро появится'), findsOneWidget);
+
       await harness.dispose(tester);
     });
   });
